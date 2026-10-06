@@ -111,6 +111,7 @@ def _ydl_base() -> dict:
     return {
         "quiet": True,
         "no_warnings": True,
+        "noprogress": True,
         "noplaylist": True,
         "ffmpeg_location": ffmpeg_bin(),
         "retries": 5,

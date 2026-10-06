@@ -34,7 +34,18 @@ Puntúa cada medio segundo del directo con varias pistas y monta un clip alreded
 - Con enlaces **no descarga el vídeo entero**: baja solo el audio para analizar (rápido incluso en
   directos de 6 horas) y luego solo los trozos de los clips.
 
-## Instalación (una sola vez)
+## 📱 Sin instalar nada (móvil o PC): Google Colab
+
+1. Descarga `AutoClips_Colab.ipynb`.
+2. Entra en <https://colab.research.google.com> con tu cuenta de Google →
+   **Archivo → Subir cuaderno** (en el móvil: menú ☰ → *Subir*) y elige ese archivo.
+3. Pulsa **▶** en el paso 1, espera a que salga ✅, pulsa **▶** en el paso 2 y toca **Abrir AutoClips**.
+
+Funciona en los ordenadores de Google, gratis, desde Android, iPhone o PC. Tienes que dejar la pestaña
+abierta mientras trabaja. YouTube a veces bloquea las descargas desde Colab; Twitch suele ir bien.
+Si cambias el código, vuelve a crear el cuaderno con `python herramientas/generar_colab.py`.
+
+## Instalación en tu PC (una sola vez)
 
 1. Instala **Python 3.10 o superior**: <https://www.python.org/downloads/>
    (en Windows marca la casilla **"Add Python to PATH"**).

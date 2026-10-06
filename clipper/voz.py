@@ -29,7 +29,16 @@ def _cargar():
     if _modelo is None:
         from faster_whisper import WhisperModel
 
-        _modelo = WhisperModel(MODELO, device="cpu", compute_type="int8")
+        try:  # con tarjeta gráfica (p. ej. Google Colab) va mucho más rápido
+            import ctranslate2
+
+            if ctranslate2.get_cuda_device_count() > 0:
+                _modelo = WhisperModel(os.environ.get("AUTOCLIPS_MODELO", "small"),
+                                       device="cuda", compute_type="float16")
+        except Exception:
+            _modelo = None
+        if _modelo is None:
+            _modelo = WhisperModel(MODELO, device="cpu", compute_type="int8")
     return _modelo
 
 
