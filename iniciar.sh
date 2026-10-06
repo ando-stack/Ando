@@ -10,4 +10,5 @@ source .venv/bin/activate
 python -m pip install -q --upgrade pip
 python -m pip install -q -r requirements.txt
 python -m pip install -q --upgrade "yt-dlp[default]"
+python -m pip install -q -r requirements-ia.txt || echo "(No se pudo instalar la IA de voz: AutoClips funciona igual sin ella)"
 python app.py "$@"

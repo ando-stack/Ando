@@ -51,6 +51,7 @@
   .clip video { width: 100%; display: block; background: #000; max-height: 420px; }
   .clip .info { padding: 12px; }
   .clip .meta { color: var(--suave); font-size: .85rem; }
+  .clip .motivo { font-size: .85rem; margin-top: 6px; }
   .clip .texto { font-size: .85rem; margin: 6px 0; max-height: 4.5em; overflow: hidden; }
   .nota { float: right; font-weight: 700; color: var(--acento2); }
   .avisos { color: #f5c26b; font-size: .9rem; }
@@ -59,12 +60,13 @@
 <body>
 <main>
   <h1>✂️ <span>AutoClips</span></h1>
-  <p class="sub">Pega el enlace de un vídeo o directo, elige cuántos clips quieres y descárgalos listos. 100% gratis y en tu ordenador.</p>
+  <p class="sub">Pega el enlace de un directo (o resubido), elige cuántos clips quieres y te saca los momentos graciosos y épicos listos para TikTok. 100% gratis.</p>
 
   <form id="form" class="panel">
     <label for="url">Enlace del vídeo o del directo</label>
-    <input type="url" id="url" name="url" placeholder="https://www.youtube.com/watch?v=…  ·  twitch.tv/…  ·  kick.com/…">
-    <div class="ayuda">YouTube, Twitch, Kick, TikTok, X/Twitter, Facebook, Instagram y más de 1000 webs.</div>
+    <input type="url" id="url" name="url" placeholder="https://www.twitch.tv/videos/…  ·  youtube.com/watch?v=…  ·  kick.com/…">
+    <div class="ayuda">Directos resubidos de Twitch (twitch.tv/videos/…), YouTube, Kick, TikTok, X… y más de 1000 webs.
+      En Twitch y YouTube también lee el <b>chat</b> para saber dónde se rió o flipó la gente.</div>
     <div class="o">— o —</div>
     <label for="archivo">Sube un vídeo de tu ordenador</label>
     <input type="file" id="archivo" name="archivo" accept="video/*">
@@ -81,14 +83,24 @@
         </div>
       </div>
       <div>
-        <label for="duracion">Duración de cada clip (segundos)</label>
-        <input type="number" id="duracion" name="duracion" min="5" max="600" value="30">
-        <div class="chips" data-para="duracion">
-          <button type="button" class="chip" data-v="15">15 s</button>
-          <button type="button" class="chip activo" data-v="30">30 s</button>
-          <button type="button" class="chip" data-v="60">1 min</button>
-          <button type="button" class="chip" data-v="90">1:30</button>
-        </div>
+        <label for="duracion">Duración de cada clip</label>
+        <select id="duracion" name="duracion">
+          <option value="auto" selected>Automática (15–60 s)</option>
+          <option value="15">15 s</option>
+          <option value="20">20 s</option>
+          <option value="30">30 s</option>
+          <option value="45">45 s</option>
+          <option value="60">1 min</option>
+          <option value="90">1:30</option>
+          <option value="120">2 min</option>
+        </select>
+        <div class="ayuda">En automático cada clip empieza un poco antes del momento y acaba tras la reacción.</div>
+      </div>
+      <div>
+        <label for="estilo">¿Qué momentos buscas?</label>
+        <select id="estilo" name="estilo">
+          {% for clave, nombre in estilos.items() %}<option value="{{ clave }}">{{ nombre }}</option>{% endfor %}
+        </select>
       </div>
       <div>
         <label for="formato">Formato</label>
@@ -105,10 +117,12 @@
         <div class="ayuda">Graba desde ahora y luego saca los clips de esa grabación.</div>
       </div>
       <div>
-        <label class="check"><input type="checkbox" name="subtitulos" {% if not subtitulos %}disabled{% endif %}> Subtítulos automáticos</label>
-        <div class="ayuda">{% if subtitulos %}Transcribe la voz y la pone en el vídeo (tarda algo más).{% else %}Instala <code>faster-whisper</code> para activarlos (ver README).{% endif %}</div>
+        <label class="check"><input type="checkbox" name="ia_voz" {% if ia_voz %}checked{% else %}disabled{% endif %}> Detectar risas con IA de voz</label>
+        <div class="ayuda">{% if ia_voz %}Escucha los mejores candidatos y sube los que tienen risas o reacciones (tarda algo más).{% else %}Instala <code>faster-whisper</code> para activarlo (ver README).{% endif %}</div>
+        <label class="check" style="margin-top:10px"><input type="checkbox" name="subtitulos" {% if not ia_voz %}disabled{% endif %}> Subtítulos automáticos</label>
         <label class="check" style="margin-top:10px"><input type="checkbox" name="escenas" checked> Analizar cortes de cámara</label>
-        <div class="ayuda">Desactívalo para ir más rápido en vídeos muy largos.</div>      </div>
+        <div class="ayuda">Solo con vídeos subidos o directos grabados.</div>
+      </div>
     </div>
 
     <button class="principal" id="enviar" type="submit">🎬 Sacar clips</button>
@@ -123,7 +137,7 @@
   <section id="resultado">
     <div class="cabecera">
       <div>
-        <h2 style="margin:0">Tus clips</h2>
+        <h2 style="margin:0">Tus clips (del mejor al peor)</h2>
         <div class="ayuda" id="senales"></div>
         <div class="avisos" id="avisos"></div>
       </div>
@@ -218,11 +232,13 @@ function mostrar(id, res) {
       <video controls preload="none" playsinline poster="${base + c.miniatura}" src="${base + c.archivo}"></video>
       <div class="info">
         <span class="nota">🔥 ${c.puntuacion}%</span>
-        <strong>Clip ${c.numero}</strong>
+        <strong>#${c.numero}</strong>
         <div class="meta">${hms(c.inicio)} → ${hms(c.fin)} (${Math.round(c.fin - c.inicio)} s)</div>
+        <div class="motivo"></div>
         ${c.texto ? `<div class="texto"></div>` : ""}
         <a class="boton sec" style="margin-top:8px" href="${base + c.archivo}?descargar=1">⬇️ Descargar</a>
       </div>`;
+    el.querySelector(".motivo").textContent = c.motivo || "";
     if (c.texto) el.querySelector(".texto").textContent = "“" + c.texto + "”";
     rejilla.appendChild(el);
   }

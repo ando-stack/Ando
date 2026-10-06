@@ -20,7 +20,7 @@ import webbrowser
 from flask import Flask, abort, jsonify, render_template, request, send_from_directory
 from werkzeug.utils import secure_filename
 
-from clipper import FORMATOS, ClipError, descargar, generar_clips, subtitulos_disponibles
+from clipper import ESTILOS, FORMATOS, ClipError, Opciones, ia_voz_disponible, procesar
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 TRABAJOS = os.path.join(RAIZ, "trabajos")
@@ -40,35 +40,19 @@ def _actualizar(id_: str, **datos) -> None:
         trabajos[id_].update(datos)
 
 
-def _procesar(id_: str, opciones: dict) -> None:
+def _procesar(id_: str, origen: str, opciones: Opciones) -> None:
     carpeta = os.path.join(TRABAJOS, id_)
     _actualizar(id_, estado="en_cola", mensaje="Esperando turno…")
     with turno:
         try:
-            fuente = opciones.get("archivo")
-            info = {"title": opciones["titulo"]} if fuente else None
-            if not fuente:
-                _actualizar(id_, estado="descargando")
-                fuente, info = descargar(
-                    opciones["url"], os.path.join(carpeta, "fuente"),
-                    lambda p, m: _actualizar(id_, progreso=round(p * 0.35, 1), mensaje=m),
-                    minutos_directo=opciones["minutos_directo"],
-                )
-                if info:
-                    _actualizar(id_, titulo=info.get("title"))
-            _actualizar(id_, estado="analizando")
-            resultado = generar_clips(
-                fuente, carpeta,
-                cantidad=opciones["cantidad"],
-                duracion_clip=opciones["duracion"],
-                formato=opciones["formato"],
-                subtitulos=opciones["subtitulos"],
-                analizar_escenas=opciones["escenas"],
-                info=info,
-                progreso=lambda p, m: _actualizar(id_, progreso=round(35 + p * 0.65, 1), mensaje=m),
+            _actualizar(id_, estado="procesando")
+            resultado = procesar(
+                origen, carpeta, opciones,
+                lambda p, m: _actualizar(id_, progreso=round(p, 1), mensaje=m),
             )
-            if not opciones.get("conservar"):
-                shutil.rmtree(os.path.join(carpeta, "fuente"), ignore_errors=True)
+            shutil.rmtree(os.path.join(carpeta, "fuente"), ignore_errors=True)
+            if origen.startswith(carpeta):
+                os.remove(origen)
             _actualizar(id_, estado="listo", progreso=100, mensaje="¡Clips listos!",
                         resultado=resultado.a_dict(), titulo=resultado.titulo)
         except ClipError as exc:
@@ -97,7 +81,7 @@ def _numero(valor, defecto, minimo, maximo, tipo=float):
 
 @app.get("/")
 def inicio():
-    return render_template("index.html", formatos=FORMATOS, subtitulos=subtitulos_disponibles())
+    return render_template("index.html", formatos=FORMATOS, estilos=ESTILOS, ia_voz=ia_voz_disponible())
 
 
 @app.post("/api/trabajos")
@@ -114,29 +98,29 @@ def crear_trabajo():
     carpeta = os.path.join(TRABAJOS, id_)
     os.makedirs(carpeta, exist_ok=True)
 
-    opciones = {
-        "url": url,
-        "cantidad": _numero(f.get("cantidad"), 5, 1, 50, int),
-        "duracion": _numero(f.get("duracion"), 30, 5, 600),
-        "formato": f.get("formato") if f.get("formato") in FORMATOS else "original",
-        "subtitulos": f.get("subtitulos") == "on",
-        "escenas": f.get("escenas", "on") == "on",
-        "minutos_directo": _numero(f.get("minutos_directo"), 10, 1, 240),
-    }
+    duracion = f.get("duracion", "auto")
+    opciones = Opciones(
+        cantidad=_numero(f.get("cantidad"), 5, 1, 50, int),
+        duracion="auto" if duracion == "auto" else _numero(duracion, 30, 5, 600),
+        formato=f.get("formato") if f.get("formato") in FORMATOS else "vertical_fondo",
+        estilo=f.get("estilo") if f.get("estilo") in ESTILOS else "todo",
+        ia_voz=f.get("ia_voz") == "on",
+        subtitulos=f.get("subtitulos") == "on",
+        escenas=f.get("escenas", "on") == "on",
+        minutos_directo=_numero(f.get("minutos_directo"), 10, 1, 240),
+    )
+    origen = url
     titulo = url
     if subida and subida.filename:
         nombre = secure_filename(subida.filename) or "video.mp4"
-        ruta = os.path.join(carpeta, "subida_" + nombre)
-        subida.save(ruta)
-        opciones["archivo"] = ruta
-        opciones["url"] = ""
-        titulo = subida.filename
-    opciones["titulo"] = titulo
+        origen = os.path.join(carpeta, "subida_" + nombre)
+        subida.save(origen)
+        titulo = opciones.titulo = subida.filename
 
     with cerrojo:
         trabajos[id_] = {"id": id_, "estado": "en_cola", "progreso": 0,
                          "mensaje": "En cola…", "titulo": titulo, "resultado": None}
-    threading.Thread(target=_procesar, args=(id_, opciones), daemon=True).start()
+    threading.Thread(target=_procesar, args=(id_, origen, opciones), daemon=True).start()
     return jsonify(id=id_)
 
 

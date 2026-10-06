@@ -1,0 +1,3 @@
+# IA de voz gratuita (opcional): detecta risas/reacciones y crea subtítulos.
+# La primera vez descarga un modelo de ~150 MB.
+faster-whisper>=1.0
