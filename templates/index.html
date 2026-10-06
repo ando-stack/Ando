@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoClips</title>
+<style>
+  :root {
+    --fondo: #0f1115; --panel: #181b22; --borde: #2a2f3a; --texto: #e8eaf0;
+    --suave: #9aa3b2; --acento: #ff4d6d; --acento2: #ff8a3d; --ok: #2ecc71;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--texto);
+         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { margin: 0 0 4px; font-size: 2rem; }
+  h1 span { background: linear-gradient(90deg, var(--acento), var(--acento2));
+            -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--suave); margin: 0 0 24px; }
+  .panel { background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; padding: 20px; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  input[type=url], input[type=number], select {
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--borde);
+    background: #0d0f13; color: var(--texto); font-size: 1rem; }
+  .fila { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 16px; }
+  .ayuda { color: var(--suave); font-size: .85rem; margin-top: 4px; }
+  .check { display: flex; gap: 8px; align-items: center; font-weight: 400; margin: 0; }
+  .o { text-align: center; color: var(--suave); margin: 10px 0; font-size: .9rem; }
+  input[type=file] { color: var(--suave); width: 100%; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { border: 1px solid var(--borde); background: transparent; color: var(--texto);
+          border-radius: 999px; padding: 4px 12px; cursor: pointer; font-size: .9rem; }
+  .chip.activo { border-color: var(--acento); background: rgba(255,77,109,.15); }
+  button.principal { margin-top: 20px; width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 700;
+         border: 0; border-radius: 12px; color: #fff; cursor: pointer;
+         background: linear-gradient(90deg, var(--acento), var(--acento2)); }
+  button.principal:disabled { opacity: .5; cursor: wait; }
+  #estado { margin-top: 20px; display: none; }
+  .barra { height: 12px; background: #0d0f13; border-radius: 999px; overflow: hidden; border: 1px solid var(--borde); }
+  .barra > div { height: 100%; width: 0; transition: width .4s;
+                 background: linear-gradient(90deg, var(--acento), var(--acento2)); }
+  #mensaje { margin-top: 8px; color: var(--suave); white-space: pre-wrap; }
+  .error { color: #ff6b6b !important; }
+  #resultado { margin-top: 24px; display: none; }
+  .cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .boton { display: inline-block; padding: 10px 16px; border-radius: 10px; text-decoration: none;
+           font-weight: 600; color: #fff; background: var(--ok); }
+  .boton.sec { background: #2a2f3a; }
+  .rejilla { display: grid; gap: 16px; margin-top: 16px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .clip { background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; overflow: hidden; }
+  .clip video { width: 100%; display: block; background: #000; max-height: 420px; }
+  .clip .info { padding: 12px; }
+  .clip .meta { color: var(--suave); font-size: .85rem; }
+  .clip .texto { font-size: .85rem; margin: 6px 0; max-height: 4.5em; overflow: hidden; }
+  .nota { float: right; font-weight: 700; color: var(--acento2); }
+  .avisos { color: #f5c26b; font-size: .9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>✂️ <span>AutoClips</span></h1>
+  <p class="sub">Pega el enlace de un vídeo o directo, elige cuántos clips quieres y descárgalos listos. 100% gratis y en tu ordenador.</p>
+
+  <form id="form" class="panel">
+    <label for="url">Enlace del vídeo o del directo</label>
+    <input type="url" id="url" name="url" placeholder="https://www.youtube.com/watch?v=…  ·  twitch.tv/…  ·  kick.com/…">
+    <div class="ayuda">YouTube, Twitch, Kick, TikTok, X/Twitter, Facebook, Instagram y más de 1000 webs.</div>
+    <div class="o">— o —</div>
+    <label for="archivo">Sube un vídeo de tu ordenador</label>
+    <input type="file" id="archivo" name="archivo" accept="video/*">
+
+    <div class="fila">
+      <div>
+        <label for="cantidad">Número de clips</label>
+        <input type="number" id="cantidad" name="cantidad" min="1" max="50" value="5">
+        <div class="chips" data-para="cantidad">
+          <button type="button" class="chip" data-v="3">3</button>
+          <button type="button" class="chip activo" data-v="5">5</button>
+          <button type="button" class="chip" data-v="10">10</button>
+          <button type="button" class="chip" data-v="20">20</button>
+        </div>
+      </div>
+      <div>
+        <label for="duracion">Duración de cada clip (segundos)</label>
+        <input type="number" id="duracion" name="duracion" min="5" max="600" value="30">
+        <div class="chips" data-para="duracion">
+          <button type="button" class="chip" data-v="15">15 s</button>
+          <button type="button" class="chip activo" data-v="30">30 s</button>
+          <button type="button" class="chip" data-v="60">1 min</button>
+          <button type="button" class="chip" data-v="90">1:30</button>
+        </div>
+      </div>
+      <div>
+        <label for="formato">Formato</label>
+        <select id="formato" name="formato">
+          {% for clave, nombre in formatos.items() %}<option value="{{ clave }}">{{ nombre }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="fila">
+      <div>
+        <label for="minutos_directo">Si es un directo: minutos a grabar</label>
+        <input type="number" id="minutos_directo" name="minutos_directo" min="1" max="240" value="10">
+        <div class="ayuda">Graba desde ahora y luego saca los clips de esa grabación.</div>
+      </div>
+      <div>
+        <label class="check"><input type="checkbox" name="subtitulos" {% if not subtitulos %}disabled{% endif %}> Subtítulos automáticos</label>
+        <div class="ayuda">{% if subtitulos %}Transcribe la voz y la pone en el vídeo (tarda algo más).{% else %}Instala <code>faster-whisper</code> para activarlos (ver README).{% endif %}</div>
+        <label class="check" style="margin-top:10px"><input type="checkbox" name="escenas" checked> Analizar cortes de cámara</label>
+        <div class="ayuda">Desactívalo para ir más rápido en vídeos muy largos.</div>      </div>
+    </div>
+
+    <button class="principal" id="enviar" type="submit">🎬 Sacar clips</button>
+  </form>
+
+  <section id="estado" class="panel">
+    <strong id="titulo"></strong>
+    <div class="barra" style="margin-top:10px"><div id="relleno"></div></div>
+    <div id="mensaje"></div>
+  </section>
+
+  <section id="resultado">
+    <div class="cabecera">
+      <div>
+        <h2 style="margin:0">Tus clips</h2>
+        <div class="ayuda" id="senales"></div>
+        <div class="avisos" id="avisos"></div>
+      </div>
+      <a class="boton" id="zip" href="#">⬇️ Descargar todos (ZIP)</a>
+    </div>
+    <div class="rejilla" id="rejilla"></div>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const form = $("#form");
+
+document.querySelectorAll(".chips").forEach((grupo) => {
+  const campo = document.getElementById(grupo.dataset.para);
+  grupo.addEventListener("click", (e) => {
+    const b = e.target.closest(".chip");
+    if (!b) return;
+    campo.value = b.dataset.v;
+    grupo.querySelectorAll(".chip").forEach((c) => c.classList.toggle("activo", c === b));
+  });
+  campo.addEventListener("input", () =>
+    grupo.querySelectorAll(".chip").forEach((c) => c.classList.toggle("activo", c.dataset.v === campo.value)));
+});
+
+const hms = (s) => {
+  s = Math.round(s);
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = String(s % 60).padStart(2, "0");
+  return h ? `${h}:${String(m).padStart(2, "0")}:${x}` : `${m}:${x}`;
+};
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const datos = new FormData(form);
+  if (!form.escenas.checked) datos.set("escenas", "off");
+  if (!datos.get("url") && !$("#archivo").files.length) {
+    alert("Pega un enlace o sube un vídeo.");
+    return;
+  }
+  $("#enviar").disabled = true;
+  $("#resultado").style.display = "none";
+  $("#estado").style.display = "block";
+  $("#mensaje").className = "";
+  $("#mensaje").textContent = $("#archivo").files.length ? "Subiendo vídeo…" : "Empezando…";
+  $("#relleno").style.width = "0";
+  $("#titulo").textContent = datos.get("url") || $("#archivo").files[0].name;
+
+  try {
+    const r = await fetch("/api/trabajos", { method: "POST", body: datos });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || "Error");
+    seguir(j.id);
+  } catch (err) {
+    fallo(err.message);
+  }
+});
+
+function fallo(msg) {
+  $("#mensaje").className = "error";
+  $("#mensaje").textContent = "❌ " + msg;
+  $("#enviar").disabled = false;
+}
+
+async function seguir(id) {
+  try {
+    const r = await fetch(`/api/trabajos/${id}`);
+    if (!r.ok) throw new Error("Se perdió el trabajo (¿se reinició el programa?)");
+    const t = await r.json();
+    if (t.titulo) $("#titulo").textContent = t.titulo;
+    $("#relleno").style.width = (t.progreso || 0) + "%";
+    $("#mensaje").textContent = `${Math.round(t.progreso || 0)}% · ${t.mensaje || ""}`;
+    if (t.estado === "error") return fallo(t.mensaje);
+    if (t.estado === "listo") return mostrar(id, t.resultado);
+  } catch (err) {
+    return fallo(err.message);
+  }
+  setTimeout(() => seguir(id), 1000);
+}
+
+function mostrar(id, res) {
+  $("#enviar").disabled = false;
+  const base = `/trabajos/${id}/`;
+  $("#zip").href = base + res.zip + "?descargar=1";
+  $("#senales").textContent = `${res.clips.length} clips · vídeo de ${hms(res.duracion_fuente)} · analizado por: ${res.senales.join(", ")}`;
+  $("#avisos").textContent = (res.avisos || []).join(" ");
+  const rejilla = $("#rejilla");
+  rejilla.innerHTML = "";
+  for (const c of res.clips) {
+    const el = document.createElement("div");
+    el.className = "clip";
+    el.innerHTML = `
+      <video controls preload="none" playsinline poster="${base + c.miniatura}" src="${base + c.archivo}"></video>
+      <div class="info">
+        <span class="nota">🔥 ${c.puntuacion}%</span>
+        <strong>Clip ${c.numero}</strong>
+        <div class="meta">${hms(c.inicio)} → ${hms(c.fin)} (${Math.round(c.fin - c.inicio)} s)</div>
+        ${c.texto ? `<div class="texto"></div>` : ""}
+        <a class="boton sec" style="margin-top:8px" href="${base + c.archivo}?descargar=1">⬇️ Descargar</a>
+      </div>`;
+    if (c.texto) el.querySelector(".texto").textContent = "“" + c.texto + "”";
+    rejilla.appendChild(el);
+  }
+  $("#resultado").style.display = "block";
+  $("#resultado").scrollIntoView({ behavior: "smooth" });
+}
+</script>
+</body>
+</html>

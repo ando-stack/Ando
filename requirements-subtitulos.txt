@@ -1,0 +1,2 @@
+# Opcional: subtítulos automáticos (descarga un modelo de ~150 MB la primera vez)
+faster-whisper>=1.0
