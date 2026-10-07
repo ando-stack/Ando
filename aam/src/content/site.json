@@ -1,69 +1,90 @@
 {
-  "_instrucciones": "Edita los textos de la web aquí. Todo lo marcado con [COMPLETAR] es contenido de ejemplo que debes sustituir por tus datos reales. Los iconos de servicios disponibles son: code, design, motion, strategy, performance, spark. Para añadir tu foto, guárdala en src/assets/images/ y añade \"photo\": \"../assets/images/tu-foto.jpg\" dentro de \"about\".",
+  "_instrucciones": "Edita los textos de la web aquí. Lo que sigue marcado con [COMPLETAR] es contenido de ejemplo que debes sustituir por tus datos reales. Iconos de servicios disponibles: code, design, motion, strategy, performance, spark. Para añadir tu foto, guárdala en src/assets/images/ y añade \"photo\": \"../assets/images/tu-foto.jpg\" dentro de \"about\".",
   "name": "Andoni Ayala Malo",
   "brand": "AAM",
-  "role": "[COMPLETAR] Tu profesión o especialidad",
-  "tagline": "[COMPLETAR] Una frase de presentación breve que explique qué haces y para quién.",
+  "role": "Agencia de contenido con IA para creadores",
+  "tagline": "Edito vídeos, creo y escalo canales de Shorts, diseño miniaturas y construyo webs con IA para influencers y creadores de contenido.",
   "location": "[COMPLETAR] Ciudad, País",
   "availability": "[COMPLETAR] Disponible para nuevos proyectos",
   "email": "completar@example.com",
   "seo": {
-    "title": "Andoni Ayala Malo — AAM | Portfolio",
-    "description": "Portfolio de Andoni Ayala Malo (AAM). [COMPLETAR] Describe en una frase qué haces y qué tipo de proyectos te interesan."
+    "title": "Andoni Ayala Malo — AAM | Agencia de contenido con IA para creadores",
+    "description": "AAM, la agencia de Andoni Ayala Malo: edición de vídeo, canales de YouTube Shorts, miniaturas y webs con IA para influencers y creadores de contenido."
   },
   "about": {
     "title": "Sobre mí",
     "paragraphs": [
-      "[COMPLETAR] Primer párrafo sobre ti: quién eres, a qué te dedicas y qué te motiva. Este texto aparece grande y se revela línea a línea al hacer scroll.",
-      "[COMPLETAR] Segundo párrafo: tu forma de trabajar, tu experiencia y lo que te diferencia.",
-      "[COMPLETAR] Tercer párrafo opcional: intereses, formación o lo que estás aprendiendo ahora."
+      "Soy Andoni Ayala Malo y con AAM ayudo a influencers y creadores de contenido a producir más y mejor gracias a la inteligencia artificial.",
+      "Edito vídeos con IA, creo canales de YouTube Shorts y los escalo, y construyo webs con IA para que cada creador tenga su propio espacio en internet. Ahora también estoy incorporando el diseño de miniaturas con IA.",
+      "[COMPLETAR] Párrafo opcional: tu forma de trabajar, con qué tipo de creadores te gusta colaborar o qué resultados buscas para ellos."
     ],
     "photoAlt": "[COMPLETAR] Retrato de Andoni Ayala Malo",
     "stats": [
-      { "value": 10, "suffix": "+", "label": "[COMPLETAR] Años de experiencia" },
-      { "value": 50, "suffix": "", "label": "[COMPLETAR] Proyectos realizados" },
-      { "value": 100, "suffix": "%", "label": "[COMPLETAR] Dato destacado" }
+      {
+        "value": 10,
+        "suffix": "+",
+        "label": "[COMPLETAR] Años de experiencia"
+      },
+      {
+        "value": 50,
+        "suffix": "",
+        "label": "[COMPLETAR] Proyectos realizados"
+      },
+      {
+        "value": 100,
+        "suffix": "%",
+        "label": "[COMPLETAR] Dato destacado"
+      }
     ]
   },
   "services": [
     {
-      "icon": "code",
-      "title": "[COMPLETAR] Servicio 1",
-      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
+      "icon": "motion",
+      "title": "Edición de vídeo con IA",
+      "description": "Edición ágil de vídeos para redes apoyada en herramientas de IA: más contenido, más rápido y con un acabado cuidado."
+    },
+    {
+      "icon": "strategy",
+      "title": "Canales de YouTube Shorts",
+      "description": "Creación de canales de Shorts con IA y sistemas para publicar de forma constante y escalarlos."
     },
     {
       "icon": "design",
-      "title": "[COMPLETAR] Servicio 2",
-      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
+      "title": "Miniaturas con IA",
+      "description": "Miniaturas diseñadas con IA para que tus vídeos destaquen y consigan más clics."
     },
     {
-      "icon": "motion",
-      "title": "[COMPLETAR] Servicio 3",
-      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
-    },
-    {
-      "icon": "performance",
-      "title": "[COMPLETAR] Servicio 4",
-      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
+      "icon": "code",
+      "title": "Webs con IA",
+      "description": "Webs rápidas y modernas construidas con IA: tu página personal, tu portfolio o la web de tu marca."
     }
   ],
   "stack": [
-    "[COMPLETAR] Tecnología 1",
-    "[COMPLETAR] Tecnología 2",
-    "[COMPLETAR] Tecnología 3",
-    "[COMPLETAR] Tecnología 4",
-    "[COMPLETAR] Herramienta 5",
-    "[COMPLETAR] Herramienta 6",
-    "[COMPLETAR] Herramienta 7",
-    "[COMPLETAR] Herramienta 8"
+    "Edición de vídeo con IA",
+    "YouTube Shorts",
+    "Escalado de canales",
+    "Miniaturas con IA",
+    "Webs con IA",
+    "Contenido para creadores",
+    "[COMPLETAR] Herramienta de IA que uses",
+    "[COMPLETAR] Otra herramienta"
   ],
   "contact": {
     "title": "¿Hablamos?",
-    "intro": "[COMPLETAR] Una frase invitando a contactar: qué tipo de proyectos o colaboraciones buscas."
+    "intro": "¿Eres influencer o creador de contenido y quieres producir más con IA? Cuéntame tu proyecto y vemos cómo ayudarte."
   },
   "socials": [
-    { "label": "LinkedIn", "url": "https://www.linkedin.com/in/COMPLETAR" },
-    { "label": "GitHub", "url": "https://github.com/COMPLETAR" },
-    { "label": "Instagram", "url": "https://www.instagram.com/COMPLETAR" }
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/COMPLETAR"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/COMPLETAR"
+    },
+    {
+      "label": "Instagram",
+      "url": "https://www.instagram.com/COMPLETAR"
+    }
   ]
 }

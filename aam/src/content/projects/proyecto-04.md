@@ -7,7 +7,7 @@
 # ============================================================
 title: "Proyecto de ejemplo 04 [COMPLETAR]"
 summary: "[COMPLETAR] Resumen del proyecto en una o dos frases: qué es y para quién."
-category: "Web" # [COMPLETAR] categoría usada en el filtro (p. ej. Web, App, Diseño)
+category: "Web" # [COMPLETAR] categoría usada en el filtro (p. ej. Vídeo, Shorts, Miniaturas, Web)
 year: 2023 # [COMPLETAR] año real
 role: "[COMPLETAR] Tu rol en el proyecto"
 technologies: # [COMPLETAR] tecnologías reales del proyecto
