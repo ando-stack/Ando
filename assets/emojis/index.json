@@ -1,0 +1,742 @@
+[
+ {
+  "emoji": "😀",
+  "file": "1f600.svg",
+  "keywords": "feliz alegría sonrisa"
+ },
+ {
+  "emoji": "😂",
+  "file": "1f602.svg",
+  "keywords": "risa gracioso jajaja"
+ },
+ {
+  "emoji": "🤣",
+  "file": "1f923.svg",
+  "keywords": "carcajada muy gracioso"
+ },
+ {
+  "emoji": "😊",
+  "file": "1f60a.svg",
+  "keywords": "contento amable"
+ },
+ {
+  "emoji": "😍",
+  "file": "1f60d.svg",
+  "keywords": "encanta amor precioso"
+ },
+ {
+  "emoji": "🥰",
+  "file": "1f970.svg",
+  "keywords": "cariño adorable"
+ },
+ {
+  "emoji": "😎",
+  "file": "1f60e.svg",
+  "keywords": "guay chulo genial"
+ },
+ {
+  "emoji": "🤔",
+  "file": "1f914.svg",
+  "keywords": "pensar duda pregunta"
+ },
+ {
+  "emoji": "🤯",
+  "file": "1f92f.svg",
+  "keywords": "alucinante mente explota sorpresa"
+ },
+ {
+  "emoji": "😱",
+  "file": "1f631.svg",
+  "keywords": "miedo susto impactante"
+ },
+ {
+  "emoji": "😮",
+  "file": "1f62e.svg",
+  "keywords": "sorpresa asombro"
+ },
+ {
+  "emoji": "😢",
+  "file": "1f622.svg",
+  "keywords": "triste pena"
+ },
+ {
+  "emoji": "😭",
+  "file": "1f62d.svg",
+  "keywords": "llorar muy triste"
+ },
+ {
+  "emoji": "😡",
+  "file": "1f621.svg",
+  "keywords": "enfadado rabia"
+ },
+ {
+  "emoji": "😅",
+  "file": "1f605.svg",
+  "keywords": "nervios uf alivio"
+ },
+ {
+  "emoji": "🙄",
+  "file": "1f644.svg",
+  "keywords": "aburrido obvio"
+ },
+ {
+  "emoji": "😴",
+  "file": "1f634.svg",
+  "keywords": "sueño dormir cansado"
+ },
+ {
+  "emoji": "🤩",
+  "file": "1f929.svg",
+  "keywords": "emocionado estrellas wow"
+ },
+ {
+  "emoji": "🥳",
+  "file": "1f973.svg",
+  "keywords": "fiesta celebrar cumpleaños"
+ },
+ {
+  "emoji": "😇",
+  "file": "1f607.svg",
+  "keywords": "inocente bueno"
+ },
+ {
+  "emoji": "🤫",
+  "file": "1f92b.svg",
+  "keywords": "secreto silencio"
+ },
+ {
+  "emoji": "🤐",
+  "file": "1f910.svg",
+  "keywords": "callar no decir"
+ },
+ {
+  "emoji": "🤑",
+  "file": "1f911.svg",
+  "keywords": "dinero ganar rico"
+ },
+ {
+  "emoji": "🤓",
+  "file": "1f913.svg",
+  "keywords": "aprender estudiar friki"
+ },
+ {
+  "emoji": "😬",
+  "file": "1f62c.svg",
+  "keywords": "incómodo ups"
+ },
+ {
+  "emoji": "🫡",
+  "file": "1fae1.svg",
+  "keywords": "respeto saludo"
+ },
+ {
+  "emoji": "🙃",
+  "file": "1f643.svg",
+  "keywords": "ironía"
+ },
+ {
+  "emoji": "😏",
+  "file": "1f60f.svg",
+  "keywords": "pícaro"
+ },
+ {
+  "emoji": "🥺",
+  "file": "1f97a.svg",
+  "keywords": "por favor tierno"
+ },
+ {
+  "emoji": "👍",
+  "file": "1f44d.svg",
+  "keywords": "bien de acuerdo ok"
+ },
+ {
+  "emoji": "👎",
+  "file": "1f44e.svg",
+  "keywords": "mal no"
+ },
+ {
+  "emoji": "👏",
+  "file": "1f44f.svg",
+  "keywords": "aplausos bravo"
+ },
+ {
+  "emoji": "🙌",
+  "file": "1f64c.svg",
+  "keywords": "celebrar bien hecho"
+ },
+ {
+  "emoji": "🙏",
+  "file": "1f64f.svg",
+  "keywords": "gracias por favor"
+ },
+ {
+  "emoji": "💪",
+  "file": "1f4aa.svg",
+  "keywords": "fuerza fuerte gimnasio esfuerzo"
+ },
+ {
+  "emoji": "👀",
+  "file": "1f440.svg",
+  "keywords": "mirar atención ojo"
+ },
+ {
+  "emoji": "👋",
+  "file": "1f44b.svg",
+  "keywords": "hola adiós saludo"
+ },
+ {
+  "emoji": "✌️",
+  "file": "270c.svg",
+  "keywords": "paz victoria"
+ },
+ {
+  "emoji": "🤝",
+  "file": "1f91d.svg",
+  "keywords": "acuerdo trato colaboración"
+ },
+ {
+  "emoji": "👉",
+  "file": "1f449.svg",
+  "keywords": "señalar esto"
+ },
+ {
+  "emoji": "👆",
+  "file": "1f446.svg",
+  "keywords": "arriba aquí"
+ },
+ {
+  "emoji": "👇",
+  "file": "1f447.svg",
+  "keywords": "abajo debajo enlace"
+ },
+ {
+  "emoji": "☝️",
+  "file": "261d.svg",
+  "keywords": "importante uno"
+ },
+ {
+  "emoji": "🤞",
+  "file": "1f91e.svg",
+  "keywords": "suerte ojalá"
+ },
+ {
+  "emoji": "✅",
+  "file": "2705.svg",
+  "keywords": "correcto hecho sí check"
+ },
+ {
+  "emoji": "❌",
+  "file": "274c.svg",
+  "keywords": "incorrecto no error"
+ },
+ {
+  "emoji": "⚠️",
+  "file": "26a0.svg",
+  "keywords": "cuidado aviso peligro"
+ },
+ {
+  "emoji": "❗",
+  "file": "2757.svg",
+  "keywords": "importante atención"
+ },
+ {
+  "emoji": "❓",
+  "file": "2753.svg",
+  "keywords": "pregunta duda"
+ },
+ {
+  "emoji": "💯",
+  "file": "1f4af.svg",
+  "keywords": "cien perfecto total"
+ },
+ {
+  "emoji": "🔥",
+  "file": "1f525.svg",
+  "keywords": "fuego increíble tendencia caliente"
+ },
+ {
+  "emoji": "⭐",
+  "file": "2b50.svg",
+  "keywords": "estrella destacado"
+ },
+ {
+  "emoji": "✨",
+  "file": "2728.svg",
+  "keywords": "magia brillo nuevo"
+ },
+ {
+  "emoji": "💡",
+  "file": "1f4a1.svg",
+  "keywords": "idea consejo truco"
+ },
+ {
+  "emoji": "🎯",
+  "file": "1f3af.svg",
+  "keywords": "objetivo meta precisión"
+ },
+ {
+  "emoji": "🚀",
+  "file": "1f680.svg",
+  "keywords": "rápido despegar crecer lanzamiento"
+ },
+ {
+  "emoji": "📈",
+  "file": "1f4c8.svg",
+  "keywords": "crecer subir datos"
+ },
+ {
+  "emoji": "📉",
+  "file": "1f4c9.svg",
+  "keywords": "bajar caer pérdida"
+ },
+ {
+  "emoji": "💰",
+  "file": "1f4b0.svg",
+  "keywords": "dinero ahorro precio"
+ },
+ {
+  "emoji": "💸",
+  "file": "1f4b8.svg",
+  "keywords": "gastar dinero caro"
+ },
+ {
+  "emoji": "💵",
+  "file": "1f4b5.svg",
+  "keywords": "dólares pago"
+ },
+ {
+  "emoji": "🏆",
+  "file": "1f3c6.svg",
+  "keywords": "ganar trofeo premio mejor"
+ },
+ {
+  "emoji": "🥇",
+  "file": "1f947.svg",
+  "keywords": "primero ganador oro"
+ },
+ {
+  "emoji": "🎉",
+  "file": "1f389.svg",
+  "keywords": "fiesta celebrar enhorabuena"
+ },
+ {
+  "emoji": "🎁",
+  "file": "1f381.svg",
+  "keywords": "regalo sorteo"
+ },
+ {
+  "emoji": "❤️",
+  "file": "2764.svg",
+  "keywords": "amor corazón me gusta"
+ },
+ {
+  "emoji": "💔",
+  "file": "1f494.svg",
+  "keywords": "desamor roto"
+ },
+ {
+  "emoji": "💥",
+  "file": "1f4a5.svg",
+  "keywords": "explosión impacto boom"
+ },
+ {
+  "emoji": "⚡",
+  "file": "26a1.svg",
+  "keywords": "energía rápido rayo"
+ },
+ {
+  "emoji": "🌟",
+  "file": "1f31f.svg",
+  "keywords": "brillante especial"
+ },
+ {
+  "emoji": "🧠",
+  "file": "1f9e0.svg",
+  "keywords": "cerebro inteligente pensar mente"
+ },
+ {
+  "emoji": "⏰",
+  "file": "23f0.svg",
+  "keywords": "tiempo hora despertador"
+ },
+ {
+  "emoji": "⏳",
+  "file": "23f3.svg",
+  "keywords": "esperar tiempo"
+ },
+ {
+  "emoji": "📅",
+  "file": "1f4c5.svg",
+  "keywords": "fecha calendario día"
+ },
+ {
+  "emoji": "📌",
+  "file": "1f4cc.svg",
+  "keywords": "importante nota fijar"
+ },
+ {
+  "emoji": "📝",
+  "file": "1f4dd.svg",
+  "keywords": "apuntar notas escribir"
+ },
+ {
+  "emoji": "📚",
+  "file": "1f4da.svg",
+  "keywords": "libros estudiar"
+ },
+ {
+  "emoji": "📱",
+  "file": "1f4f1.svg",
+  "keywords": "móvil teléfono app"
+ },
+ {
+  "emoji": "💻",
+  "file": "1f4bb.svg",
+  "keywords": "ordenador portátil trabajo"
+ },
+ {
+  "emoji": "🖥️",
+  "file": "1f5a5.svg",
+  "keywords": "pantalla ordenador"
+ },
+ {
+  "emoji": "⌨️",
+  "file": "2328.svg",
+  "keywords": "teclado escribir"
+ },
+ {
+  "emoji": "🎮",
+  "file": "1f3ae.svg",
+  "keywords": "videojuego jugar"
+ },
+ {
+  "emoji": "🎬",
+  "file": "1f3ac.svg",
+  "keywords": "vídeo cine grabar"
+ },
+ {
+  "emoji": "🎥",
+  "file": "1f3a5.svg",
+  "keywords": "cámara grabar"
+ },
+ {
+  "emoji": "📷",
+  "file": "1f4f7.svg",
+  "keywords": "foto cámara"
+ },
+ {
+  "emoji": "🎤",
+  "file": "1f3a4.svg",
+  "keywords": "micrófono hablar cantar"
+ },
+ {
+  "emoji": "🎧",
+  "file": "1f3a7.svg",
+  "keywords": "auriculares música escuchar"
+ },
+ {
+  "emoji": "🎵",
+  "file": "1f3b5.svg",
+  "keywords": "música canción"
+ },
+ {
+  "emoji": "🔊",
+  "file": "1f50a.svg",
+  "keywords": "volumen sonido"
+ },
+ {
+  "emoji": "🔇",
+  "file": "1f507.svg",
+  "keywords": "silencio sin sonido"
+ },
+ {
+  "emoji": "📣",
+  "file": "1f4e3.svg",
+  "keywords": "anuncio aviso"
+ },
+ {
+  "emoji": "🔔",
+  "file": "1f514.svg",
+  "keywords": "notificación suscribir campana"
+ },
+ {
+  "emoji": "🔍",
+  "file": "1f50d.svg",
+  "keywords": "buscar lupa investigar"
+ },
+ {
+  "emoji": "🔑",
+  "file": "1f511.svg",
+  "keywords": "clave llave secreto"
+ },
+ {
+  "emoji": "🔒",
+  "file": "1f512.svg",
+  "keywords": "seguro privado"
+ },
+ {
+  "emoji": "🛠️",
+  "file": "1f6e0.svg",
+  "keywords": "herramientas arreglar"
+ },
+ {
+  "emoji": "⚙️",
+  "file": "2699.svg",
+  "keywords": "ajustes configuración"
+ },
+ {
+  "emoji": "🧪",
+  "file": "1f9ea.svg",
+  "keywords": "experimento prueba"
+ },
+ {
+  "emoji": "🧩",
+  "file": "1f9e9.svg",
+  "keywords": "pieza encajar puzle"
+ },
+ {
+  "emoji": "🤖",
+  "file": "1f916.svg",
+  "keywords": "robot ia inteligencia artificial"
+ },
+ {
+  "emoji": "👾",
+  "file": "1f47e.svg",
+  "keywords": "videojuego retro"
+ },
+ {
+  "emoji": "🌍",
+  "file": "1f30d.svg",
+  "keywords": "mundo planeta viaje"
+ },
+ {
+  "emoji": "✈️",
+  "file": "2708.svg",
+  "keywords": "viaje avión"
+ },
+ {
+  "emoji": "🏠",
+  "file": "1f3e0.svg",
+  "keywords": "casa hogar"
+ },
+ {
+  "emoji": "🚗",
+  "file": "1f697.svg",
+  "keywords": "coche conducir"
+ },
+ {
+  "emoji": "🏃",
+  "file": "1f3c3.svg",
+  "keywords": "correr deporte prisa"
+ },
+ {
+  "emoji": "⚽",
+  "file": "26bd.svg",
+  "keywords": "fútbol deporte"
+ },
+ {
+  "emoji": "🏀",
+  "file": "1f3c0.svg",
+  "keywords": "baloncesto"
+ },
+ {
+  "emoji": "🍕",
+  "file": "1f355.svg",
+  "keywords": "pizza comida"
+ },
+ {
+  "emoji": "🍔",
+  "file": "1f354.svg",
+  "keywords": "hamburguesa comida"
+ },
+ {
+  "emoji": "☕",
+  "file": "2615.svg",
+  "keywords": "café mañana"
+ },
+ {
+  "emoji": "🍺",
+  "file": "1f37a.svg",
+  "keywords": "cerveza bar"
+ },
+ {
+  "emoji": "🍷",
+  "file": "1f377.svg",
+  "keywords": "vino cena"
+ },
+ {
+  "emoji": "🎂",
+  "file": "1f382.svg",
+  "keywords": "tarta cumpleaños"
+ },
+ {
+  "emoji": "🍿",
+  "file": "1f37f.svg",
+  "keywords": "palomitas película"
+ },
+ {
+  "emoji": "🌞",
+  "file": "1f31e.svg",
+  "keywords": "sol verano buen día"
+ },
+ {
+  "emoji": "🌧️",
+  "file": "1f327.svg",
+  "keywords": "lluvia mal tiempo"
+ },
+ {
+  "emoji": "❄️",
+  "file": "2744.svg",
+  "keywords": "frío nieve invierno"
+ },
+ {
+  "emoji": "🌈",
+  "file": "1f308.svg",
+  "keywords": "arcoíris colores"
+ },
+ {
+  "emoji": "🐶",
+  "file": "1f436.svg",
+  "keywords": "perro mascota"
+ },
+ {
+  "emoji": "🐱",
+  "file": "1f431.svg",
+  "keywords": "gato mascota"
+ },
+ {
+  "emoji": "🦄",
+  "file": "1f984.svg",
+  "keywords": "unicornio único"
+ },
+ {
+  "emoji": "🌱",
+  "file": "1f331.svg",
+  "keywords": "crecer planta empezar"
+ },
+ {
+  "emoji": "🌹",
+  "file": "1f339.svg",
+  "keywords": "rosa flor"
+ },
+ {
+  "emoji": "🐐",
+  "file": "1f410.svg",
+  "keywords": "el mejor goat"
+ },
+ {
+  "emoji": "💀",
+  "file": "1f480.svg",
+  "keywords": "muerto de risa muerto"
+ },
+ {
+  "emoji": "👻",
+  "file": "1f47b.svg",
+  "keywords": "fantasma"
+ },
+ {
+  "emoji": "👑",
+  "file": "1f451.svg",
+  "keywords": "rey reina mejor"
+ },
+ {
+  "emoji": "💎",
+  "file": "1f48e.svg",
+  "keywords": "valioso diamante"
+ },
+ {
+  "emoji": "🛒",
+  "file": "1f6d2.svg",
+  "keywords": "comprar tienda"
+ },
+ {
+  "emoji": "📦",
+  "file": "1f4e6.svg",
+  "keywords": "paquete envío"
+ },
+ {
+  "emoji": "🧾",
+  "file": "1f9fe.svg",
+  "keywords": "factura recibo"
+ },
+ {
+  "emoji": "💳",
+  "file": "1f4b3.svg",
+  "keywords": "tarjeta pagar"
+ },
+ {
+  "emoji": "🗣️",
+  "file": "1f5e3.svg",
+  "keywords": "hablar decir"
+ },
+ {
+  "emoji": "💬",
+  "file": "1f4ac.svg",
+  "keywords": "mensaje comentario chat"
+ },
+ {
+  "emoji": "🤷",
+  "file": "1f937.svg",
+  "keywords": "no sé da igual"
+ },
+ {
+  "emoji": "🤦",
+  "file": "1f926.svg",
+  "keywords": "facepalm error tonto"
+ },
+ {
+  "emoji": "🙋",
+  "file": "1f64b.svg",
+  "keywords": "pregunta yo levantar mano"
+ },
+ {
+  "emoji": "👨‍💻",
+  "file": "1f468-200d-1f4bb.svg",
+  "keywords": "programador trabajo"
+ },
+ {
+  "emoji": "📊",
+  "file": "1f4ca.svg",
+  "keywords": "gráfico estadísticas"
+ },
+ {
+  "emoji": "🆕",
+  "file": "1f195.svg",
+  "keywords": "nuevo novedad"
+ },
+ {
+  "emoji": "🆓",
+  "file": "1f193.svg",
+  "keywords": "gratis"
+ },
+ {
+  "emoji": "🔝",
+  "file": "1f51d.svg",
+  "keywords": "top mejor"
+ },
+ {
+  "emoji": "➡️",
+  "file": "27a1.svg",
+  "keywords": "siguiente derecha"
+ },
+ {
+  "emoji": "⬅️",
+  "file": "2b05.svg",
+  "keywords": "anterior izquierda"
+ },
+ {
+  "emoji": "🔄",
+  "file": "1f504.svg",
+  "keywords": "repetir actualizar"
+ },
+ {
+  "emoji": "➕",
+  "file": "2795.svg",
+  "keywords": "más añadir"
+ },
+ {
+  "emoji": "➖",
+  "file": "2796.svg",
+  "keywords": "menos quitar"
+ }
+]

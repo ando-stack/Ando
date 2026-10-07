@@ -1,0 +1,13 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+python-dotenv>=1.0
+numpy>=1.26
+opencv-python-headless>=4.9
+mediapipe>=0.10.14
+faster-whisper>=1.0
+anthropic>=1.0
+# solo para generar los clips de prueba y ejecutar los tests
+scikit-image>=0.22
+pytest>=8

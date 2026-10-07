@@ -3,3 +3,12 @@ __pycache__/
 .venv/
 trabajos/
 clips/
+
+# Editor de vídeo con IA
+.env
+projects/*
+!projects/.gitkeep
+frontend/node_modules/
+frontend/dist/
+frontend/render/.bundle/
+.pytest_cache/
