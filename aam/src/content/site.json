@@ -4,19 +4,19 @@
     "AAM"
   ],
   "brand": "AAM",
-  "role": "Agencia de contenido con IA para creadores",
-  "tagline": "Edito vídeos, gestiono tus redes, creo y escalo canales de Shorts, diseño miniaturas y construyo webs con IA para influencers y creadores de contenido.",
+  "role": "Agencia de contenido con IA para creadores y negocios",
+  "tagline": "Edito vídeos, gestiono redes, creo y escalo canales de Shorts, diseño miniaturas y construyo webs con IA para creadores de contenido y negocios.",
   "location": "[COMPLETAR] Ciudad, País",
   "availability": "[COMPLETAR] Disponible para nuevos proyectos",
   "email": "aamcontacto1@gmail.com",
   "seo": {
-    "title": "AAM | Agencia de contenido con IA para creadores",
-    "description": "AAM, agencia de contenido con IA: edición de vídeo, gestión de redes, canales de YouTube Shorts, miniaturas y webs para influencers y creadores."
+    "title": "AAM | Agencia de contenido con IA para creadores y negocios",
+    "description": "AAM, agencia de contenido con IA: edición de vídeo, gestión de redes, Shorts, miniaturas y webs para creadores de contenido y negocios."
   },
   "about": {
     "title": "Sobre mí",
     "paragraphs": [
-      "En AAM ayudo a influencers y creadores de contenido a producir más y mejor gracias a la inteligencia artificial.",
+      "En AAM ayudo a creadores de contenido y negocios a producir más y mejor gracias a la inteligencia artificial.",
       "Edito vídeos con IA, creo canales de YouTube Shorts y los escalo, y construyo webs con IA para que cada creador tenga su propio espacio en internet. Ahora también estoy incorporando el diseño de miniaturas con IA.",
       "[COMPLETAR] Párrafo opcional: tu forma de trabajar, con qué tipo de creadores te gusta colaborar o qué resultados buscas para ellos."
     ],
@@ -48,7 +48,7 @@
     {
       "icon": "social",
       "title": "Gestión de redes",
-      "description": "Me encargo de subir tu contenido: Shorts, TikToks, Reels y vídeos largos de YouTube, con títulos, descripciones y hashtags."
+      "description": "Me encargo de tus redes, seas creador o negocio: subo Shorts, TikToks, Reels y vídeos de YouTube con títulos, descripciones y hashtags."
     },
     {
       "icon": "strategy",
@@ -79,7 +79,7 @@
   ],
   "contact": {
     "title": "¿Hablamos?",
-    "intro": "¿Eres influencer o creador de contenido y quieres producir más con IA? Cuéntame tu proyecto y vemos cómo ayudarte."
+    "intro": "¿Eres creador de contenido o tienes un negocio y quieres crecer en redes con IA? Cuéntame tu proyecto y vemos cómo ayudarte."
   },
   "socials": [
     {
@@ -204,6 +204,27 @@
           "Ahorras más de 200 € frente a contratarlo por separado"
         ],
         "extras": [
+          "Todos los servicios se pueden contratar también por separado"
+        ]
+      },
+      {
+        "icon": "performance",
+        "title": "Pack Negocios",
+        "prefix": "",
+        "price": 349,
+        "unit": "/ mes",
+        "highlight": "Para negocios",
+        "wide": true,
+        "description": "Para restaurantes, tiendas, gimnasios, clínicas y cualquier negocio local u online: llevo tus redes para que atraigas más clientes mientras tú te centras en tu negocio.",
+        "features": [
+          "Gestión de Instagram, TikTok y Facebook",
+          "12 Reels / TikToks editados al mes con el material de tu negocio",
+          "8 diseños para publicaciones e historias al mes",
+          "Calendario de contenidos y textos pensados para atraer clientes",
+          "Resumen mensual de resultados"
+        ],
+        "extras": [
+          "Web para tu negocio con un 30 % de descuento si contratas el pack",
           "Todos los servicios se pueden contratar también por separado"
         ]
       }
