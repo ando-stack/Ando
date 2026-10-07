@@ -1,0 +1,377 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MediaPlaceholder from '../../components/MediaPlaceholder.astro';
+import { getProjects, getSite } from '../../lib/site';
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      prev: projects[(i - 1 + projects.length) % projects.length],
+      next: projects[(i + 1) % projects.length],
+      index: i + 1,
+      total: projects.length,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { project, prev, next, index, total } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+const site = await getSite();
+const hasBody = Boolean(project.body?.trim());
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const paragraphs = (text: string) =>
+  text
+    .split(/\n\s*\n/)
+    .map((p) => p.replace(/\s*\n\s*/g, ' ').trim())
+    .filter(Boolean);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: data.title,
+  description: data.summary,
+  dateCreated: String(data.year),
+  creator: { '@type': 'Person', name: site.name },
+  keywords: data.technologies.join(', '),
+  url: new URL(`/proyectos/${project.id}`, Astro.site).href,
+};
+---
+
+<BaseLayout title={data.title} description={data.summary} image={data.cover} imageAlt={data.coverAlt || data.title} type="article" jsonLd={jsonLd}>
+  <article class="project">
+    <header class="container-site project__header">
+      <nav class="micro project__crumbs" aria-label="Ruta de navegación">
+        <a href="/#proyectos" class="link-underline">Proyectos</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{pad(index)} de {pad(total)}</span>
+      </nav>
+      <p class="micro project__category" data-reveal="fade">{data.category} — {data.year}</p>
+      <h1 class="project__title" data-split="words" data-split-intro>{data.title}</h1>
+      <p class="project__summary" data-split="lines" data-split-intro data-split-delay="0.3">{data.summary}</p>
+    </header>
+
+    <div class="container-site">
+      <figure class="project__cover">
+        {
+          data.cover ? (
+            <Image
+              src={data.cover}
+              alt={data.coverAlt}
+              widths={[640, 960, 1280, 1600]}
+              sizes="(min-width: 1472px) 1376px, calc(100vw - 2 * var(--aam-gutter))"
+              loading="eager"
+              fetchpriority="high"
+              class="project__cover-img"
+            />
+          ) : (
+            <MediaPlaceholder label="Portada pendiente" />
+          )
+        }
+        {
+          data.video && (
+            <video class="project__video" src={data.video} muted loop playsinline autoplay preload="metadata" aria-label={`Vídeo del proyecto ${data.title}`} />
+          )
+        }
+      </figure>
+    </div>
+
+    <section class="container-site project__overview" aria-label="Resumen del proyecto">
+      <dl class="project__facts">
+        <div data-reveal="up">
+          <dt class="micro">Rol</dt>
+          <dd>{data.role}</dd>
+        </div>
+        <div data-reveal="up">
+          <dt class="micro">Año</dt>
+          <dd>{data.year}</dd>
+        </div>
+        <div data-reveal="up">
+          <dt class="micro">Tecnologías</dt>
+          <dd>
+            <ul class="project__tags">
+              {data.technologies.map((t) => <li>{t}</li>)}
+            </ul>
+          </dd>
+        </div>
+        {
+          (data.links.web || data.links.repo) && (
+            <div data-reveal="up">
+              <dt class="micro">Enlaces</dt>
+              <dd class="project__links">
+                {data.links.web && (
+                  <a href={data.links.web} target="_blank" rel="noopener noreferrer" class="btn" data-magnetic data-cursor="Abrir">
+                    <span data-magnetic-inner>Ver web</span>
+                    <span class="sr-only"> (se abre en una pestaña nueva)</span>
+                  </a>
+                )}
+                {data.links.repo && (
+                  <a href={data.links.repo} target="_blank" rel="noopener noreferrer" class="btn" data-magnetic data-cursor="Abrir">
+                    <span data-magnetic-inner>Repositorio</span>
+                    <span class="sr-only"> (se abre en una pestaña nueva)</span>
+                  </a>
+                )}
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </section>
+
+    <section class="container-site project__block" aria-labelledby="challenge-title">
+      <h2 id="challenge-title" class="micro project__block-title"><span>(01)</span> Desafío</h2>
+      <div class="project__block-body">
+        {paragraphs(data.challenge).map((p, i) => (i === 0 ? <p class="project__lead" data-split="lines">{p}</p> : <p data-reveal="up">{p}</p>))}
+      </div>
+    </section>
+
+    <section class="container-site project__block" aria-labelledby="solution-title">
+      <h2 id="solution-title" class="micro project__block-title"><span>(02)</span> Solución</h2>
+      <div class="project__block-body">
+        {paragraphs(data.solution).map((p, i) => (i === 0 ? <p class="project__lead" data-split="lines">{p}</p> : <p data-reveal="up">{p}</p>))}
+        {
+          hasBody && (
+            <div class="project__prose" data-reveal="up">
+              <Content />
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    {
+      data.gallery.length > 0 && (
+        <section class="container-site project__gallery" aria-label="Galería de imágenes">
+          {data.gallery.map((img, i) => (
+            <figure class:list={['project__shot', { 'project__shot--wide': i % 3 === 0 }]} data-reveal-img>
+              <Image
+                src={img.src}
+                alt={img.alt}
+                widths={[480, 800, 1200, 1600]}
+                sizes={i % 3 === 0 ? '(min-width: 1472px) 1376px, 100vw' : '(min-width: 768px) 50vw, 100vw'}
+                loading="lazy"
+              />
+            </figure>
+          ))}
+        </section>
+      )
+    }
+
+    <section class="container-site project__block" aria-labelledby="result-title">
+      <h2 id="result-title" class="micro project__block-title"><span>(03)</span> Resultado</h2>
+      <div class="project__block-body">
+        {paragraphs(data.result).map((p, i) => (i === 0 ? <p class="project__lead" data-split="lines">{p}</p> : <p data-reveal="up">{p}</p>))}
+      </div>
+    </section>
+
+    <nav class="container-site project__pager" aria-label="Otros proyectos">
+      <a href={`/proyectos/${prev.id}`} class="project__pager-link" data-cursor="Anterior" rel="prev">
+        <span class="micro">← Proyecto anterior</span>
+        <span class="project__pager-title">{prev.data.title}</span>
+      </a>
+      <a href={`/proyectos/${next.id}`} class="project__pager-link project__pager-link--next" data-cursor="Siguiente" rel="next">
+        <span class="micro">Proyecto siguiente →</span>
+        <span class="project__pager-title">{next.data.title}</span>
+      </a>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .project__header {
+    padding-top: calc(var(--aam-header-h) + clamp(2.5rem, 2rem + 4vw, 6rem));
+    padding-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
+    display: grid;
+    gap: 1.5rem;
+  }
+  .project__crumbs {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--aam-fg-muted);
+  }
+  .project__crumbs a {
+    color: var(--aam-fg);
+  }
+  .project__category {
+    color: var(--aam-accent-ink);
+  }
+  .project__title {
+    font-size: var(--aam-text-3xl);
+    max-width: 18ch;
+  }
+  .project__summary {
+    font-size: var(--aam-text-lg);
+    color: var(--aam-fg-muted);
+    max-width: 46ch;
+  }
+  .project__cover {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--aam-radius-lg);
+    overflow: hidden;
+    background: var(--aam-bg-elevated);
+  }
+  .project__cover :global(img),
+  .project__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  :global(html.motion) .project__cover :global(img) {
+    animation: cover-in 1.8s var(--aam-ease-out) both;
+  }
+  @keyframes cover-in {
+    from {
+      transform: scale(1.12);
+    }
+  }
+  .project__overview {
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .project__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    border-top: 1px solid var(--aam-line);
+  }
+  .project__facts > div {
+    padding: 1.5rem 1.5rem 1.5rem 0;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+  }
+  .project__facts dt {
+    color: var(--aam-fg-muted);
+  }
+  .project__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .project__tags li {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--aam-line);
+    border-radius: var(--aam-radius-full);
+    font-size: var(--aam-text-sm);
+  }
+  .project__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .project__block {
+    display: grid;
+    gap: 1.5rem;
+    padding-block: clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+  .project__block-title {
+    color: var(--aam-fg-muted);
+    font-family: var(--aam-font-body);
+    letter-spacing: 0.14em;
+  }
+  .project__block-title span {
+    color: var(--aam-accent-ink);
+    margin-right: 0.5rem;
+  }
+  .project__block-body {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 60rem;
+  }
+  .project__block-body p:not(.project__lead) {
+    color: var(--aam-fg-muted);
+    max-width: 62ch;
+  }
+  .project__lead {
+    font-family: var(--aam-font-display);
+    font-size: var(--aam-text-xl);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .project__prose :global(p) {
+    margin-bottom: 1rem;
+  }
+  .project__gallery {
+    display: grid;
+    gap: 1rem;
+    padding-block: 2rem;
+  }
+  .project__shot {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--aam-radius-md);
+    aspect-ratio: 16 / 10;
+    background: var(--aam-bg-elevated);
+  }
+  .project__shot :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (min-width: 768px) {
+    .project__gallery {
+      grid-template-columns: 1fr 1fr;
+    }
+    .project__shot--wide {
+      grid-column: 1 / -1;
+    }
+    .project__block {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    }
+  }
+  .project__pager {
+    display: grid;
+    border-top: 1px solid var(--aam-line);
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .project__pager-link {
+    display: grid;
+    gap: 0.75rem;
+    padding-block: clamp(2rem, 1.5rem + 3vw, 4rem);
+    color: var(--aam-fg-muted);
+    transition: color var(--aam-duration-base);
+  }
+  .project__pager-link:hover,
+  .project__pager-link:focus-visible {
+    color: var(--aam-fg);
+  }
+  .project__pager-title {
+    font-family: var(--aam-font-display);
+    font-weight: 700;
+    font-size: var(--aam-text-2xl);
+    line-height: 1;
+    color: var(--aam-fg);
+    transition: color var(--aam-duration-base), transform var(--aam-duration-slow) var(--aam-ease-out);
+  }
+  .project__pager-link:hover .project__pager-title {
+    color: var(--aam-accent-ink);
+    transform: translateX(0.5rem);
+  }
+  .project__pager-link--next {
+    border-top: 1px solid var(--aam-line);
+  }
+  @media (min-width: 768px) {
+    .project__pager {
+      grid-template-columns: 1fr 1fr;
+    }
+    .project__pager-link--next {
+      border-top: 0;
+      border-left: 1px solid var(--aam-line);
+      padding-left: 2rem;
+      text-align: right;
+      justify-items: end;
+    }
+    .project__pager-link--next:hover .project__pager-title {
+      transform: translateX(-0.5rem);
+    }
+  }
+</style>

@@ -1,0 +1,137 @@
+---
+import { Image } from 'astro:assets';
+import SectionHeading from '../SectionHeading.astro';
+import MediaPlaceholder from '../MediaPlaceholder.astro';
+import { getSite } from '../../lib/site';
+
+const { about } = await getSite();
+const [lead, ...paragraphs] = about.paragraphs;
+---
+
+<section id="sobre-mi" class="section about" aria-labelledby="about-title">
+  <div class="container-site">
+    <SectionHeading number="01" label={about.title}>
+      <h2 id="about-title" class="sr-only">{about.title}</h2>
+    </SectionHeading>
+
+    <div class="about__grid">
+      <figure class="about__media" data-reveal-img>
+        <div class="about__parallax" data-parallax="0.14">
+          {
+            about.photo ? (
+              <Image
+                src={about.photo}
+                alt={about.photoAlt}
+                widths={[480, 720, 960, 1200]}
+                sizes="(min-width: 900px) 34vw, 100vw"
+                class="about__img"
+                loading="lazy"
+              />
+            ) : (
+              <MediaPlaceholder label="[COMPLETAR] Foto opcional" />
+            )
+          }
+        </div>
+      </figure>
+
+      <div class="about__text">
+        <p class="about__lead" data-split="lines">{lead}</p>
+        {
+          paragraphs.map((p) => (
+            <p class="about__p" data-reveal="up">
+              {p}
+            </p>
+          ))
+        }
+
+        {
+          about.stats.length > 0 && (
+            <dl class="about__stats">
+              {about.stats.map((s) => (
+                <div class="about__stat" data-reveal="up">
+                  <dt class="micro about__stat-label">{s.label}</dt>
+                  <dd class="about__stat-value">
+                    <span data-count-to={s.value}>{s.value.toLocaleString('es-ES')}</span>
+                    <span class="about__stat-suffix">{s.suffix}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about__grid {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 3vw, 6rem);
+  }
+  .about__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--aam-radius-md);
+    background: var(--aam-bg-elevated);
+    max-width: 30rem;
+  }
+  .about__parallax {
+    position: absolute;
+    inset: -8% 0;
+  }
+  .about__parallax :global(.about__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .about__lead {
+    font-family: var(--aam-font-display);
+    font-size: var(--aam-text-2xl);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin-bottom: 2.5rem;
+  }
+  .about__p {
+    color: var(--aam-fg-muted);
+    max-width: 58ch;
+    margin-bottom: 1.25rem;
+  }
+  .about__stats {
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    border-top: 1px solid var(--aam-line);
+  }
+  .about__stat {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    padding: 1.5rem 1.5rem 0 0;
+  }
+  .about__stat-label {
+    color: var(--aam-fg-muted);
+  }
+  .about__stat-value {
+    font-family: var(--aam-font-display);
+    font-size: var(--aam-text-3xl);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .about__stat-suffix {
+    color: var(--aam-accent-ink);
+  }
+  @media (min-width: 900px) {
+    .about__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+    .about__media {
+      position: sticky;
+      top: calc(var(--aam-header-h) + 2rem);
+    }
+  }
+</style>

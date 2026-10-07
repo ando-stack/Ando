@@ -1,0 +1,40 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button type="button" class:list={['theme-toggle', className]} data-theme-toggle aria-pressed="false" aria-label="Cambiar a tema claro" data-magnetic="0.3">
+  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+    <circle cx="12" cy="12" r="8.5"></circle>
+    <path class="theme-toggle__half" d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"></path>
+  </svg>
+</button>
+
+<style>
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--aam-line);
+    color: var(--aam-fg);
+    transition: border-color var(--aam-duration-fast);
+  }
+  .theme-toggle:hover {
+    border-color: var(--aam-fg);
+  }
+  .theme-toggle svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    transition: transform var(--aam-duration-slow) var(--aam-ease-out);
+  }
+  :global([data-theme='light']) .theme-toggle svg {
+    transform: rotate(180deg);
+  }
+  :global(html:not(.js)) .theme-toggle {
+    display: none;
+  }
+</style>

@@ -1,0 +1,23 @@
+# build
+dist/
+.astro/
+.netlify/
+
+# dependencias
+node_modules/
+
+# logs
+npm-debug.log*
+*.log
+
+# entorno
+.env
+.env.*
+!.env.example
+
+# sistema
+.DS_Store
+Thumbs.db
+
+# informes locales
+lighthouse/

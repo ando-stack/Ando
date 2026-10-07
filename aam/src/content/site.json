@@ -1,0 +1,69 @@
+{
+  "_instrucciones": "Edita los textos de la web aquí. Todo lo marcado con [COMPLETAR] es contenido de ejemplo que debes sustituir por tus datos reales. Los iconos de servicios disponibles son: code, design, motion, strategy, performance, spark. Para añadir tu foto, guárdala en src/assets/images/ y añade \"photo\": \"../assets/images/tu-foto.jpg\" dentro de \"about\".",
+  "name": "Andoni Ayala Malo",
+  "brand": "AAM",
+  "role": "[COMPLETAR] Tu profesión o especialidad",
+  "tagline": "[COMPLETAR] Una frase de presentación breve que explique qué haces y para quién.",
+  "location": "[COMPLETAR] Ciudad, País",
+  "availability": "[COMPLETAR] Disponible para nuevos proyectos",
+  "email": "completar@example.com",
+  "seo": {
+    "title": "Andoni Ayala Malo — AAM | Portfolio",
+    "description": "Portfolio de Andoni Ayala Malo (AAM). [COMPLETAR] Describe en una frase qué haces y qué tipo de proyectos te interesan."
+  },
+  "about": {
+    "title": "Sobre mí",
+    "paragraphs": [
+      "[COMPLETAR] Primer párrafo sobre ti: quién eres, a qué te dedicas y qué te motiva. Este texto aparece grande y se revela línea a línea al hacer scroll.",
+      "[COMPLETAR] Segundo párrafo: tu forma de trabajar, tu experiencia y lo que te diferencia.",
+      "[COMPLETAR] Tercer párrafo opcional: intereses, formación o lo que estás aprendiendo ahora."
+    ],
+    "photoAlt": "[COMPLETAR] Retrato de Andoni Ayala Malo",
+    "stats": [
+      { "value": 10, "suffix": "+", "label": "[COMPLETAR] Años de experiencia" },
+      { "value": 50, "suffix": "", "label": "[COMPLETAR] Proyectos realizados" },
+      { "value": 100, "suffix": "%", "label": "[COMPLETAR] Dato destacado" }
+    ]
+  },
+  "services": [
+    {
+      "icon": "code",
+      "title": "[COMPLETAR] Servicio 1",
+      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
+    },
+    {
+      "icon": "design",
+      "title": "[COMPLETAR] Servicio 2",
+      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
+    },
+    {
+      "icon": "motion",
+      "title": "[COMPLETAR] Servicio 3",
+      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
+    },
+    {
+      "icon": "performance",
+      "title": "[COMPLETAR] Servicio 4",
+      "description": "[COMPLETAR] Describe en dos líneas en qué consiste este servicio y qué aporta."
+    }
+  ],
+  "stack": [
+    "[COMPLETAR] Tecnología 1",
+    "[COMPLETAR] Tecnología 2",
+    "[COMPLETAR] Tecnología 3",
+    "[COMPLETAR] Tecnología 4",
+    "[COMPLETAR] Herramienta 5",
+    "[COMPLETAR] Herramienta 6",
+    "[COMPLETAR] Herramienta 7",
+    "[COMPLETAR] Herramienta 8"
+  ],
+  "contact": {
+    "title": "¿Hablamos?",
+    "intro": "[COMPLETAR] Una frase invitando a contactar: qué tipo de proyectos o colaboraciones buscas."
+  },
+  "socials": [
+    { "label": "LinkedIn", "url": "https://www.linkedin.com/in/COMPLETAR" },
+    { "label": "GitHub", "url": "https://github.com/COMPLETAR" },
+    { "label": "Instagram", "url": "https://www.instagram.com/COMPLETAR" }
+  ]
+}

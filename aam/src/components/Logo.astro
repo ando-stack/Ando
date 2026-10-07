@@ -1,0 +1,44 @@
+---
+/**
+ * Monograma AAM en SVG (hereda el color con currentColor).
+ * animated: trazos separados con pathLength=1 para animar el dibujo.
+ */
+interface Props {
+  class?: string;
+  animated?: boolean;
+  title?: string;
+  strokeWidth?: number;
+}
+const { class: className, animated = false, title, strokeWidth = 7 } = Astro.props;
+const paths = [
+  { cls: 'aam-bar-left', d: 'M12 89V11' },
+  { cls: 'aam-zigzag', d: 'M12 78L31 22L50 78L69 22L88 78' },
+  { cls: 'aam-bar-a1', d: 'M17.4 62H44.6' },
+  { cls: 'aam-bar-a2', d: 'M55.4 62H82.6' },
+  { cls: 'aam-bar-right', d: 'M88 11V89' },
+];
+---
+
+<svg
+  class={className}
+  viewBox="0 0 100 100"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linejoin="miter"
+  stroke-miterlimit="10"
+  role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  aria-label={title}
+  focusable="false"
+>
+  {
+    paths.map((p) =>
+      animated ? (
+        <path class:list={['aam-stroke', p.cls]} d={p.d} pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" />
+      ) : (
+        <path d={p.d} />
+      ),
+    )
+  }
+</svg>

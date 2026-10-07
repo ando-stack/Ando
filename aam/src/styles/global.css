@@ -1,0 +1,239 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    background: var(--aam-bg);
+    color: var(--aam-fg);
+    font-family: var(--aam-font-body);
+    font-size: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: var(--aam-header-h);
+  }
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: clip;
+  }
+  body {
+    min-height: 100dvh;
+    font-size: var(--aam-text-base);
+    line-height: 1.6;
+    overflow-x: clip;
+    transition: background-color var(--aam-duration-base) var(--aam-ease-out), color var(--aam-duration-base) var(--aam-ease-out);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--aam-font-display);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: var(--aam-accent);
+    color: var(--aam-on-accent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--aam-accent-ink);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+  /* Quitar el contorno solo cuando se usa el ratón */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+  img, video, svg {
+    max-width: 100%;
+  }
+}
+
+/* ---------- Utilidades propias ---------- */
+@layer components {
+  .container-site {
+    width: 100%;
+    max-width: var(--aam-max-width);
+    margin-inline: auto;
+    padding-inline: var(--aam-gutter);
+  }
+  .section {
+    padding-block: var(--aam-section-y);
+    position: relative;
+  }
+  .micro {
+    font-size: var(--aam-text-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .hairline {
+    border-color: var(--aam-line);
+  }
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px currentColor;
+  }
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size var(--aam-duration-base) var(--aam-ease-out);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Botón principal */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    min-height: 3rem;
+    padding: 0.85rem 1.6rem;
+    border-radius: var(--aam-radius-full);
+    border: 1px solid var(--aam-line-strong);
+    font-weight: 500;
+    font-size: var(--aam-text-sm);
+    line-height: 1;
+    transition: background-color var(--aam-duration-fast), color var(--aam-duration-fast), border-color var(--aam-duration-fast);
+    will-change: transform;
+  }
+  .btn:hover {
+    border-color: var(--aam-fg);
+  }
+  .btn-accent {
+    background: var(--aam-accent);
+    color: var(--aam-on-accent);
+    border-color: var(--aam-accent);
+  }
+  .btn-accent:hover {
+    background: var(--aam-fg);
+    border-color: var(--aam-fg);
+    color: var(--aam-bg);
+  }
+}
+
+/* ---------- Grano / ruido de fondo ---------- */
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  opacity: var(--aam-grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1.2s steps(6) infinite;
+}
+:root[data-theme='light'] .grain {
+  filter: invert(1);
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-4%, 3%); }
+  40% { transform: translate(3%, -5%); }
+  60% { transform: translate(-2%, 6%); }
+  80% { transform: translate(5%, 2%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------- Estado inicial de elementos animados ----------
+   Solo se ocultan si JavaScript está activo (clase .js en <html>) y el
+   usuario no ha pedido reducir el movimiento. Si JS falla, todo es visible. */
+html.js.motion [data-reveal='fade'],
+html.js.motion [data-reveal='up'] {
+  opacity: 0;
+}
+html.js.motion [data-reveal-img] {
+  clip-path: inset(100% 0 0 0);
+}
+html.js.motion [data-split] {
+  visibility: hidden;
+}
+html.js.motion [data-split].is-split {
+  visibility: visible;
+}
+
+/* ---------- Cinta en movimiento (marquee) ---------- */
+.marquee {
+  --gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: var(--gap);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee__track {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  min-width: 100%;
+  justify-content: space-around;
+  animation: marquee var(--aam-marquee-duration) linear infinite;
+}
+.marquee[data-direction='reverse'] .marquee__track {
+  animation-direction: reverse;
+}
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% - var(--gap))); }
+}
+
+/* ---------- Movimiento reducido: sin animaciones grandes ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .grain {
+    animation: none;
+  }
+  .marquee {
+    mask-image: none;
+  }
+  .marquee__track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+  .marquee__track[aria-hidden='true'] {
+    display: none;
+  }
+}
+
+/* ---------- Transiciones de página (View Transitions) ---------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}

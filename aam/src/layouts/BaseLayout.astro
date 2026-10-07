@@ -1,0 +1,330 @@
+---
+/**
+ * Layout base: SEO (título, descripción, canónica, Open Graph, Twitter Card,
+ * datos estructurados), tema, transiciones de página y elementos globales.
+ */
+import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Preloader from '../components/Preloader.astro';
+import Logo from '../components/Logo.astro';
+import { effects, PRELOADER_KEY, THEME_KEY } from '../lib/config';
+import { getSite } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: ImageMetadata | string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const site = await getSite();
+const {
+  title,
+  description = site.seo.description,
+  image,
+  imageAlt = `${site.brand} — ${site.name}`,
+  type = 'website',
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+const fullTitle = title ? `${title} — ${site.brand} · ${site.name}` : site.seo.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+let ogImage = new URL('/og-image.jpg', Astro.site).href;
+if (image && typeof image !== 'string') {
+  const img = await getImage({ src: image, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+  ogImage = new URL(img.src, Astro.site).href;
+} else if (typeof image === 'string') {
+  ogImage = new URL(image, Astro.site).href;
+}
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  alternateName: site.brand,
+  url: new URL('/', Astro.site).href,
+  image: new URL('/og-image.jpg', Astro.site).href,
+  jobTitle: site.role,
+  email: `mailto:${site.email}`,
+  sameAs: site.socials.map((s) => s.url),
+};
+const structured = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+
+// Script inicial (antes de pintar): tema, clases js/motion, precarga y respaldo si JS falla.
+const bootScript = `(() => {
+  const d = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  d.classList.add('js');
+  if (!reduce) d.classList.add('motion');
+  let theme = null;
+  try { theme = localStorage.getItem(${JSON.stringify(THEME_KEY)}); } catch (e) {}
+  d.dataset.theme = theme === 'light' ? 'light' : 'dark';
+  if (${effects.preloader} && !reduce) {
+    let seen = '1';
+    try { seen = sessionStorage.getItem(${JSON.stringify(PRELOADER_KEY)}); } catch (e) {}
+    if (!seen) d.classList.add('show-preloader');
+  }
+  setTimeout(() => {
+    if (!d.classList.contains('anim-ready')) d.classList.remove('motion', 'show-preloader');
+  }, 6000);
+  if (!window.__aamBoot) {
+    window.__aamBoot = true;
+    document.addEventListener('astro:before-swap', (e) => {
+      const n = e.newDocument.documentElement;
+      ['js', 'motion', 'has-cursor', 'anim-ready'].forEach((c) => d.classList.contains(c) && n.classList.add(c));
+      n.dataset.theme = d.dataset.theme;
+    });
+  }
+})();`;
+---
+
+<!doctype html>
+<html lang="es" data-theme="dark" transition:animate="none">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="author" content={site.name} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0b0b0c" />
+
+    <!-- Iconos -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content={type} />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content={`${site.brand} — ${site.name}`} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+
+    <!-- Fuentes propias: precarga de los pesos latinos -->
+    <link rel="preload" href="/fonts/syne-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <script is:inline set:html={bootScript} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    {structured.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+
+    <ClientRouter fallback="swap" />
+  </head>
+  <body class="bg-bg text-fg antialiased">
+    <a href="#main" class="skip-link">Saltar al contenido</a>
+    <div id="top" tabindex="-1" class="sr-only">Inicio de la página</div>
+
+    {effects.preloader && <Preloader />}
+
+    {
+      effects.scrollProgress && (
+        <div class="scroll-progress" aria-hidden="true" transition:persist="scroll-progress">
+          <span data-scroll-progress />
+        </div>
+      )
+    }
+
+    <Header />
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {
+      effects.cursor && (
+        <div id="cursor" class="cursor" aria-hidden="true" transition:persist="cursor">
+          <span class="cursor__ring">
+            <span class="cursor__label" />
+          </span>
+          <span class="cursor__dot" />
+        </div>
+      )
+    }
+
+    {
+      effects.pageTransitions && (
+        <div class="curtain" data-curtain hidden aria-hidden="true" transition:persist="curtain">
+          <Logo class="curtain__mark" animated strokeWidth={5} />
+        </div>
+      )
+    }
+
+    {effects.grain && <div class="grain" aria-hidden="true" transition:persist="grain" />}
+
+    <script>
+      import '../lib/app';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .skip-link {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 300;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--aam-radius-full);
+    background: var(--aam-accent);
+    color: var(--aam-on-accent);
+    font-weight: 600;
+    transform: translateY(-200%);
+    transition: transform var(--aam-duration-fast);
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+  html.scroll-locked {
+    overflow: hidden;
+  }
+  #main:focus {
+    outline: none;
+  }
+
+  /* Barra de progreso */
+  .scroll-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 2px;
+    z-index: 120;
+    pointer-events: none;
+  }
+  .scroll-progress span {
+    display: block;
+    height: 100%;
+    background: var(--aam-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  /* Cursor personalizado */
+  .cursor {
+    display: none;
+  }
+  html.has-cursor .cursor {
+    display: block;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 250;
+    opacity: 0;
+    transition: opacity var(--aam-duration-base);
+  }
+  html.has-cursor .cursor.is-visible {
+    opacity: 1;
+  }
+  .cursor__dot,
+  .cursor__ring {
+    position: fixed;
+    left: 0;
+    top: 0;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  .cursor__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--aam-accent);
+  }
+  .cursor__ring {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+  }
+  .cursor__ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--aam-line-strong);
+    transition: transform var(--aam-duration-base) var(--aam-ease-out), background-color var(--aam-duration-base),
+      border-color var(--aam-duration-base);
+  }
+  .cursor.is-hover .cursor__ring::before {
+    transform: scale(1.6);
+    border-color: var(--aam-accent);
+  }
+  .cursor.has-label .cursor__ring::before {
+    transform: scale(2.4);
+    background: var(--aam-accent);
+    border-color: var(--aam-accent);
+  }
+  .cursor.is-text .cursor__ring::before {
+    transform: scale(0.4, 0.9);
+    border-radius: 2px;
+  }
+  .cursor.is-down .cursor__ring::before {
+    transform: scale(0.8);
+  }
+  .cursor.has-label .cursor__dot {
+    opacity: 0;
+  }
+  .cursor__label {
+    position: relative;
+    font-size: var(--aam-text-micro);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--aam-on-accent);
+    opacity: 0;
+    transition: opacity var(--aam-duration-fast);
+    white-space: nowrap;
+  }
+  .cursor.has-label .cursor__label {
+    opacity: 1;
+  }
+  /* Con cursor propio, se oculta el del sistema salvo en campos de texto */
+  html.has-cursor,
+  html.has-cursor a,
+  html.has-cursor button,
+  html.has-cursor [data-cursor] {
+    cursor: none;
+  }
+
+  /* Cortina de transición */
+  .curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 220;
+    display: grid;
+    place-items: center;
+    background: var(--aam-accent);
+    color: var(--aam-on-accent);
+    clip-path: inset(100% 0% 0% 0%);
+  }
+  .curtain[hidden] {
+    display: none;
+  }
+  .curtain__mark {
+    width: clamp(4rem, 3rem + 5vw, 7rem);
+  }
+</style>

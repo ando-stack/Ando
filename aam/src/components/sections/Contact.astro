@@ -1,0 +1,204 @@
+---
+import ContactForm from '../ContactForm';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+const FORM_NAME = 'contacto';
+---
+
+<section id="contacto" class="section contact" aria-labelledby="contact-title">
+  <div class="container-site">
+    <p class="micro contact__meta" data-reveal="fade">
+      <span class="contact__num">(06)</span>
+      <span class="contact__rule" aria-hidden="true"></span>
+      <span>Contacto</span>
+    </p>
+
+    <h2 id="contact-title" class="contact__title" data-split="chars">{site.contact.title}</h2>
+
+    <div class="contact__grid">
+      <div class="contact__info">
+        <p class="contact__intro" data-reveal="up">{site.contact.intro}</p>
+
+        <a href={`mailto:${site.email}`} class="contact__email" data-magnetic="0.15" data-cursor="Escribir">
+          <span data-magnetic-inner class="link-underline">{site.email}</span>
+        </a>
+
+        {
+          site.socials.length > 0 && (
+            <ul class="contact__socials" aria-label="Redes sociales">
+              {site.socials.map((s) => (
+                <li>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" class="btn contact__social" data-magnetic data-cursor="Abrir">
+                    <span data-magnetic-inner>{s.label}</span>
+                    <span class="sr-only"> (se abre en una pestaña nueva)</span>
+                    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M5 11 11 5M6 5h5v5" />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+
+      <div class="contact__form" data-reveal="up">
+        <ContactForm client:visible formName={FORM_NAME} />
+      </div>
+    </div>
+  </div>
+
+  <!--
+    Formulario oculto para que Netlify detecte el formulario en el HTML estático
+    durante el despliegue (el formulario visible lo renderiza React).
+  -->
+  <form name={FORM_NAME} data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <textarea name="message"></textarea>
+    <input name="bot-field" />
+  </form>
+</section>
+
+<style>
+  .contact {
+    overflow: hidden;
+  }
+  .contact__meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--aam-fg-muted);
+  }
+  .contact__num {
+    color: var(--aam-accent-ink);
+  }
+  .contact__rule {
+    width: 3rem;
+    height: 1px;
+    background: var(--aam-line-strong);
+  }
+  .contact__title {
+    /* Ajustado para que "¿Hablamos?" quepa en una línea en cualquier pantalla */
+    font-size: clamp(2.5rem, (100vw - 2 * var(--aam-gutter)) / 9.8, 12rem);
+    white-space: nowrap;
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    margin-block: 2rem clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .contact__grid {
+    display: grid;
+    gap: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .contact__intro {
+    font-size: var(--aam-text-lg);
+    max-width: 34ch;
+    color: var(--aam-fg-muted);
+  }
+  .contact__email {
+    display: inline-block;
+    margin-block: 2.5rem;
+    font-family: var(--aam-font-display);
+    font-size: var(--aam-text-xl);
+    font-weight: 600;
+    word-break: break-all;
+  }
+  .contact__socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  @media (min-width: 900px) {
+    .contact__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  /* ---------- Formulario (componente React) ---------- */
+  .contact__form :global(.form) {
+    display: grid;
+    gap: 1.75rem;
+  }
+  .contact__form :global(.form__honeypot) {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .contact__form :global(.form__field) {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .contact__form :global(.form__label) {
+    font-size: var(--aam-text-micro);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--aam-fg-muted);
+  }
+  .contact__form :global(.form__input) {
+    width: 100%;
+    padding: 0.9rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--aam-line-strong);
+    background: transparent;
+    color: var(--aam-fg);
+    font: inherit;
+    font-size: var(--aam-text-lg);
+    border-radius: 0;
+    transition: border-color var(--aam-duration-fast);
+  }
+  .contact__form :global(.form__input:focus) {
+    outline: none;
+    border-bottom-color: var(--aam-accent-ink);
+    box-shadow: 0 1px 0 0 var(--aam-accent-ink);
+  }
+  .contact__form :global(.form__input[aria-invalid='true']) {
+    border-bottom-color: var(--aam-danger);
+  }
+  .contact__form :global(.form__textarea) {
+    resize: vertical;
+    min-height: 8rem;
+  }
+  .contact__form :global(.form__error) {
+    color: var(--aam-danger);
+    font-size: var(--aam-text-sm);
+    animation: form-in 0.5s var(--aam-ease-out);
+  }
+  .contact__form :global(.form__actions) {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+  .contact__form :global(.form__submit[disabled]) {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .contact__form :global(.form__message) {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 1rem 1.25rem;
+    border-radius: var(--aam-radius-md);
+    border: 1px solid currentColor;
+    animation: form-in 0.7s var(--aam-ease-out);
+  }
+  .contact__form :global(.form__message--success) {
+    color: var(--aam-success);
+  }
+  .contact__form :global(.form__message--error) {
+    color: var(--aam-danger);
+  }
+  @keyframes form-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

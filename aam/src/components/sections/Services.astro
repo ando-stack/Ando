@@ -1,0 +1,99 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import Icon from '../Icon.astro';
+import { getSite } from '../../lib/site';
+
+const { services } = await getSite();
+---
+
+<section id="servicios" class="section services" aria-labelledby="services-title">
+  <div class="container-site">
+    <SectionHeading number="02" label="Servicios" title="Qué hago" id="services-title" />
+
+    <ul class="services__grid">
+      {
+        services.map((s, i) => (
+          <li class="services__item" data-reveal="up">
+            <article class="service-card" data-tilt="8">
+              <div class="service-card__glare" aria-hidden="true" />
+              <div class="service-card__top">
+                <Icon name={s.icon} class="service-card__icon" />
+                <span class="micro service-card__num">{String(i + 1).padStart(2, '0')}</span>
+              </div>
+              <h3 class="service-card__title">{s.title}</h3>
+              <p class="service-card__desc">{s.description}</p>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .services__grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+  .services__item {
+    perspective: 900px;
+  }
+  .service-card {
+    position: relative;
+    height: 100%;
+    min-height: 20rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+    border: 1px solid var(--aam-line);
+    border-radius: var(--aam-radius-lg);
+    background: var(--aam-bg-elevated);
+    overflow: hidden;
+    transition: border-color var(--aam-duration-base);
+    will-change: transform;
+  }
+  .service-card:hover {
+    border-color: var(--aam-line-strong);
+  }
+  .service-card__glare {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at var(--glare-x, 50%) var(--glare-y, 0%),
+      color-mix(in srgb, var(--aam-accent) 16%, transparent),
+      transparent 55%
+    );
+    opacity: 0;
+    transition: opacity var(--aam-duration-base);
+  }
+  .service-card:hover .service-card__glare {
+    opacity: 1;
+  }
+  .service-card__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: auto;
+  }
+  .service-card :global(.service-card__icon) {
+    width: 3rem;
+    height: 3rem;
+    color: var(--aam-accent-ink);
+  }
+  .service-card__num {
+    color: var(--aam-fg-muted);
+  }
+  .service-card__title {
+    font-size: var(--aam-text-xl);
+    line-height: 1.05;
+    margin-top: 3rem;
+  }
+  .service-card__desc {
+    color: var(--aam-fg-muted);
+    font-size: var(--aam-text-sm);
+    line-height: 1.6;
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+import Logo from './Logo.astro';
+import { getSite, sections } from '../lib/site';
+
+const site = await getSite();
+const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
+const href = (id: string) => (isHome ? `#${id}` : `/#${id}`);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container-site">
+    <div class="site-footer__top">
+      <a href="/" class="site-footer__brand" aria-label={`${site.brand}, ir al inicio`}>
+        <Logo class="site-footer__mark" />
+      </a>
+      <nav aria-label="Pie de página">
+        <ul class="site-footer__links">
+          {
+            sections.map((s) => (
+              <li>
+                <a href={href(s.id)} class="link-underline">
+                  {s.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <ul class="site-footer__links">
+        {
+          site.socials.map((s) => (
+            <li>
+              <a href={s.url} target="_blank" rel="noopener noreferrer" class="link-underline">
+                {s.label}
+                <span class="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a href="#top" class="btn site-footer__top-btn" data-scroll-top data-magnetic data-cursor="Subir">
+        <span data-magnetic-inner>Volver arriba</span>
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"
+          ><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"></path></svg
+        >
+      </a>
+    </div>
+
+    <div class="site-footer__bottom micro">
+      <p>
+        © <span data-current-year>{year}</span>{' '}{site.name}
+      </p>
+      <p class="site-footer__wordmark" aria-hidden="true">{site.brand}</p>
+      <p>{site.location}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--aam-line);
+    padding-block: clamp(3rem, 2rem + 4vw, 5rem) 2rem;
+  }
+  .site-footer__top {
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .site-footer__brand {
+    display: inline-block;
+  }
+  .site-footer__brand :global(.site-footer__mark) {
+    width: 3.5rem;
+    color: var(--aam-accent-ink);
+  }
+  .site-footer__links {
+    display: grid;
+    gap: 0.6rem;
+    font-size: var(--aam-text-sm);
+  }
+  .site-footer__links a {
+    display: inline-block;
+    padding-block: 0.15rem;
+  }
+  .site-footer__top-btn {
+    justify-self: start;
+  }
+  .site-footer__bottom {
+    margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--aam-line);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--aam-fg-muted);
+  }
+  .site-footer__wordmark {
+    font-family: var(--aam-font-display);
+    letter-spacing: 0.4em;
+  }
+  @media (min-width: 768px) {
+    .site-footer__top {
+      grid-template-columns: 1fr 1fr 1fr auto;
+    }
+  }
+</style>

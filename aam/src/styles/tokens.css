@@ -1,0 +1,176 @@
+/* =========================================================================
+   AAM — TOKENS DE DISEÑO
+   Único lugar donde se definen colores, tipografías, tamaños, espaciados,
+   radios y tiempos de animación. Cambia aquí y se actualiza toda la web.
+   ========================================================================= */
+
+/* ---------- Fuentes (alojadas en /public/fonts, licencia SIL OFL) ---------- */
+@font-face {
+  font-family: 'Syne';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 800;
+  src: url('/fonts/syne-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Syne';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 800;
+  src: url('/fonts/syne-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Fuente de respaldo con métricas ajustadas para evitar saltos de diseño (CLS) */
+@font-face {
+  font-family: 'Syne Fallback';
+  src: local('Arial');
+  size-adjust: 112%;
+  ascent-override: 84%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+/* ---------- Tema oscuro (por defecto) ---------- */
+:root {
+  color-scheme: dark;
+
+  /* Colores */
+  --aam-bg: #0b0b0c;
+  --aam-bg-elevated: #141416;
+  --aam-surface: #1b1b1e;
+  --aam-fg: #edede8;
+  --aam-fg-muted: #a3a39c;
+  --aam-line: rgb(237 237 232 / 0.14);
+  --aam-line-strong: rgb(237 237 232 / 0.32);
+  --aam-accent: #c8ff2e; /* color de acento (fondos, detalles) */
+  --aam-accent-ink: #c8ff2e; /* acento usado como color de texto */
+  --aam-on-accent: #0b0b0c; /* texto sobre fondo de acento */
+  --aam-danger: #ff6b5b;
+  --aam-success: #c8ff2e;
+  --aam-grain-opacity: 0.07;
+  --aam-scene-a: #c8ff2e; /* colores de la escena 3D */
+  --aam-scene-b: #6d5dfc;
+
+  /* Tipografía */
+  --aam-font-display: 'Syne', 'Syne Fallback', ui-sans-serif, system-ui, sans-serif;
+  --aam-font-body: 'Inter', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
+
+  /* Escala tipográfica fluida (móvil → escritorio) */
+  --aam-text-micro: 0.6875rem; /* 11px: microtextos, etiquetas */
+  --aam-text-sm: 0.875rem;
+  --aam-text-base: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --aam-text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --aam-text-xl: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
+  --aam-text-2xl: clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem);
+  --aam-text-3xl: clamp(2.5rem, 1.5rem + 4.5vw, 5.5rem);
+  --aam-text-hero: clamp(3rem, 0.8rem + 9.6vw, 11.5rem);
+  --aam-text-giant: clamp(4rem, 1rem + 13vw, 16rem);
+
+  /* Espaciados */
+  --aam-gutter: clamp(1.25rem, 0.6rem + 2.6vw, 3rem); /* margen lateral */
+  --aam-section-y: clamp(5rem, 3.5rem + 6vw, 9rem); /* separación entre secciones */
+  --aam-stack-sm: 0.75rem;
+  --aam-stack-md: 1.5rem;
+  --aam-stack-lg: 3rem;
+  --aam-max-width: 92rem;
+  --aam-header-h: 4.5rem;
+
+  /* Radios y bordes */
+  --aam-radius-sm: 0.375rem;
+  --aam-radius-md: 0.875rem;
+  --aam-radius-lg: 1.5rem;
+  --aam-radius-full: 999px;
+
+  /* Movimiento */
+  --aam-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --aam-ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --aam-duration-fast: 200ms;
+  --aam-duration-base: 450ms;
+  --aam-duration-slow: 900ms;
+  --aam-marquee-duration: 38s;
+}
+
+/* ---------- Tema claro ---------- */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --aam-bg: #f2f1ec;
+  --aam-bg-elevated: #e9e8e2;
+  --aam-surface: #e1e0d9;
+  --aam-fg: #0f0f10;
+  --aam-fg-muted: #54544e;
+  --aam-line: rgb(15 15 16 / 0.14);
+  --aam-line-strong: rgb(15 15 16 / 0.34);
+  --aam-accent: #c8ff2e;
+  --aam-accent-ink: #3f5c00; /* versión oscura del acento: contraste AA sobre fondo claro */
+  --aam-on-accent: #0b0b0c;
+  --aam-danger: #b42318;
+  --aam-success: #3f5c00;
+  --aam-grain-opacity: 0.05;
+  --aam-scene-a: #4f7300;
+  --aam-scene-b: #5145d8;
+}
+
+/* ---------- Puente con Tailwind: genera utilidades como bg-bg, text-fg, text-accent-ink ---------- */
+@theme inline {
+  --color-bg: var(--aam-bg);
+  --color-bg-elevated: var(--aam-bg-elevated);
+  --color-surface: var(--aam-surface);
+  --color-fg: var(--aam-fg);
+  --color-muted: var(--aam-fg-muted);
+  --color-line: var(--aam-line);
+  --color-line-strong: var(--aam-line-strong);
+  --color-accent: var(--aam-accent);
+  --color-accent-ink: var(--aam-accent-ink);
+  --color-on-accent: var(--aam-on-accent);
+  --color-danger: var(--aam-danger);
+  --color-success: var(--aam-success);
+
+  --font-display: var(--aam-font-display);
+  --font-body: var(--aam-font-body);
+
+  --text-micro: var(--aam-text-micro);
+  --text-micro--letter-spacing: 0.14em;
+  --text-lead: var(--aam-text-lg);
+  --text-title: var(--aam-text-2xl);
+  --text-display: var(--aam-text-3xl);
+  --text-hero: var(--aam-text-hero);
+  --text-giant: var(--aam-text-giant);
+
+  --spacing-gutter: var(--aam-gutter);
+  --spacing-section: var(--aam-section-y);
+  --spacing-header: var(--aam-header-h);
+  --container-site: var(--aam-max-width);
+
+  --ease-out-expo: var(--aam-ease-out);
+  --ease-in-out-quart: var(--aam-ease-in-out);
+}

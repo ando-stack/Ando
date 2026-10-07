@@ -1,0 +1,53 @@
+---
+interface Props {
+  number: string;
+  label: string;
+  title?: string;
+  id?: string;
+  class?: string;
+}
+const { number, label, title, id, class: className } = Astro.props;
+---
+
+<div class:list={['section-heading', className]}>
+  <p class="micro section-heading__meta" data-reveal="fade">
+    <span class="section-heading__num">({number})</span>
+    <span class="section-heading__rule" aria-hidden="true"></span>
+    <span>{label}</span>
+  </p>
+  {
+    title && (
+      <h2 id={id} class="section-heading__title" data-split="lines">
+        {title}
+      </h2>
+    )
+  }
+  <slot />
+</div>
+
+<style>
+  .section-heading {
+    display: grid;
+    gap: clamp(1.25rem, 1rem + 1vw, 2rem);
+    margin-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .section-heading__meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--aam-fg-muted);
+  }
+  .section-heading__num {
+    color: var(--aam-accent-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .section-heading__rule {
+    width: 3rem;
+    height: 1px;
+    background: var(--aam-line-strong);
+  }
+  .section-heading__title {
+    font-size: var(--aam-text-3xl);
+    max-width: 16ch;
+  }
+</style>

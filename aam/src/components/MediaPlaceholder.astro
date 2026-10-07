@@ -1,0 +1,36 @@
+---
+/** Marcador elegante para cuando falta una imagen (portada, foto...). */
+import Logo from './Logo.astro';
+interface Props {
+  label?: string;
+  class?: string;
+}
+const { label = 'Imagen pendiente', class: className } = Astro.props;
+---
+
+<div class:list={['media-placeholder', className]} role="img" aria-label={label}>
+  <Logo class="media-placeholder__mark" strokeWidth={4} />
+  <span class="micro">{label}</span>
+</div>
+
+<style>
+  .media-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1rem;
+    color: var(--aam-fg-muted);
+    background:
+      radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--aam-accent) 18%, transparent), transparent 55%),
+      repeating-linear-gradient(135deg, var(--aam-line) 0 1px, transparent 1px 14px),
+      var(--aam-bg-elevated);
+    text-align: center;
+    padding: 1rem;
+  }
+  .media-placeholder :global(.media-placeholder__mark) {
+    width: 3.5rem;
+    opacity: 0.6;
+  }
+</style>

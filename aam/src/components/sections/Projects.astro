@@ -1,0 +1,273 @@
+---
+import { Image } from 'astro:assets';
+import SectionHeading from '../SectionHeading.astro';
+import MediaPlaceholder from '../MediaPlaceholder.astro';
+import { getProjects } from '../../lib/site';
+
+const projects = (await getProjects()).filter((p) => p.data.featured);
+const categories = [...new Set(projects.map((p) => p.data.category))];
+---
+
+<section id="proyectos" class="section projects" aria-labelledby="projects-title" data-projects>
+  <div class="container-site">
+    <SectionHeading number="04" label="Proyectos destacados" title="Trabajo seleccionado" id="projects-title" />
+
+    <div class="projects__filters" role="group" aria-label="Filtrar proyectos por categoría">
+      <button type="button" class="projects__filter" data-filter="all" aria-pressed="true" data-magnetic="0.2">
+        Todos <sup>{projects.length}</sup>
+      </button>
+      {
+        categories.map((c) => (
+          <button type="button" class="projects__filter" data-filter={c} aria-pressed="false" data-magnetic="0.2">
+            {c} <sup>{projects.filter((p) => p.data.category === c).length}</sup>
+          </button>
+        ))
+      }
+      <p class="sr-only" aria-live="polite" data-filter-status></p>
+    </div>
+
+    <ol class="projects__list">
+      {
+        projects.map((p, i) => (
+          <li class="project-row" data-project data-slug={p.id} data-category={p.data.category}>
+            <a href={`/proyectos/${p.id}`} class="project-row__link" data-project-link data-cursor="Ver">
+              <div class="project-row__thumb">
+                {p.data.cover ? (
+                  <Image
+                    src={p.data.cover}
+                    alt=""
+                    widths={[400, 640, 900]}
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    loading="lazy"
+                    class="project-row__img"
+                  />
+                ) : (
+                  <MediaPlaceholder label="Portada pendiente" />
+                )}
+              </div>
+              <span class="micro project-row__num">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="project-row__title">{p.data.title}</h3>
+              <span class="project-row__meta">
+                <span class="micro">{p.data.category}</span>
+                <span class="micro project-row__year">{p.data.year}</span>
+              </span>
+              <span class="project-row__tech micro">{p.data.technologies.join(' · ')}</span>
+              <span class="project-row__arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M7 17 17 7M8 7h9v9" />
+                </svg>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <!-- Vista previa flotante que sigue al cursor (solo escritorio con ratón) -->
+  <div class="project-preview" data-project-preview aria-hidden="true">
+    {
+      projects.map((p) => (
+        <div class="project-preview__item" data-preview-item={p.id}>
+          {p.data.video ? (
+            <video src={p.data.video} muted loop playsinline preload="none" />
+          ) : p.data.cover ? (
+            <Image src={p.data.cover} alt="" widths={[480, 720]} sizes="26rem" loading="lazy" />
+          ) : (
+            <MediaPlaceholder label="Portada pendiente" />
+          )}
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .projects__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  :global(html:not(.js)) .projects__filters {
+    display: none;
+  }
+  .projects__filter {
+    min-height: 2.75rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: var(--aam-radius-full);
+    border: 1px solid var(--aam-line);
+    font-size: var(--aam-text-sm);
+    transition: background-color var(--aam-duration-fast), color var(--aam-duration-fast), border-color var(--aam-duration-fast);
+  }
+  .projects__filter sup {
+    font-size: 0.65em;
+    color: var(--aam-fg-muted);
+  }
+  .projects__filter:hover {
+    border-color: var(--aam-fg);
+  }
+  .projects__filter[aria-pressed='true'] {
+    background: var(--aam-fg);
+    color: var(--aam-bg);
+    border-color: var(--aam-fg);
+  }
+  .projects__filter[aria-pressed='true'] sup {
+    color: inherit;
+  }
+
+  .projects__list {
+    border-top: 1px solid var(--aam-line);
+  }
+  .project-row {
+    border-bottom: 1px solid var(--aam-line);
+  }
+  .project-row[hidden] {
+    display: none;
+  }
+  .project-row__link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'thumb thumb thumb'
+      'num title arrow'
+      'meta meta meta'
+      'tech tech tech';
+    gap: 0.75rem 1rem;
+    padding-block: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    align-items: center;
+    transition: opacity var(--aam-duration-base) var(--aam-ease-out);
+  }
+  .project-row__thumb {
+    grid-area: thumb;
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--aam-radius-md);
+    overflow: hidden;
+    background: var(--aam-bg-elevated);
+    margin-bottom: 0.75rem;
+  }
+  .project-row__thumb :global(.project-row__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--aam-duration-slow) var(--aam-ease-out);
+  }
+  .project-row__link:hover .project-row__thumb :global(.project-row__img) {
+    transform: scale(1.05);
+  }
+  .project-row__num {
+    grid-area: num;
+    color: var(--aam-fg-muted);
+    align-self: start;
+    padding-top: 0.6em;
+  }
+  .project-row__title {
+    grid-area: title;
+    font-size: var(--aam-text-2xl);
+    line-height: 1;
+    transition: transform var(--aam-duration-slow) var(--aam-ease-out), color var(--aam-duration-base);
+  }
+  .project-row__meta {
+    grid-area: meta;
+    display: flex;
+    gap: 1.5rem;
+    color: var(--aam-fg-muted);
+  }
+  .project-row__tech {
+    grid-area: tech;
+    color: var(--aam-fg-muted);
+    text-transform: none;
+    letter-spacing: 0.04em;
+  }
+  .project-row__arrow {
+    grid-area: arrow;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 1px solid var(--aam-line);
+    transition: background-color var(--aam-duration-base), color var(--aam-duration-base), transform var(--aam-duration-slow) var(--aam-ease-out),
+      border-color var(--aam-duration-base);
+  }
+  .project-row__arrow svg {
+    width: 1.1rem;
+  }
+  .project-row__link:hover .project-row__title,
+  .project-row__link:focus-visible .project-row__title {
+    color: var(--aam-accent-ink);
+    transform: translateX(0.75rem);
+    font-style: italic;
+  }
+  .project-row__link:hover .project-row__arrow,
+  .project-row__link:focus-visible .project-row__arrow {
+    background: var(--aam-accent);
+    border-color: var(--aam-accent);
+    color: var(--aam-on-accent);
+    transform: rotate(45deg);
+  }
+  /* El resto de proyectos se atenúa al pasar por uno */
+  .projects__list:has(.project-row__link:hover) .project-row__link:not(:hover) {
+    opacity: 0.35;
+  }
+
+  @media (min-width: 768px) {
+    .project-row__link {
+      grid-template-columns: 4rem minmax(0, 1fr) 12rem 3rem;
+      grid-template-areas:
+        'thumb thumb thumb thumb'
+        'num title meta arrow'
+        '. tech tech .';
+      column-gap: 1.5rem;
+    }
+    .project-row__meta {
+      justify-content: space-between;
+    }
+    .project-row__thumb {
+      max-width: 36rem;
+    }
+  }
+
+  /* Con ratón y efectos activos, la miniatura se sustituye por la vista previa flotante */
+  .projects:global(.has-preview) .project-row__thumb {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .projects:global(.has-preview) .project-row__link {
+      grid-template-areas:
+        'num title meta arrow'
+        '. tech tech .';
+    }
+  }
+
+  .project-preview {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 60;
+    width: clamp(16rem, 12rem + 12vw, 26rem);
+    aspect-ratio: 4 / 3;
+    border-radius: var(--aam-radius-md);
+    overflow: hidden;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    background: var(--aam-bg-elevated);
+    display: none;
+  }
+  .projects:global(.has-preview) .project-preview {
+    display: block;
+  }
+  .project-preview__item {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .project-preview__item :global(img),
+  .project-preview__item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Logo from '../components/Logo.astro';
+---
+
+<BaseLayout title="Página no encontrada" description="La página que buscas no existe o se ha movido." noindex>
+  <section class="not-found" aria-labelledby="nf-title">
+    <div class="container-site not-found__inner">
+      <p class="micro not-found__meta" data-reveal="fade">Error 404 — Página no encontrada</p>
+      <div class="not-found__code" aria-hidden="true">
+        <span class="not-found__digit">4</span>
+        <span class="not-found__mark-wrap"><Logo class="not-found__mark" animated strokeWidth={5} /></span>
+        <span class="not-found__digit">4</span>
+      </div>
+      <h1 id="nf-title" class="not-found__title" data-split="words">Te has salido del mapa.</h1>
+      <p class="not-found__text" data-reveal="up">
+        La página que buscas no existe o ha cambiado de sitio. Vuelve al inicio para seguir explorando.
+      </p>
+      <a href="/" class="btn btn-accent" data-magnetic data-cursor="Inicio" data-reveal="up">
+        <span data-magnetic-inner>Volver al inicio</span>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-block: calc(var(--aam-header-h) + 3rem) 4rem;
+  }
+  .not-found__inner {
+    display: grid;
+    justify-items: start;
+    gap: 1.75rem;
+  }
+  .not-found__meta {
+    color: var(--aam-accent-ink);
+  }
+  .not-found__code {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.5rem, 2vw, 2rem);
+    font-family: var(--aam-font-display);
+    font-weight: 800;
+    font-size: var(--aam-text-giant);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+  }
+  .not-found__mark-wrap {
+    display: inline-block;
+    width: 0.8em;
+    color: var(--aam-accent-ink);
+  }
+  .not-found__digit {
+    display: inline-block;
+  }
+  :global(html.motion) .not-found__digit:first-child {
+    animation: float 6s ease-in-out infinite;
+  }
+  :global(html.motion) .not-found__digit:last-child {
+    animation: float 6s ease-in-out -3s infinite;
+  }
+  :global(html.motion) .not-found__mark-wrap :global(.aam-stroke) {
+    animation: draw 3.2s var(--aam-ease-in-out) infinite alternate;
+  }
+  :global(html.motion) .not-found__mark-wrap :global(.aam-zigzag) {
+    animation-delay: 0.2s;
+  }
+  :global(html.motion) .not-found__mark-wrap :global(.aam-bar-a1),
+  :global(html.motion) .not-found__mark-wrap :global(.aam-bar-a2) {
+    animation-delay: 0.45s;
+  }
+  :global(html.motion) .not-found__mark-wrap :global(.aam-bar-right) {
+    animation-delay: 0.6s;
+  }
+  :global(html:not(.motion)) .not-found__mark-wrap :global(.aam-stroke) {
+    stroke-dashoffset: 0;
+  }
+  .not-found__title {
+    font-size: var(--aam-text-2xl);
+  }
+  .not-found__text {
+    max-width: 44ch;
+    color: var(--aam-fg-muted);
+  }
+  @keyframes float {
+    50% {
+      transform: translateY(-0.08em) rotate(-3deg);
+    }
+  }
+  @keyframes draw {
+    0%,
+    15% {
+      stroke-dashoffset: 1;
+    }
+    70%,
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

@@ -1,0 +1,13 @@
+<!--
+  Versión animable del monograma AAM: cada trazo es un path independiente
+  con pathLength="1", de modo que se puede "dibujar" animando
+  stroke-dashoffset de 1 a 0 (ver src/lib/preloader.ts).
+  Orden recomendado: barra izquierda → zigzag (las dos A) → travesaños → barra derecha.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="miter" stroke-miterlimit="10" role="img" aria-label="AAM">
+  <path class="aam-stroke aam-bar-left" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" d="M12 89V11"/>
+  <path class="aam-stroke aam-zigzag" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" d="M12 78L31 22L50 78L69 22L88 78"/>
+  <path class="aam-stroke aam-bar-a1" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" d="M17.4 62H44.6"/>
+  <path class="aam-stroke aam-bar-a2" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" d="M55.4 62H82.6"/>
+  <path class="aam-stroke aam-bar-right" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" d="M88 11V89"/>
+</svg>
