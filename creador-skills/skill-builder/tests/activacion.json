@@ -1,0 +1,15 @@
+{
+  "casos": [
+    {"peticion": "Crea una skill que convierta mis notas de reunión en un acta con decisiones y tareas pendientes", "debe_activarse": true},
+    {"peticion": "Quiero hacer una skill para Claude que revise mis textos según la guía de estilo de mi empresa", "debe_activarse": true},
+    {"peticion": "Convierte este proceso que te he explicado en una skill reutilizable para Claude Code", "debe_activarse": true},
+    {"peticion": "Valida la skill que tengo en ./skills/facturas y dime qué falla en el SKILL.md", "debe_activarse": true},
+    {"peticion": "Empaqueta mi skill de ./skills/informes en un zip para subirla a claude.ai", "debe_activarse": true},
+    {"peticion": "Mi skill no se activa nunca, ¿puedes mejorar la descripción de ./skills/resumenes/SKILL.md?", "debe_activarse": true},
+    {"peticion": "Escribe un script en Python que renombre todas las fotos de una carpeta por fecha", "debe_activarse": false, "nota": "tarea de programación normal, no una skill"},
+    {"peticion": "Configura un hook de Claude Code que ejecute los tests antes de cada commit", "debe_activarse": false, "nota": "hooks, no skills"},
+    {"peticion": "¿Qué habilidades blandas debería poner en mi currículum?", "debe_activarse": false, "nota": "'skills' en otro sentido"},
+    {"peticion": "Resume este artículo sobre inteligencia artificial en cinco puntos", "debe_activarse": false},
+    {"peticion": "Crea un subagente de Claude Code especializado en revisar seguridad", "debe_activarse": false, "nota": "subagente, no skill"}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "casos": [
+    {"peticion": "¿Qué hay en el archivo ventas_2024.csv? Dame un resumen", "debe_activarse": true},
+    {"peticion": "Te paso clientes.csv, analízalo por encima y dime si tiene datos vacíos", "debe_activarse": true},
+    {"peticion": "Describe las columnas de este export en CSV que saqué del CRM: export_crm.csv", "debe_activarse": true},
+    {"peticion": "Resume los datos tabulares de inventario.csv: cuántas filas y columnas tiene y qué tipos", "debe_activarse": true},
+    {"peticion": "Hazme un gráfico de barras con las ventas por mes", "debe_activarse": false, "nota": "gráficos, fuera de alcance"},
+    {"peticion": "Convierte este JSON a CSV", "debe_activarse": false, "nota": "transformación, no resumen"},
+    {"peticion": "Abre presupuesto.xlsx y suma la columna B", "debe_activarse": false, "nota": "Excel"},
+    {"peticion": "¿Qué significa CSV?", "debe_activarse": false, "nota": "pregunta general"},
+    {"peticion": "Resume este artículo de prensa en tres frases", "debe_activarse": false}
+  ]
+}

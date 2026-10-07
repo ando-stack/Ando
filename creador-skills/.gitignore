@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.zip.parcial
+.DS_Store
+# Checklists manuales generados por test_triggers.py
+**/tests/checklist-activacion.md

@@ -1,0 +1,13 @@
+{
+  "casos": [
+    {"peticion": "Escribe un post de Instagram para Lumen Café anunciando el nuevo cold brew", "debe_activarse": true},
+    {"peticion": "Diseña la carta de bebidas de Lumen con sus colores y tipografías", "debe_activarse": true},
+    {"peticion": "Revisa si este cartel respeta la marca de Lumen: fondo negro, letras amarillas y la palabra OFERTA en grande", "debe_activarse": true},
+    {"peticion": "Prepara el texto de una newsletter para los clientes de Lumen Café sobre el filtro del día", "debe_activarse": true},
+    {"peticion": "¿Qué color hexadecimal usa Lumen para los botones de su web?", "debe_activarse": true},
+    {"peticion": "Escribe un post de Instagram para mi panadería sobre el pan de centeno", "debe_activarse": false, "nota": "otra marca"},
+    {"peticion": "Explícame la diferencia entre un flat white y un cortado", "debe_activarse": false, "nota": "pregunta general sobre café"},
+    {"peticion": "Crea una paleta de colores para una marca de ropa deportiva", "debe_activarse": false},
+    {"peticion": "¿Qué es un lumen en física?", "debe_activarse": false, "nota": "homónimo"}
+  ]
+}

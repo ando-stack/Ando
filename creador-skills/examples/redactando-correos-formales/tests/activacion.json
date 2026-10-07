@@ -1,0 +1,14 @@
+{
+  "casos": [
+    {"peticion": "Escríbeme un correo para un cliente diciéndole que su presupuesto estará listo el viernes", "debe_activarse": true},
+    {"peticion": "Ayúdame a responder este email de mi jefe pidiendo dos días de vacaciones en junio", "debe_activarse": true},
+    {"peticion": "Pule este borrador de email al ayuntamiento para que suene más profesional: 'hola, queria saber como va lo de mi licencia de obra'", "debe_activarse": true},
+    {"peticion": "Redacta un mail formal a un proveedor reclamando una factura duplicada", "debe_activarse": true},
+    {"peticion": "Necesito contestar a un cliente enfadado por un retraso, con tono profesional", "debe_activarse": true},
+    {"peticion": "Escribe un mensaje de WhatsApp para felicitar a mi primo por su cumpleaños", "debe_activarse": false, "nota": "mensaje informal"},
+    {"peticion": "Escribe un post para LinkedIn anunciando nuestro nuevo producto", "debe_activarse": false, "nota": "marketing, no correo"},
+    {"peticion": "¿Cómo configuro mi cuenta de Gmail en el móvil?", "debe_activarse": false, "nota": "soporte técnico de correo"},
+    {"peticion": "Traduce al inglés este párrafo de un informe técnico", "debe_activarse": false},
+    {"peticion": "Escribe un poema corto sobre el mar", "debe_activarse": false}
+  ]
+}
