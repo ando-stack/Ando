@@ -107,11 +107,21 @@ def fuente_local(ruta: str) -> Fuente:
 # yt-dlp
 # ---------------------------------------------------------------------------
 
+_CLIENTES_YOUTUBE = ["default", "mweb"]
+
+
+def _es_bloqueo_youtube(exc: Exception) -> bool:
+    texto = str(exc)
+    return "not a bot" in texto or "Sign in to confirm" in texto
+
+
 def _ydl_base() -> dict:
     return {
         "quiet": True,
         "no_warnings": True,
         "noprogress": True,
+        # Si YouTube bloquea la vía normal ("confirma que no eres un bot"), prueba la web móvil.
+        "extractor_args": {"youtube": {"player_client": list(_CLIENTES_YOUTUBE)}},
         "noplaylist": True,
         "ffmpeg_location": ffmpeg_bin(),
         "retries": 5,
@@ -131,8 +141,17 @@ def obtener_info(url: str, formato: Optional[str] = None) -> dict:
     if formato:
         opciones["format"] = formato
     try:
-        with yt_dlp.YoutubeDL(opciones) as ydl:
-            info = ydl.extract_info(url, download=False)
+        try:
+            with yt_dlp.YoutubeDL(opciones) as ydl:
+                info = ydl.extract_info(url, download=False)
+        except Exception as exc:
+            if not _es_bloqueo_youtube(exc) or _CLIENTES_YOUTUBE == ["mweb"]:
+                raise
+            # YouTube a veces pide "confirmar que no eres un bot": seguimos solo por la web móvil.
+            _CLIENTES_YOUTUBE[:] = ["mweb"]
+            opciones.update(_ydl_base(), **({"format": formato} if formato else {}))
+            with yt_dlp.YoutubeDL(opciones) as ydl:
+                info = ydl.extract_info(url, download=False)
     except Exception as exc:
         raise ClipError(
             "No se pudo leer el enlace. Comprueba que es público y correcto "

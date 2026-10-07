@@ -246,7 +246,8 @@ def tiene_chat_youtube(info: dict) -> bool:
 def chat_youtube(url: str, carpeta: str, limite_segundos: float = 300) -> Chat:
     os.makedirs(carpeta, exist_ok=True)
     cmd = [sys.executable, "-m", "yt_dlp", "--skip-download", "--write-subs",
-           "--sub-langs", "live_chat", "--no-playlist", "-q", "--no-warnings",
+           "--sub-langs", "live_chat", "--no-playlist",
+           "--extractor-args", "youtube:player_client=default,mweb", "-q", "--no-warnings",
            "-o", os.path.join(carpeta, "chat.%(ext)s"), url]
     try:
         subprocess.run(cmd, timeout=limite_segundos, stdout=subprocess.DEVNULL,
