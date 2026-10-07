@@ -40,7 +40,7 @@ const jsonLd = {
   name: data.title,
   description: data.summary,
   dateCreated: String(data.year),
-  creator: { '@type': 'Person', name: site.name },
+  creator: { '@type': 'Organization', name: site.brand },
   keywords: data.technologies.join(', '),
   url: new URL(`/proyectos/${project.id}`, Astro.site).href,
 };

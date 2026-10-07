@@ -71,7 +71,7 @@ const site = defineCollection({
   }),
   schema: ({ image }) =>
     z.object({
-      name: z.string().min(1),
+      heroTitle: z.array(z.string().min(1)).min(1, 'Añade al menos una línea en "heroTitle"'),
       brand: z.string().min(1),
       role: z.string().min(1),
       tagline: z.string().min(1),

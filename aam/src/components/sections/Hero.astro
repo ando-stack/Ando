@@ -1,7 +1,8 @@
 ---
 import { getSite } from '../../lib/site';
 const site = await getSite();
-const [first, ...rest] = site.name.split(' ');
+const lines = site.heroTitle;
+const isShort = lines.join('').length <= 5;
 ---
 
 <section id="inicio" class="hero" aria-labelledby="hero-title">
@@ -17,8 +18,8 @@ const [first, ...rest] = site.name.split(' ');
       {site.location && <span class="hero__location">{site.location}</span>}
     </div>
 
-    <h1 id="hero-title" class="hero__title" data-split="chars" data-split-intro>
-      {first}<br />{rest.join(' ')}
+    <h1 id="hero-title" class:list={['hero__title', { 'hero__title--short': isShort }]} data-split="chars" data-split-intro>
+      {lines.map((line, i) => (i === 0 ? line : [<br />, line]))}
     </h1>
 
     <div class="hero__bottom">
@@ -114,6 +115,13 @@ const [first, ...rest] = site.name.split(' ');
     text-transform: uppercase;
     margin-top: auto;
   }
+  .hero__title--short {
+    /* Titular corto (p. ej. "AAM"): se muestra mucho más grande */
+    font-size: min(calc((100vw - 2 * var(--aam-gutter)) / 4.1), 22rem);
+    white-space: nowrap;
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+  }
   .hero__bottom {
     display: grid;
     gap: 2rem;
@@ -185,7 +193,14 @@ const [first, ...rest] = site.name.split(' ');
     }
   }
   @media (min-width: 900px) {
-    .hero__bottom {
+    .hero__title--short {
+    /* Titular corto (p. ej. "AAM"): se muestra mucho más grande */
+    font-size: min(calc((100vw - 2 * var(--aam-gutter)) / 4.1), 22rem);
+    white-space: nowrap;
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+  }
+  .hero__bottom {
       grid-template-columns: 1fr auto;
     }
     .hero__aside {

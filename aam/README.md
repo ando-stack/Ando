@@ -1,6 +1,6 @@
-# AAM — Portfolio de Andoni Ayala Malo
+# AAM — Agencia de contenido con IA para creadores
 
-Web personal construida con **Astro** (sitio estático), **TypeScript**, **Tailwind CSS**, **React** (solo para el formulario de contacto), **GSAP + ScrollTrigger**, **Lenis** y **Three.js** (escena 3D del inicio).
+Web de AAM construida con **Astro** (sitio estático), **TypeScript**, **Tailwind CSS**, **React** (solo para el formulario de contacto), **GSAP + ScrollTrigger**, **Lenis** y **Three.js** (escena 3D del inicio).
 
 > Todo el contenido personal es provisional y está marcado con **`[COMPLETAR]`**.
 > Para encontrar todo lo que falta por rellenar:
@@ -70,7 +70,8 @@ aam/
 
 | Campo | Dónde aparece |
 | --- | --- |
-| `name`, `brand` | Nombre y marca (cabecera, pie, SEO) |
+| `heroTitle` | Titular grande del inicio (una línea por elemento; si es corto, como "AAM", se muestra extra grande) |
+| `brand` | Marca (cabecera, pie, SEO) |
 | `role`, `tagline`, `location`, `availability` | Inicio |
 | `email` | Contacto, menú móvil |
 | `seo.title`, `seo.description` | Título y descripción de la página de inicio en Google/redes |
@@ -86,7 +87,7 @@ aam/
 
 ```json
 "photo": "../assets/images/yo.jpg",
-"photoAlt": "Retrato de Andoni Ayala Malo"
+"photoAlt": "Descripción de la foto"
 ```
 
 Astro la optimiza sola (WebP, varios tamaños, carga diferida). Si no hay foto se muestra un marcador.

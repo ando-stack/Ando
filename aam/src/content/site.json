@@ -1,6 +1,8 @@
 {
-  "_instrucciones": "Edita los textos de la web aquí. Lo que sigue marcado con [COMPLETAR] es contenido de ejemplo que debes sustituir por tus datos reales. Iconos de servicios disponibles: code, design, motion, strategy, performance, spark. Para añadir tu foto, guárdala en src/assets/images/ y añade \"photo\": \"../assets/images/tu-foto.jpg\" dentro de \"about\".",
-  "name": "Andoni Ayala Malo",
+  "_instrucciones": "Edita los textos de la web aquí. \"heroTitle\" es el titular grande del inicio (una línea por elemento). Lo que sigue marcado con [COMPLETAR] es contenido de ejemplo que debes sustituir por tus datos reales. Iconos de servicios disponibles: code, design, motion, strategy, performance, spark. Para añadir tu foto, guárdala en src/assets/images/ y añade \"photo\": \"../assets/images/tu-foto.jpg\" dentro de \"about\".",
+  "heroTitle": [
+    "AAM"
+  ],
   "brand": "AAM",
   "role": "Agencia de contenido con IA para creadores",
   "tagline": "Edito vídeos, creo y escalo canales de Shorts, diseño miniaturas y construyo webs con IA para influencers y creadores de contenido.",
@@ -8,17 +10,17 @@
   "availability": "[COMPLETAR] Disponible para nuevos proyectos",
   "email": "completar@example.com",
   "seo": {
-    "title": "Andoni Ayala Malo — AAM | Agencia de contenido con IA para creadores",
-    "description": "AAM, la agencia de Andoni Ayala Malo: edición de vídeo, canales de YouTube Shorts, miniaturas y webs con IA para influencers y creadores de contenido."
+    "title": "AAM | Agencia de contenido con IA para creadores",
+    "description": "AAM es una agencia de contenido con IA: edición de vídeo, canales de YouTube Shorts, miniaturas y webs para influencers y creadores de contenido."
   },
   "about": {
     "title": "Sobre mí",
     "paragraphs": [
-      "Soy Andoni Ayala Malo y con AAM ayudo a influencers y creadores de contenido a producir más y mejor gracias a la inteligencia artificial.",
+      "En AAM ayudo a influencers y creadores de contenido a producir más y mejor gracias a la inteligencia artificial.",
       "Edito vídeos con IA, creo canales de YouTube Shorts y los escalo, y construyo webs con IA para que cada creador tenga su propio espacio en internet. Ahora también estoy incorporando el diseño de miniaturas con IA.",
       "[COMPLETAR] Párrafo opcional: tu forma de trabajar, con qué tipo de creadores te gusta colaborar o qué resultados buscas para ellos."
     ],
-    "photoAlt": "[COMPLETAR] Retrato de Andoni Ayala Malo",
+    "photoAlt": "[COMPLETAR] Descripción de tu foto",
     "stats": [
       {
         "value": 10,

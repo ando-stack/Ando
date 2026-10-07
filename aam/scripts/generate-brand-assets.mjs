@@ -48,9 +48,9 @@ const og = `
     <path d="M80 0V630M1120 0V630M0 80H1200M0 550H1200"/>
   </g>
   ${mark(800, 150, 320, ACCENT, 6)}
-  <text x="80" y="180" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="4" fill="${FG}" fill-opacity=".65">AAM — PORTFOLIO</text>
-  <text x="80" y="330" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="92" fill="${FG}">Andoni</text>
-  <text x="80" y="430" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="92" fill="${FG}">Ayala Malo</text>
+  <text x="80" y="180" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="4" fill="${FG}" fill-opacity=".65">AAM — AGENCIA PARA CREADORES</text>
+  <text x="80" y="330" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="92" fill="${FG}">Contenido</text>
+  <text x="80" y="430" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="92" fill="${FG}">con IA</text>
   <rect x="80" y="480" width="64" height="6" fill="${ACCENT}"/>
   <rect width="1200" height="630" filter="url(#g)"/>
 </svg>`;

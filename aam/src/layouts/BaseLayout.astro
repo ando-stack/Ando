@@ -29,13 +29,13 @@ const {
   title,
   description = site.seo.description,
   image,
-  imageAlt = `${site.brand} — ${site.name}`,
+  imageAlt = `${site.brand} — ${site.role}`,
   type = 'website',
   noindex = false,
   jsonLd,
 } = Astro.props;
 
-const fullTitle = title ? `${title} — ${site.brand} · ${site.name}` : site.seo.title;
+const fullTitle = title ? `${title} — ${site.brand}` : site.seo.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 
 let ogImage = new URL('/og-image.jpg', Astro.site).href;
@@ -48,12 +48,12 @@ if (image && typeof image !== 'string') {
 
 const personLd = {
   '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: site.name,
-  alternateName: site.brand,
+  '@type': 'Organization',
+  name: site.brand,
+  description: site.role,
   url: new URL('/', Astro.site).href,
+  logo: new URL('/icon-512.png', Astro.site).href,
   image: new URL('/og-image.jpg', Astro.site).href,
-  jobTitle: site.role,
   email: `mailto:${site.email}`,
   sameAs: site.socials.map((s) => s.url),
 };
@@ -96,7 +96,7 @@ const bootScript = `(() => {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, follow" />}
-    <meta name="author" content={site.name} />
+    <meta name="author" content={site.brand} />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#0b0b0c" />
 
@@ -109,7 +109,7 @@ const bootScript = `(() => {
     <!-- Open Graph / Twitter -->
     <meta property="og:type" content={type} />
     <meta property="og:locale" content="es_ES" />
-    <meta property="og:site_name" content={`${site.brand} — ${site.name}`} />
+    <meta property="og:site_name" content={site.brand} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />

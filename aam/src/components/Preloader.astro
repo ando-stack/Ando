@@ -1,12 +1,14 @@
 ---
 import Logo from './Logo.astro';
+import { getSite } from '../lib/site';
+const site = await getSite();
 ---
 
 <div class="preloader" data-preloader aria-hidden="true">
   <div class="preloader__inner">
     <Logo class="preloader__mark" animated strokeWidth={5} />
     <div class="preloader__meta micro">
-      <span>Andoni Ayala Malo</span>
+      <span>{site.brand}</span>
       <span class="preloader__count" data-preloader-count>000</span>
     </div>
     <div class="preloader__track"><span class="preloader__bar" data-preloader-bar></span></div>
