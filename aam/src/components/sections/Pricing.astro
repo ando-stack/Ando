@@ -1,0 +1,250 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import Icon from '../Icon.astro';
+import { getSite } from '../../lib/site';
+
+const { pricing } = await getSite();
+const format = (n: number) => n.toLocaleString('es-ES');
+---
+
+{
+  pricing && (
+    <section id="precios" class="section pricing" aria-labelledby="pricing-title">
+      <div class="container-site">
+        <SectionHeading number="06" label="Precios" title={pricing.title} id="pricing-title">
+          {pricing.intro && (
+            <p class="pricing__intro" data-reveal="up">
+              {pricing.intro}
+            </p>
+          )}
+        </SectionHeading>
+
+        <ul class="pricing__grid">
+          {pricing.plans.map((plan) => (
+            <li class:list={['pricing__item', { 'pricing__item--wide': plan.wide }]} data-reveal="up">
+              <article class:list={['plan', { 'plan--highlight': plan.highlight }]}>
+                <header class="plan__head">
+                  <Icon name={plan.icon} class="plan__icon" />
+                  {plan.highlight && <span class="micro plan__badge">{plan.highlight}</span>}
+                </header>
+
+                <div class="plan__main">
+                  <h3 class="plan__title">{plan.title}</h3>
+                  {plan.description && <p class="plan__desc">{plan.description}</p>}
+                  <p class="plan__price">
+                    {plan.prefix && <span class="micro plan__prefix">{plan.prefix}</span>}
+                    <span class="plan__amount">
+                      {format(plan.price)}
+                      <span class="plan__currency">{pricing.currency}</span>
+                    </span>
+                    {plan.unit && <span class="plan__unit">{plan.unit}</span>}
+                  </p>
+                </div>
+
+                <div class="plan__details">
+                  {plan.features.length > 0 && (
+                    <ul class="plan__features">
+                      {plan.features.map((f) => (
+                        <li>
+                          <span class="plan__check" aria-hidden="true">✦</span>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {plan.extras.length > 0 && (
+                    <ul class="plan__extras">
+                      {plan.extras.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <a
+                    href="#contacto"
+                    class:list={['btn', 'plan__cta', { 'btn-accent': plan.highlight }]}
+                    data-magnetic="0.2"
+                    data-cursor="Hablemos"
+                  >
+                    <span data-magnetic-inner>{pricing.cta}</span>
+                    <span class="sr-only"> para {plan.title}</span>
+                  </a>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+
+        {pricing.note && (
+          <p class="micro pricing__note" data-reveal="fade">
+            {pricing.note}
+          </p>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .pricing__intro {
+    max-width: 46ch;
+    color: var(--aam-fg-muted);
+    font-size: var(--aam-text-lg);
+  }
+  .pricing__grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+  .pricing__item--wide {
+    grid-column: 1 / -1;
+  }
+  .plan {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+    border: 1px solid var(--aam-line);
+    border-radius: var(--aam-radius-lg);
+    background: var(--aam-bg-elevated);
+    transition: border-color var(--aam-duration-base), transform var(--aam-duration-slow) var(--aam-ease-out);
+  }
+  .plan:hover {
+    border-color: var(--aam-line-strong);
+    transform: translateY(-4px);
+  }
+  .plan--highlight {
+    border-color: var(--aam-accent-ink);
+    background:
+      radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--aam-accent) 14%, transparent), transparent 55%),
+      var(--aam-bg-elevated);
+  }
+  .plan--highlight:hover {
+    border-color: var(--aam-accent-ink);
+  }
+  .plan__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+  }
+  .plan :global(.plan__icon) {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--aam-accent-ink);
+  }
+  .plan__badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--aam-radius-full);
+    background: var(--aam-accent);
+    color: var(--aam-on-accent);
+    font-weight: 600;
+  }
+  .plan__main {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .plan__title {
+    font-size: var(--aam-text-xl);
+    line-height: 1.05;
+  }
+  .plan__desc {
+    color: var(--aam-fg-muted);
+    font-size: var(--aam-text-sm);
+  }
+  .plan__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .plan__prefix {
+    color: var(--aam-fg-muted);
+  }
+  .plan__amount {
+    font-family: var(--aam-font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 1.8rem + 2vw, 3.5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+  .plan__currency {
+    font-size: 0.5em;
+    margin-left: 0.1em;
+    color: var(--aam-accent-ink);
+  }
+  .plan__unit {
+    color: var(--aam-fg-muted);
+    font-size: var(--aam-text-sm);
+  }
+  .plan__details {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: auto;
+    align-content: end;
+  }
+  .plan__features {
+    display: grid;
+    gap: 0.6rem;
+    font-size: var(--aam-text-sm);
+    border-top: 1px solid var(--aam-line);
+    padding-top: 1.25rem;
+  }
+  .plan__features li {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .plan__check {
+    color: var(--aam-accent-ink);
+    font-size: 0.7em;
+    line-height: 2;
+    flex-shrink: 0;
+  }
+  .plan__extras {
+    display: grid;
+    gap: 0.4rem;
+    font-size: var(--aam-text-sm);
+    color: var(--aam-fg-muted);
+  }
+  .plan__extras li::before {
+    content: '+ ';
+    color: var(--aam-accent-ink);
+  }
+  .plan__cta {
+    justify-self: start;
+  }
+  .pricing__item--wide .plan__amount {
+    font-size: var(--aam-text-3xl);
+  }
+  .pricing__note {
+    margin-top: 2rem;
+    color: var(--aam-fg-muted);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
+  @media (min-width: 900px) {
+    .pricing__item--wide .plan {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr;
+      align-items: center;
+      gap: 2.5rem;
+    }
+    .pricing__item--wide .plan__head {
+      flex-direction: column;
+      gap: 1rem;
+      align-self: start;
+    }
+    .pricing__item--wide .plan__details {
+      margin-top: 0;
+    }
+    .pricing__item--wide .plan__features {
+      border-top: 0;
+      padding-top: 0;
+      border-left: 1px solid var(--aam-line);
+      padding-left: 2.5rem;
+    }
+  }
+</style>

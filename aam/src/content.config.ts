@@ -110,6 +110,31 @@ const site = defineCollection({
         intro: z.string(),
       }),
       socials: z.array(social).default([]),
+      pricing: z
+        .object({
+          title: z.string().min(1),
+          intro: z.string().default(''),
+          currency: z.string().default('€'),
+          plans: z
+            .array(
+              z.object({
+                icon: z.enum(['code', 'design', 'motion', 'strategy', 'performance', 'spark']).default('spark'),
+                title: z.string().min(1),
+                prefix: z.string().default('desde'), // texto antes del precio ("desde", "")
+                price: z.number({ error: 'Cada plan necesita "price" (número)' }).min(0),
+                unit: z.string().default(''), // p. ej. "/ short", "/ mes"
+                description: z.string().default(''),
+                features: z.array(z.string()).default([]),
+                extras: z.array(z.string()).default([]), // precios adicionales o packs
+                highlight: z.string().optional(), // etiqueta destacada (p. ej. "Recomendado")
+                wide: z.boolean().default(false), // ocupa todo el ancho
+              }),
+            )
+            .min(1),
+          note: z.string().default(''),
+          cta: z.string().default('Pedir presupuesto'),
+        })
+        .optional(),
     }),
 });
 

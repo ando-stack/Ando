@@ -86,5 +86,100 @@
       "label": "Instagram",
       "url": "https://www.instagram.com/COMPLETAR"
     }
-  ]
+  ],
+  "pricing": {
+    "title": "Precios",
+    "intro": "Precios de lanzamiento, claros y sin sorpresas. Si necesitas algo a medida, escríbeme y te preparo un presupuesto.",
+    "currency": "€",
+    "plans": [
+      {
+        "icon": "motion",
+        "title": "Edición de vídeo con IA",
+        "prefix": "desde",
+        "price": 15,
+        "unit": "/ short",
+        "description": "Shorts, Reels y TikToks listos para publicar.",
+        "features": [
+          "Vídeos verticales de hasta 60 s",
+          "Subtítulos dinámicos, cortes, música y efectos",
+          "Entrega en 48–72 h",
+          "1 ronda de cambios incluida"
+        ],
+        "extras": [
+          "Pack 10 shorts: 120 €",
+          "Vídeo largo de YouTube (hasta 10 min): desde 40 €"
+        ]
+      },
+      {
+        "icon": "strategy",
+        "title": "Canal de YouTube Shorts",
+        "prefix": "desde",
+        "price": 199,
+        "unit": "/ mes",
+        "description": "Creo y gestiono un canal de Shorts con IA para que crezca publicando a diario.",
+        "features": [
+          "30 shorts al mes",
+          "Ideas y guiones con IA",
+          "Publicación programada",
+          "Resumen mensual de resultados"
+        ],
+        "extras": [
+          "Puesta en marcha del canal (nombre, logo y banner): 99 € pago único"
+        ]
+      },
+      {
+        "icon": "design",
+        "title": "Miniaturas con IA",
+        "prefix": "desde",
+        "price": 8,
+        "unit": "/ miniatura",
+        "description": "Miniaturas llamativas para que tus vídeos consigan más clics.",
+        "features": [
+          "Diseño creado con IA y retocado a mano",
+          "2 propuestas por vídeo",
+          "Entrega en 24–48 h",
+          "1 ronda de cambios incluida"
+        ],
+        "extras": [
+          "Pack 5 miniaturas: 35 €"
+        ]
+      },
+      {
+        "icon": "code",
+        "title": "Webs con IA",
+        "prefix": "desde",
+        "price": 149,
+        "unit": "",
+        "description": "Tu web personal, link-in-bio o portfolio, rápida y adaptada a móvil.",
+        "features": [
+          "Web de una página (landing)",
+          "Diseño adaptado a móvil",
+          "Formulario de contacto",
+          "Entrega en 5–7 días"
+        ],
+        "extras": [
+          "Web completa (hasta 5 páginas): desde 349 €"
+        ]
+      },
+      {
+        "icon": "spark",
+        "title": "Pack Creador",
+        "prefix": "",
+        "price": 249,
+        "unit": "/ mes",
+        "highlight": "Recomendado",
+        "wide": true,
+        "description": "Todo lo que necesitas para publicar cada semana sin preocuparte de la edición.",
+        "features": [
+          "20 shorts editados al mes",
+          "8 miniaturas al mes",
+          "Publicación programada en tus redes",
+          "Ahorras más de 100 € frente a contratarlo por separado"
+        ],
+        "extras": []
+      }
+    ],
+    "note": "Precios orientativos en euros. [COMPLETAR] Indica si incluyen IVA según tu situación fiscal.",
+    "cta": "Pedir presupuesto"
+  }
 }
