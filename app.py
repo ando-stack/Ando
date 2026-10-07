@@ -3,11 +3,16 @@
 Uso:
     python app.py                 # abre http://127.0.0.1:5000
     python app.py --red           # accesible desde el móvil en la misma wifi
+
+Si existe la variable de entorno AUTOCLIPS_CLAVE, la web pide esa contraseña
+(útil al publicarla en internet, p. ej. en Hugging Face Spaces).
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
+import hmac
 import os
 import re
 import shutil
@@ -17,7 +22,7 @@ import traceback
 import uuid
 import webbrowser
 
-from flask import Flask, abort, jsonify, render_template, request, send_from_directory
+from flask import Flask, abort, jsonify, redirect, render_template, request, send_from_directory
 from werkzeug.utils import secure_filename
 
 from clipper import ESTILOS, FORMATOS, ClipError, Opciones, ia_voz_disponible, procesar
@@ -25,6 +30,8 @@ from clipper import ESTILOS, FORMATOS, ClipError, Opciones, ia_voz_disponible, p
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 TRABAJOS = os.path.join(RAIZ, "trabajos")
 HORAS_CADUCIDAD = 24
+CLAVE = os.environ.get("AUTOCLIPS_CLAVE", "")
+COOKIE = "autoclips_sesion"
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 ** 3  # subidas de hasta 8 GB
@@ -33,6 +40,32 @@ trabajos: dict[str, dict] = {}
 cerrojo = threading.Lock()
 # Un trabajo pesado a la vez para no saturar el ordenador.
 turno = threading.Semaphore(1)
+
+
+def _ficha() -> str:
+    return hmac.new(CLAVE.encode(), b"autoclips", hashlib.sha256).hexdigest()
+
+
+@app.before_request
+def _proteger():
+    if not CLAVE or request.endpoint == "entrar":
+        return None
+    if hmac.compare_digest(request.cookies.get(COOKIE, ""), _ficha()):
+        return None
+    if request.path.startswith("/api/"):
+        return jsonify(error="Sesión caducada: recarga la página y escribe la contraseña."), 401
+    return render_template("entrar.html", error=False), 401
+
+
+@app.post("/entrar")
+def entrar():
+    if not CLAVE or not hmac.compare_digest(request.form.get("clave", ""), CLAVE):
+        return render_template("entrar.html", error=True), 401
+    respuesta = redirect("./")
+    seguro = request.is_secure or request.headers.get("X-Forwarded-Proto") == "https"
+    respuesta.set_cookie(COOKIE, _ficha(), max_age=30 * 24 * 3600, httponly=True,
+                         secure=seguro, samesite="None" if seguro else "Lax")
+    return respuesta
 
 
 def _actualizar(id_: str, **datos) -> None:

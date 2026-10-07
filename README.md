@@ -1,3 +1,14 @@
+---
+title: AutoClips
+emoji: ✂️
+colorFrom: pink
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+short_description: Saca los momentos graciosos y épicos de directos y vídeos
+---
+
 # ✂️ AutoClips
 
 Programa **gratis** que saca automáticamente los **momentos graciosos y épicos** de un directo
@@ -44,6 +55,15 @@ Puntúa cada medio segundo del directo con varias pistas y monta un clip alreded
 Funciona en los ordenadores de Google, gratis, desde Android, iPhone o PC. Tienes que dejar la pestaña
 abierta mientras trabaja. YouTube a veces bloquea las descargas desde Colab; Twitch suele ir bien.
 Si cambias el código, vuelve a crear el cuaderno con `python herramientas/generar_colab.py`.
+
+## 🌐 Publicarlo como web gratis (Hugging Face Spaces)
+
+1. En <https://huggingface.co/new-space>: nombre `autoclips`, SDK **Docker** → *Blank*, hardware gratis (*CPU basic*).
+2. Pestaña **Files → Add file → Upload files**: arrastra **todos** los archivos y carpetas de este proyecto
+   (el `Dockerfile` y este `README.md` incluidos) y pulsa *Commit*.
+3. **Settings → Variables and secrets → New secret**: nombre `AUTOCLIPS_CLAVE`, valor la contraseña que quieras.
+   Sin ella, cualquiera con el enlace podría usar tu servidor.
+4. Espera a que ponga **Running** (la primera vez tarda unos minutos) y abre `https://TU-USUARIO-autoclips.hf.space`.
 
 ## Instalación en tu PC (una sola vez)
 

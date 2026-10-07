@@ -186,7 +186,7 @@ form.addEventListener("submit", async (e) => {
   $("#titulo").textContent = datos.get("url") || $("#archivo").files[0].name;
 
   try {
-    const r = await fetch("/api/trabajos", { method: "POST", body: datos });
+    const r = await fetch("api/trabajos", { method: "POST", body: datos });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || "Error");
     seguir(j.id);
@@ -203,7 +203,7 @@ function fallo(msg) {
 
 async function seguir(id) {
   try {
-    const r = await fetch(`/api/trabajos/${id}`);
+    const r = await fetch(`api/trabajos/${id}`);
     if (!r.ok) throw new Error("Se perdió el trabajo (¿se reinició el programa?)");
     const t = await r.json();
     if (t.titulo) $("#titulo").textContent = t.titulo;
@@ -219,7 +219,7 @@ async function seguir(id) {
 
 function mostrar(id, res) {
   $("#enviar").disabled = false;
-  const base = `/trabajos/${id}/`;
+  const base = `trabajos/${id}/`;
   $("#zip").href = base + res.zip + "?descargar=1";
   $("#senales").textContent = `${res.clips.length} clips · vídeo de ${hms(res.duracion_fuente)} · analizado por: ${res.senales.join(", ")}`;
   $("#avisos").textContent = (res.avisos || []).join(" ");
