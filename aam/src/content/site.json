@@ -1,17 +1,17 @@
 {
-  "_instrucciones": "Edita los textos de la web aquí. \"heroTitle\" es el titular grande del inicio (una línea por elemento). Lo que sigue marcado con [COMPLETAR] es contenido de ejemplo que debes sustituir por tus datos reales. Iconos de servicios disponibles: code, design, motion, strategy, performance, spark. Para añadir tu foto, guárdala en src/assets/images/ y añade \"photo\": \"../assets/images/tu-foto.jpg\" dentro de \"about\".",
+  "_instrucciones": "Edita los textos de la web aquí. \"heroTitle\" es el titular grande del inicio (una línea por elemento). Lo que sigue marcado con [COMPLETAR] es contenido de ejemplo que debes sustituir por tus datos reales. Iconos de servicios disponibles: code, design, motion, strategy, performance, spark, social. Para añadir tu foto, guárdala en src/assets/images/ y añade \"photo\": \"../assets/images/tu-foto.jpg\" dentro de \"about\".",
   "heroTitle": [
     "AAM"
   ],
   "brand": "AAM",
   "role": "Agencia de contenido con IA para creadores",
-  "tagline": "Edito vídeos, creo y escalo canales de Shorts, diseño miniaturas y construyo webs con IA para influencers y creadores de contenido.",
+  "tagline": "Edito vídeos, gestiono tus redes, creo y escalo canales de Shorts, diseño miniaturas y construyo webs con IA para influencers y creadores de contenido.",
   "location": "[COMPLETAR] Ciudad, País",
   "availability": "[COMPLETAR] Disponible para nuevos proyectos",
   "email": "aamcontacto1@gmail.com",
   "seo": {
     "title": "AAM | Agencia de contenido con IA para creadores",
-    "description": "AAM es una agencia de contenido con IA: edición de vídeo, canales de YouTube Shorts, miniaturas y webs para influencers y creadores de contenido."
+    "description": "AAM, agencia de contenido con IA: edición de vídeo, gestión de redes, canales de YouTube Shorts, miniaturas y webs para influencers y creadores."
   },
   "about": {
     "title": "Sobre mí",
@@ -46,6 +46,11 @@
       "description": "Edición ágil de vídeos para redes apoyada en herramientas de IA: más contenido, más rápido y con un acabado cuidado."
     },
     {
+      "icon": "social",
+      "title": "Gestión de redes",
+      "description": "Me encargo de subir tu contenido: Shorts, TikToks, Reels y vídeos largos de YouTube, con títulos, descripciones y hashtags."
+    },
+    {
       "icon": "strategy",
       "title": "Canales de YouTube Shorts",
       "description": "Creación de canales de Shorts con IA y sistemas para publicar de forma constante y escalarlos."
@@ -63,6 +68,7 @@
   ],
   "stack": [
     "Edición de vídeo con IA",
+    "Gestión de redes",
     "YouTube Shorts",
     "Escalado de canales",
     "Miniaturas con IA",
@@ -110,6 +116,24 @@
         "extras": [
           "Pack 10 shorts: 120 €",
           "Vídeo largo de YouTube (hasta 10 min): desde 40 €"
+        ]
+      },
+      {
+        "icon": "social",
+        "title": "Gestión de redes",
+        "prefix": "desde",
+        "price": 99,
+        "unit": "/ mes",
+        "description": "Subo y programo tu contenido para que tú solo te preocupes de crear.",
+        "features": [
+          "Hasta 30 publicaciones al mes",
+          "Shorts, TikToks, Reels y vídeos largos de YouTube",
+          "Títulos, descripciones y hashtags",
+          "Publicación en los mejores horarios",
+          "Resumen mensual de resultados"
+        ],
+        "extras": [
+          "Hasta 60 publicaciones al mes: 149 €"
         ]
       },
       {
@@ -167,18 +191,21 @@
         "icon": "spark",
         "title": "Pack Creador",
         "prefix": "",
-        "price": 249,
+        "price": 299,
         "unit": "/ mes",
         "highlight": "Recomendado",
         "wide": true,
-        "description": "Todo lo que necesitas para publicar cada semana sin preocuparte de la edición.",
+        "description": "Edición, miniaturas y gestión de tus redes en un solo pack: tú grabas y yo me encargo del resto.",
         "features": [
-          "20 shorts editados al mes",
+          "20 shorts / TikToks / Reels editados al mes",
+          "2 vídeos largos de YouTube editados al mes",
           "8 miniaturas al mes",
-          "Publicación programada en tus redes",
-          "Ahorras más de 100 € frente a contratarlo por separado"
+          "Gestión de redes: subo todo a TikTok, Instagram y YouTube",
+          "Ahorras más de 200 € frente a contratarlo por separado"
         ],
-        "extras": []
+        "extras": [
+          "Todos los servicios se pueden contratar también por separado"
+        ]
       }
     ],
     "note": "Precios orientativos en euros. [COMPLETAR] Indica si incluyen IVA según tu situación fiscal.",

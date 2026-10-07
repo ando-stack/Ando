@@ -99,7 +99,7 @@ const site = defineCollection({
       }),
       services: z.array(
         z.object({
-          icon: z.enum(['code', 'design', 'motion', 'strategy', 'performance', 'spark']),
+          icon: z.enum(['code', 'design', 'motion', 'strategy', 'performance', 'spark', 'social']),
           title: z.string(),
           description: z.string(),
         }),
@@ -118,7 +118,7 @@ const site = defineCollection({
           plans: z
             .array(
               z.object({
-                icon: z.enum(['code', 'design', 'motion', 'strategy', 'performance', 'spark']).default('spark'),
+                icon: z.enum(['code', 'design', 'motion', 'strategy', 'performance', 'spark', 'social']).default('spark'),
                 title: z.string().min(1),
                 prefix: z.string().default('desde'), // texto antes del precio ("desde", "")
                 price: z.number({ error: 'Cada plan necesita "price" (número)' }).min(0),

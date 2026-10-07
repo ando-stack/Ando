@@ -93,7 +93,17 @@ const format = (n: number) => n.toLocaleString('es-ES');
   .pricing__grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .pricing__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1200px) {
+    .pricing__grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
   }
   .pricing__item--wide {
     grid-column: 1 / -1;
