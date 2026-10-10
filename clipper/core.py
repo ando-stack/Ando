@@ -185,6 +185,31 @@ def procesar(origen: str, carpeta: str, op: Optional[Opciones] = None,
     momentos = sorted(momentos, key=lambda m: -m.valor)[:op.cantidad]
     calificar(momentos)
 
+    # 3b) Cortar en frases completas: que ningún clip empiece o acabe a mitad de frase.
+    if usar_voz:
+        for k, m in enumerate(momentos):
+            progreso(p_voz + 4 * k / len(momentos),
+                     f"Ajustando cortes a frases completas ({k + 1}/{len(momentos)})…")
+            try:
+                ini, fin, subs = voz.ajustar_a_frases(audio, m.inicio, m.fin, total,
+                                                      largo_max=max(dur_max, dur_min + 10))
+            except Exception:
+                continue
+            base = ini  # los subtítulos vienen relativos a este inicio
+            # Sin pisar a los clips mejor puntuados ya ajustados.
+            for otro in momentos[:k]:
+                if ini < otro.fin and fin > otro.inicio:
+                    if m.pico >= otro.fin:
+                        ini = max(ini, otro.fin)
+                    else:
+                        fin = min(fin, otro.inicio)
+            if fin - ini >= 5:
+                m.inicio, m.fin = round(ini, 2), round(fin, 2)
+                d = m.inicio - base
+                m.transcripcion = [(max(0.0, a - d), b - d, t) for a, b, t in subs
+                                   if b - d > 0 and a - d < m.fin - m.inicio]
+        p_voz += 4
+
     # 4) Cortar.
     resultado = Resultado(titulo=info.get("title") or os.path.basename(origen),
                           duracion_fuente=total, senales=an.senales, avisos=avisos)
