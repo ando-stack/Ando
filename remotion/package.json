@@ -1,0 +1,16 @@
+{
+  "name": "autoclips-remotion",
+  "version": "1.0.0",
+  "description": "Plantillas de vídeo con Remotion para AutoClips",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Clip out/clip.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.535",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.535"
+  },
+  "private": true
+}
