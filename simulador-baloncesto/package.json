@@ -1,0 +1,47 @@
+{
+  "name": "simulador-baloncesto",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Simulador Monte Carlo posesión a posesión de partidos de NBA, EuroLiga y Liga Endesa (ACB)",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run data:copy && tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "data:copy": "tsx ingest/copy-snapshots.ts",
+    "ingest": "tsx ingest/run.ts all",
+    "ingest:euroleague": "tsx ingest/run.ts euroleague",
+    "ingest:acb": "tsx ingest/run.ts acb",
+    "ingest:nba": "tsx ingest/run.ts nba",
+    "ingest:upload": "tsx ingest/upload-supabase.ts",
+    "calibrate": "tsx engine/calibrate.ts",
+    "backtest": "tsx engine/backtest.ts",
+    "bench": "tsx tests/bench.ts"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "recharts": "^2.13.3"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.46.2",
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  }
+}
