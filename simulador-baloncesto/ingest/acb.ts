@@ -14,7 +14,7 @@ export const ACB_SOURCE = 'ACB – acb.com / live.acb.com (páginas públicas de
 const LIGA_COMPETITION_ID = 1;
 
 /** Edición de la ACB (editionId) por temporada, tal y como la usa acb.com. */
-export const ACB_EDITION: Record<string, number> = { '2025-26': 90, '2026-27': 91 };
+export const ACB_EDITION: Record<string, number> = { '2024-25': 89, '2025-26': 90, '2026-27': 91 };
 
 /** Extrae y decodifica el flujo de datos de React Server Components de una página Next.js. */
 export function parseFlight(html: string): any[] {

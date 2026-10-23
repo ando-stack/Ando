@@ -39,7 +39,7 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
     const noisy = new Float64Array(np[t]);
     let sum = 0;
     for (let i = 0; i < np[t]; i++) {
-      const sd = pl[i].minutes >= 20 ? P.minutesSd : P.minutesSd * 1.8;
+      const sd = pl[i].minutes >= 20 ? P.minutesSd : P.minutesSd * 2;
       noisy[i] = pl[i].minutes * Math.exp(sd * rng.normal() - (sd * sd) / 2);
       sum += noisy[i];
     }
@@ -222,7 +222,9 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
 
   // ---- Contexto de final de partido
   const late = () => period >= rules.periodos - 1;
-  const shootEdge = [1 + P.homeShootingEdge / 2, 1 - P.homeShootingEdge / 2];
+  // Ventaja de campo y forma del día de cada equipo (acierto correlacionado dentro del partido)
+  const form = [Math.exp((P.gameFormSd ?? 0) * rng.normal()), Math.exp((P.gameFormSd ?? 0) * rng.normal())];
+  const shootEdge = [(1 + P.homeShootingEdge / 2) * form[0], (1 - P.homeShootingEdge / 2) * form[1]];
 
   /** Juega una posesión del equipo o. Devuelve true si el siguiente ataque es en transición. */
   const possession = (o: number): boolean => {
@@ -387,7 +389,10 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
       // Tiro de campo
       const three = r >= wT + wF + w2;
       const base = three ? S.fg3 * D.defFg3 * P.fg3Factor : S.fg2 * D.defFg2 * P.fg2Factor;
-      const lead = Math.max(-25, Math.min(25, margin));
+      // Desviación respecto a la ventaja esperada a estas alturas del partido
+      const elapsedFrac = period < rules.periodos ? (period * regLen + (regLen - rem)) / regSec : 1;
+      const expLead = (o === 0 ? 1 : -1) * (input.expectedMargin ?? 0) * elapsedFrac;
+      const lead = Math.max(-25, Math.min(25, margin - expLead));
       const pMake = Math.min(0.95, base * shootEdge[o] * (1 - (P.scoreEffect * lead) / 10) * (buzzer ? 0.6 : 1));
       inc(o, sh, three ? ST.FG3A : ST.FG2A);
       if (rng.next() < pMake) {

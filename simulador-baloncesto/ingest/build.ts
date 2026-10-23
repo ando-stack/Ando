@@ -29,9 +29,9 @@ import { validateSnapshot } from './lib/validate';
 /** Constantes del modelo de datos (documentadas en docs/modelo.md). */
 export const DATA_PARAMS = {
   /** Peso de la temporada anterior: 1 / (1 + partidos actuales / K). */
-  previousSeasonK: 8,
+  previousSeasonK: Number(process.env.SIM_PREV_K ?? 16),
   /** Minutos de "prior" para regularizar tasas por minuto hacia la media de su posición. */
-  priorMinutes: 150,
+  priorMinutes: Number(process.env.SIM_PRIOR_MIN ?? 150),
   /** Intentos de "prior" para regularizar porcentajes. */
   priorFg2: 100,
   priorFg3: 120,

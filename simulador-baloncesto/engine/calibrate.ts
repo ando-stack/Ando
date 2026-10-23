@@ -13,6 +13,7 @@ import type { CompetitionId } from './datatypes';
 import { buildGameInput, defaultTeamSetup, type TeamSetup } from './prepare';
 import { DEFAULT_PARAMS, N_STATS, ST, type SimParams } from './types';
 import { simulateGame } from './simulate';
+import { estimateExpectedMargin } from './run';
 import { Rng } from './rng';
 
 export interface SimLeagueStats {
@@ -50,7 +51,8 @@ export function simulateLeague(snap: CompetitionSnapshot, params: SimParams, per
   for (const h of snap.teams) {
     for (const a of snap.teams) {
       if (h.id === a.id) continue;
-      const input = buildGameInput(snap, setups.get(h.id)!, setups.get(a.id)!, params);
+      const base = buildGameInput(snap, setups.get(h.id)!, setups.get(a.id)!, params);
+      const input = { ...base, expectedMargin: estimateExpectedMargin(base, 40) };
       for (let k = 0; k < perPair; k++) {
         const r = simulateGame(input, rng);
         acc.games++;

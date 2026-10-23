@@ -110,8 +110,11 @@ export interface SimParams {
   garbageMargin: number;
   /** Fracción de fallos que acaban en rebote de equipo (no asignado a ningún jugador). */
   teamReboundShare: number;
-  /** Efecto marcador: reducción relativa del acierto del que gana por cada 10 puntos de ventaja. */
+  /** Efecto marcador: reducción relativa del acierto del equipo que va por encima de la ventaja
+   *  esperada en ese momento, por cada 10 puntos de desviación (y aumento si va por debajo). */
   scoreEffect: number;
+  /** Forma del día: desviación típica (log) de un multiplicador de acierto por equipo y partido. */
+  gameFormSd: number;
 }
 
 export const DEFAULT_PARAMS: SimParams = {
@@ -131,11 +134,12 @@ export const DEFAULT_PARAMS: SimParams = {
   threeShotTripShare: 0.04,
   ftOrebFactor: 0.45,
   homeShootingEdge: 0.02,
-  minutesSd: 0.15,
+  minutesSd: 0.21,
   paceSd: 0.035,
   garbageMargin: 20,
   teamReboundShare: 0.1,
   scoreEffect: 0.02,
+  gameFormSd: 0,
 };
 
 export interface SimGameInput {
@@ -145,6 +149,8 @@ export interface SimGameInput {
   leaguePace: number;
   home: SimTeam;
   away: SimTeam;
+  /** Margen final esperado (local - visitante) sin efecto marcador; lo calcula una simulación piloto. */
+  expectedMargin?: number;
 }
 
 /** Resultado de un partido simulado. */

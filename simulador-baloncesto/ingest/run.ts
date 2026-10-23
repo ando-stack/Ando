@@ -68,6 +68,18 @@ async function raw(comp: CompetitionId) {
 }
 
 const comps: CompetitionId[] = target === 'all' ? ['euroleague', 'acb', 'nba'] : [target as CompetitionId];
+// --season AAAA-AA: descarga solo los partidos de esa temporada (por ejemplo, la base del backtest)
+const si = args.indexOf('--season');
+if (si > 0) {
+  const season = args[si + 1];
+  for (const c of comps) {
+    if (c === 'euroleague') await step(c, `partidos ${season}`, () => ingestEuroleagueSeason(season, { withPbp: false, maxAgeHours: 24 * 30 }));
+    if (c === 'acb') await step(c, `partidos ${season}`, () => ingestAcbSeason(season, ACB_MATCH_RANGES[season].ranges, 0));
+    if (c === 'nba') await step(c, `partidos ${season}`, () => ingestNbaSeason(season, { exactStarters: false, maxAgeHours: 24 * 30 }));
+  }
+  log('Ingesta terminada');
+  process.exit(0);
+}
 for (const c of comps) {
   if (!buildOnly) await raw(c);
   if (!rawOnly) await step(c, 'snapshot', () => buildSnapshot(c));
