@@ -107,7 +107,17 @@ row('Prórrogas: prevista / real', (r) => `${pct(r.otPredicted)} / ${pct(r.otAct
 row('Error medio por jugador: puntos / rebotes / asistencias', (r) => `${num(r.playerPtsMAE, 2)} / ${num(r.playerRebMAE, 2)} / ${num(r.playerAstMAE, 2)}`);
 row('Tiempo del backtest', (r) => `${Math.round(r.elapsedSec)} s`);
 L();
-L('Lectura: el modelo mejora a las dos referencias simples en Brier (probabilidades mejor calibradas y más informativas). El acierto «a ganador» depende mucho de la ventaja de campo de cada temporada (en la EuroLiga 2025-26 ganó el local el 65 % de las veces). Las predicciones de margen y total están bien escaladas (pendiente ≈ 1) y los intervalos cubren aproximadamente lo que deben (50 % y 80 %).');
+{
+  const parts = COMPS.map(([, n], i) => {
+    const r = res[i];
+    const b = base[i];
+    if (!r || !b) return null;
+    const best = Math.min(b.brierHome, b.brierRecord);
+    const d = best - r.brier;
+    return `${n}, el modelo ${d > 0.0015 ? 'mejora' : d > -0.0015 ? 'iguala' : 'empeora'} a la mejor referencia (${num(r.brier, 3)} frente a ${num(best, 3)})`;
+  }).filter(Boolean);
+  L(`Lectura: en Brier (calidad de las probabilidades de victoria): en ${parts.join('; en ')}. El acierto «a ganador» depende mucho de la ventaja de campo de cada temporada (en la EuroLiga 2025-26 ganó el local el 65 % de las veces, lo que hace muy difícil batir a «gana el local»). Las predicciones de margen y total están bien escaladas (pendiente ≈ 1) y los intervalos cubren aproximadamente lo que deben (50 % y 80 %).`);
+}
 L();
 L('## 2. Calibración de probabilidades (over/under, hándicaps y jugadores)');
 L();
@@ -183,7 +193,7 @@ const bench = read<{ at: string; results: { comp: string; single: number; parall
 if (bench) {
   L(`- **Rendimiento** (${bench.at.slice(0, 10)}, Node.js, CPU de ${bench.results[0]?.cores ?? '?'} núcleos):`);
   for (const b of bench.results) L(`  - ${b.comp}: 5.000 simulaciones en ${num(b.single, 2)} s con un hilo y ${num(b.parallel, 2)} s con ${b.workers} workers.`);
-  L('  - En el navegador (Chromium, mismo equipo, 3 workers), 5.000 simulaciones de EuroLiga tardan ≈ 1,7 s incluida la creación de los workers.');
+  L('  - En el navegador (Chromium, mismo equipo, 3 Web Workers, incluida su creación): 5.000 simulaciones en 1,3 s (NBA y EuroLiga) y 1,4 s (ACB); 100.000 simulaciones en 16,5 s (NBA), 14,5 s (EuroLiga) y 14,8 s (ACB), sin bloquear la interfaz (barra de progreso activa).');
 }
 L();
 L('## 6. Ajustes hechos al modelo a partir de la validación');
@@ -201,11 +211,11 @@ L('10. **Forma del día** (acierto correlacionado por equipo y partido): probada
 L();
 L('## 7. Limitaciones conocidas');
 L();
-L('- **Prórrogas algo infraestimadas**: ≈ 3 % simuladas frente a ≈ 4-6 % reales. La proporción de partidos ajustados (|margen| ≤ 3 al final del tiempo reglamentario) sí coincide (≈ 18 %), pero los finales reales acumulan más empates exactos de los que reproduce la lógica de final de partido.');
+L('- **Prórrogas infraestimadas**: ≈ 2-3 % simuladas frente a ≈ 4-5 % reales. La proporción de partidos ajustados (|margen| ≤ 3 al final del tiempo reglamentario) sí coincide (≈ 18 %), pero los finales reales acumulan más empates exactos de los que reproduce la lógica de final de partido.');
 L('- **Tendencia de anotación dentro de la temporada**: en la ACB 2025-26 la anotación subió de ≈ 171 puntos por partido en noviembre a ≈ 182 en mayo; el modelo solo usa lo ocurrido hasta cada fecha y va por detrás (sesgo del total de −5 a −7 puntos en los últimos meses, ECE del over/under del total más alta en la ACB). En producción conviene recalibrar a menudo (`npm run calibrate`).');
 L('- La ventaja de campo es la media de la liga (no específica de cada equipo) y la defensa es a nivel de equipo.');
 L('- El backtest supone conocidos los jugadores disponibles y los titulares (como ocurre poco antes del salto inicial); con quintetos solo «probables» la precisión sería algo menor.');
-L('- Las líneas de jugador con probabilidades altas (≥ 70 %) siguen algo sobreconfiadas en puntos (ver tablas): el modelo no recoge del todo los partidos con muy pocos minutos (lesiones durante el partido, decisiones técnicas).');
+L('- Líneas de jugador: puntos, triples y asistencias bien calibrados (ECE ≈ 0,01-0,02); los **rebotes de jugador en la NBA** salen algo sobreestimados en las líneas altas (por ejemplo, se prevé 65 % y ocurre 58 %; ECE 0,037), y en general las probabilidades altas (≥ 75 %) se cumplen algo menos de lo previsto: el modelo no recoge del todo los partidos con muy pocos minutos (lesiones durante el partido, decisiones técnicas).');
 L('- NBA: la fuente (pbpstats) no marca titulares en el box score; para 2026-27 se obtienen exactos de la distribución de tiempo en pista, pero en el backtest de 2025-26 se estiman como los 5 jugadores con más minutos en el primer cuarto (comprobado con 2026-27: coincide el 84 % de los titulares, jugador a jugador). Como temporada previa del backtest NBA se usan los totales agregados de 2024-25 (sin reparto por cuartos), porque descargar sus 1.230 partidos uno a uno con la fuente lenta habría llevado horas.');
 writeFileSync('docs/validacion.md', lines.join('\n') + '\n');
 console.log('docs/validacion.md generado');
