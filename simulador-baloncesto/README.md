@@ -14,6 +14,20 @@ mayor a menor frecuencia, con buscador, filtro por equipo, exportación a CSV y 
 > asesoramiento de apuestas; juego responsable, solo mayores de 18 años.
 
 <!-- RESUMEN-VALIDACION:INICIO -->
+### Resultados de la validación (backtest de la temporada 2025-26)
+
+| | EuroLiga | Liga Endesa (ACB) | NBA |
+|---|---:|---:|---:|
+| Partidos evaluados | 352 | 282 | 866 |
+| Acierto del ganador | 62,2 % | 63,8 % | 65,4 % |
+| Acierto «gana el local» / «mejor balance» | 64,8 % / 58,0 % | 55,7 % / 64,9 % | 52,9 % / 65,5 % |
+| Brier ganador (modelo / mejor referencia) | 0,221 / 0,228 | 0,217 / 0,217 | 0,220 / 0,225 |
+| Error medio del total de puntos | 14,1 | 13,7 | 15,4 |
+| Error medio del margen | 9,2 | 10,3 | 11,3 |
+| ECE over/under total · hándicap · puntos jugador | 0,037 · 0,019 · 0,013 | 0,092 · 0,021 · 0,013 | 0,007 · 0,011 · 0,010 |
+| Prórroga prevista / real | 2,7 % / 4,8 % | 2,2 % / 4,3 % | 2,3 % / 4,4 % |
+
+Detalle, método y limitaciones en [`docs/validacion.md`](docs/validacion.md).
 <!-- RESUMEN-VALIDACION:FIN -->
 
 ## Fuentes de datos y condiciones

@@ -82,10 +82,14 @@ rival sea un robo y de taponar un fallo de 2.
    (si el equipo se queda sin 5 jugadores disponibles, vuelve a pista sin sumar más faltas
    personales). Con más de 20 puntos de diferencia en el último 40 % del 4.º cuarto, juegan más los
    suplentes («tiempo de la basura»).
-3. **Cada posesión.** Primero puede haber una falta personal no de tiro (tasa calibrada, ajustada
+3. **Uso del día.** El uso de cada jugador se multiplica en cada partido por un factor lognormal
+   (desv. 0,3): hay noches en las que un jugador tira mucho más o mucho menos de lo habitual. Se
+   añadió porque, sin él, las líneas de puntos de jugador salían demasiado estrechas en el
+   backtest (ver docs/validacion.md).
+4. **Cada posesión.** Primero puede haber una falta personal no de tiro (tasa calibrada, ajustada
    por la tendencia a hacer faltas de los defensores en pista); si el equipo está en bonus, 2 tiros
    libres. Si no, se elige el jugador que termina la posesión entre los 5 en pista en proporción a
-   su uso, y la acción según su reparto ajustado por la defensa rival (multiplicadores de pérdidas,
+   su uso del día, y la acción según su reparto ajustado por la defensa rival (multiplicadores de pérdidas,
    faltas en el tiro y proporción de triples) y el contexto (final de partido).
    - **Pérdida**: una fracción (12 %) son faltas en ataque (falta personal del atacante, falta
      recibida para un defensor); del resto, con probabilidad = robos/pérdidas rivales del equipo
@@ -96,27 +100,27 @@ rival sea un robo y de taponar un fallo de 2.
    - **Tiro de 2 o de 3**: acierto = % del jugador × multiplicador defensivo rival × factor de
      calibración × ventaja de campo (+h/2 local, −h/2 visitante) × efecto marcador (abajo), ×0,6 si
      es un tiro sobre la bocina.
-4. **Canasta**: puede ser asistida con probabilidad = asistencias por canasta del equipo
+5. **Canasta**: puede ser asistida con probabilidad = asistencias por canasta del equipo
    (más alta en triples, ×1,35, que en canastas de 2, ×0,85, normalizado) ajustada por los
    pasadores en pista; el asistente se elige entre los otros 4 por su tasa de asistencias. Con
    probabilidad 4 % es un 2+1 / 3+1.
-5. **Tapones**: un fallo de 2 puede ser tapón de un defensor (probabilidad del equipo, ajustada por
+6. **Tapones**: un fallo de 2 puede ser tapón de un defensor (probabilidad del equipo, ajustada por
    los taponadores en pista, asignado por tasa de tapones).
-6. **Rebotes**: tras un fallo (o el último tiro libre fallado), rebote ofensivo con probabilidad
+7. **Rebotes**: tras un fallo (o el último tiro libre fallado), rebote ofensivo con probabilidad
    combinada tipo *log5* entre el % de rebote ofensivo del atacante y el % concedido por el
    defensor, ajustada por los reboteadores en pista (y ×0,45 tras tiro libre). Una fracción
    calibrada de los rebotes son «de equipo» (balón fuera, etc.) y no se asignan a ningún jugador,
    como en las actas oficiales. El rebote se asigna a un jugador por su tasa de rebote ofensivo o
    defensivo. El rebote ofensivo continúa la posesión.
-7. **Faltas y bonus** (config/reglas.ts):
+8. **Faltas y bonus** (config/reglas.ts):
    - NBA: penalización desde la 5.ª falta de equipo del periodo (4.ª en la prórroga); en los dos
      últimos minutos, la 2.ª falta del equipo si no había llegado al cupo; las faltas en ataque no
      cuentan como falta de equipo.
    - FIBA: penalización desde la 5.ª falta de equipo del cuarto; las de la prórroga cuentan como del
      4.º cuarto; las faltas en ataque cuentan como falta de equipo (pero se castigan con saque).
-8. **Prórrogas**: si hay empate al final, prórrogas de 5 minutos hasta que haya ganador (salto
+9. **Prórrogas**: si hay empate al final, prórrogas de 5 minutos hasta que haya ganador (salto
    inicial en el 1.º periodo y prórrogas; saques alternos según cada reglamento en el resto).
-9. **Final de partido** (último cuarto y prórrogas):
+10. **Final de partido** (último cuarto y prórrogas):
    - El que pierde hace faltas intencionadas cuando defiende: perdiendo de 1-2 si quedan menos
      segundos que el reloj de posesión; de 3, solo en los últimos 8 s (40 % de las veces); de 4 a 6,
      en el último 60 % de la ventana (60 s NBA / 50 s FIBA); de 7 a 9, en toda la ventana. La falta
@@ -128,7 +132,7 @@ rival sea un robo y de taponar un fallo de 2.
      de 3 en los últimos 30 s se buscan triples (×5); perdiendo de 3 a 6 en el último minuto, ×2,5;
      perdiendo de 1-2 en los últimos 24 s, tiros de 2 (×1,8); perdiendo de 7 o más en el último
      minuto, más triples (×1,6).
-10. **Efecto marcador.** En los partidos reales la dispersión del margen es menor que la de
+11. **Efecto marcador.** En los partidos reales la dispersión del margen es menor que la de
     posesiones independientes (el que va ganando se relaja y el que pierde aprieta). El acierto del
     equipo que va *por encima de la ventaja esperada a esas alturas del partido* se reduce un
     `scoreEffect × desviación / 10` (y aumenta si va por debajo). La ventaja esperada sale de una
@@ -140,8 +144,10 @@ rival sea un robo y de taponar un fallo de 2.
 
 Se simulan todos los cruces posibles entre los equipos de la competición (con su rotación por
 defecto) y se ajustan iterativamente (8 iteraciones, con amortiguación) los factores globales para
-que las medias simuladas por equipo y partido coincidan con las reales de la competición (temporada
-actual + anterior ponderada):
+que las medias simuladas por equipo y partido coincidan con las reales de la competición. En esas
+medias de la liga la temporada anterior pesa `1 / (1 + partidos de la temporada actual / 30)`
+(decae mucho más rápido que en equipos y jugadores, porque la media de la liga se estabiliza con
+pocos partidos y la anotación cambia de una temporada a otra):
 
 | Factor | Se ajusta con |
 |---|---|

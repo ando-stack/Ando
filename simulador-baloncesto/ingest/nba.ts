@@ -109,7 +109,7 @@ export async function nbaStartersFromDistribution(season: string, teamPlayers: R
 
 export async function ingestNbaSeason(
   season: string,
-  opts: { exactStarters: boolean; maxAgeHours: number; seasonType?: 'Regular Season' | 'Playoffs' },
+  opts: { exactStarters: boolean; maxAgeHours: number; seasonType?: 'Regular Season' | 'Playoffs'; cacheOnly?: boolean },
 ) {
   const st = (opts.seasonType ?? 'Regular Season').replace(' ', '%2B');
   const teamsList = await fetchJson<any>(`${API}/get-teams/nba`, { maxAgeHours: 24 * 7 });
@@ -140,7 +140,15 @@ export async function ingestNbaSeason(
   for (const g of list) {
     i++;
     if (i % 50 === 0) log(`  NBA ${season}: partido ${i}/${list.length}`);
-    const d = await fetchJson<any>(`${API}/get-game-stats?GameId=${g.GameId}&Type=Player`, { maxAgeHours: Infinity });
+    let d: any = null;
+    try {
+      d = await fetchJson<any>(`${API}/get-game-stats?GameId=${g.GameId}&Type=Player`, { maxAgeHours: Infinity, cacheOnly: opts.cacheOnly });
+      if (!d && opts.cacheOnly) continue;
+    } catch (e) {
+      // La fuente falla a veces (502/504): se omite el partido y se anota; la próxima ejecución lo reintenta
+      notes.push(`Partido ${g.GameId} omitido por error de la fuente: ${(e as Error).message}`);
+      continue;
+    }
     if (!d?.stats?.Home || !d?.stats?.Away) {
       notes.push(`Sin estadísticas: ${g.GameId}`);
       continue;

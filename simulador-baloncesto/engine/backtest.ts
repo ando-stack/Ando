@@ -20,6 +20,7 @@ import { runSimulations } from './run';
 import { DEFAULT_PARAMS, type SimParams } from './types';
 import { countOver, histMean, histQuantile } from './markets';
 import { MARGIN_OFFSET } from './aggregate';
+import { calibrate } from './calibrate';
 import { PREVIOUS_SEASON, BACKTEST_PRIOR_SEASON } from '../config/temporadas';
 import type { CompetitionSnapshot } from './snapshot';
 
@@ -56,6 +57,8 @@ export interface BacktestResult {
   playerAstMAE: number;
   reliability: Record<string, { bins: { lo: number; hi: number; n: number; pred: number; obs: number }[]; ece: number; brier: number; n: number }>;
   elapsedSec: number;
+  /** Número de recalibraciones hechas durante el backtest (0 = factores fijos). */
+  calibrations: number;
   perGame: { id: string; date: string; home: string; away: string; pHome: number; predTotal: number; predMargin: number; total: number; margin: number }[];
 }
 
@@ -157,7 +160,10 @@ function teamSetupForGame(snap: CompetitionSnapshot, side: GameRecord['home'], r
   return { teamId: side.teamId, players };
 }
 
-export function runBacktest(comp: CompetitionId, sims: number, params: SimParams, log = console.log): BacktestResult {
+/** Días entre recalibraciones del motor dentro del backtest. */
+const RECALIBRATE_DAYS = 28;
+
+export function runBacktest(comp: CompetitionId, sims: number, params: SimParams, log = console.log, rolling = true): BacktestResult {
   const t0 = Date.now();
   const file: SeasonGamesFile = JSON.parse(readFileSync(`data/games/${comp}/${PREVIOUS_SEASON}.json`, 'utf8'));
   const priorPath = `data/games/${comp}/${BACKTEST_PRIOR_SEASON}.json`;
@@ -197,6 +203,10 @@ export function runBacktest(comp: CompetitionId, sims: number, params: SimParams
   const perGame: BacktestResult['perGame'] = [];
   let snapDay = '';
   let snap: CompetitionSnapshot | null = null;
+  // Recalibración periódica con los datos anteriores a cada fecha (sin información futura)
+  let calParams: SimParams | null = null;
+  let calDay = '';
+  let calibrations = 0;
   const record = new Map<string, { w: number; l: number }>();
   for (let gi = 0; gi < games.length; gi++) {
     const g = games[gi];
@@ -234,6 +244,11 @@ export function runBacktest(comp: CompetitionId, sims: number, params: SimParams
           generatedAt: g.date,
         });
         snapDay = day;
+        if (rolling && (!calParams || (Date.parse(day) - Date.parse(calDay)) / 86400000 >= RECALIBRATE_DAYS)) {
+          calParams = calibrate(snap, calParams ? 4 : 7, undefined, { start: calParams ?? params, quiet: true, skipFinal: true }).params;
+          calDay = day;
+          calibrations++;
+        }
       }
       // Jugadores que debutan en este partido: se añaden con tasas de su posición
       const s = snap!;
@@ -259,7 +274,7 @@ export function runBacktest(comp: CompetitionId, sims: number, params: SimParams
       }
       const home = teamSetupForGame(s, g.home, regMin);
       const away = teamSetupForGame(s, g.away, regMin);
-      const input = buildGameInput(s, home, away, params);
+      const input = buildGameInput(s, home, away, rolling && calParams ? calParams : params);
       const agg = runSimulations(input, sims, 1000 + gi);
       n++;
       const pH = agg.homeWins / agg.n;
@@ -366,6 +381,7 @@ export function runBacktest(comp: CompetitionId, sims: number, params: SimParams
       triplesJugador: reliability(fg3Pairs),
     },
     elapsedSec: (Date.now() - t0) / 1000,
+    calibrations,
     perGame,
   };
 }

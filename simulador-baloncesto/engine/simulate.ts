@@ -57,6 +57,14 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
       target[t][i * 5 + 4] = q4 > 0 ? (target[t][i * 5 + 3] / q4) * 5 * rules.duracionProrroga : 0;
   }
 
+  // ---- Uso de cada jugador en este partido (variabilidad por partido)
+  const usageW = [new Float64Array(np[0]), new Float64Array(np[1])];
+  for (let t = 0; t < 2; t++)
+    for (let i = 0; i < np[t]; i++) {
+      const sd = P.usageSd ?? 0;
+      usageW[t][i] = teams[t].players[i].usage * (sd > 0 ? Math.exp(sd * rng.normal() - (sd * sd) / 2) : 1);
+    }
+
   // ---- Estado
   const onCourt = [new Int32Array(5), new Int32Array(5)];
   const isOn = [new Uint8Array(np[0]), new Uint8Array(np[1])];
@@ -306,7 +314,7 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
       let mean = segment === 0 ? avgPossDur : avgPossDur * 0.55;
       if (fast) mean *= 0.6;
       if (isLate && margin > 0) mean = Math.max(mean, 18); // agotar posesión
-      if (isLate && margin < 0) mean *= rem <= 60 ? 0.4 : 0.6; // prisa (en el último minuto, ataques muy rápidos)
+      if (isLate && margin < 0) mean *= rem <= 60 ? P.lateMinuteHurry ?? 0.4 : 0.6; // prisa (en el último minuto, ataques muy rápidos)
       const cap = segment === 0 ? rules.relojPosesion : rules.relojTrasReboteOfensivo;
       let dur = Math.min(cap, Math.max(1.5, rng.erlang(3, mean)));
       // Último tiro: empate o perdiendo por 1-3 con el reloj por debajo del de posesión
@@ -351,7 +359,11 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
       }
 
       // Jugador que termina la posesión y tipo de acción
-      const sh = pickOn(o, (x) => x.usage);
+      // Jugador que termina la posesión: ponderado por su uso en este partido
+      const ocO = onCourt[o];
+      for (let j = 0; j < 5; j++) wbuf[j] = ocO[j] >= 0 ? usageW[o][ocO[j]] : 0;
+      const jSh = rng.weighted(wbuf, 5);
+      const sh = jSh < 0 ? -1 : ocO[jSh];
       if (sh < 0) return false;
       const S = O.players[sh];
       let wT = S.pTov * D.defTov * P.tovFactor;
@@ -362,7 +374,7 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
         w3 *= 5;
         w2 *= 0.4;
       } else if (late() && rem <= 60 && margin <= -3 && margin >= -6) {
-        w3 *= 2.5; // perdiendo de 3-6 en el último minuto: se buscan triples
+        w3 *= P.lateThreeBoost ?? 2.5; // perdiendo de 3-6 en el último minuto: se buscan triples
       } else if (late() && rem <= 24 && (margin === -2 || margin === -1)) {
         w2 *= 1.8; // buscar el empate / la canasta segura
         wT *= 0.7;

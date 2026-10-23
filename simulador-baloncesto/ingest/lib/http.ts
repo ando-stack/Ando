@@ -17,7 +17,7 @@ const CACHE_DIR = join(process.cwd(), '.cache', 'http');
 
 /** Milisegundos mínimos entre peticiones a un mismo dominio. */
 export const HOST_DELAY_MS: Record<string, number> = {
-  'api.pbpstats.com': 1500,
+  'api.pbpstats.com': 2500,
   'api-live.euroleague.net': 800,
   'live.euroleague.net': 800,
   'acb.com': 2500,
@@ -39,6 +39,8 @@ export interface FetchOptions {
   maxAgeHours?: number;
   /** Si es true, no lanza error con 404 sino que devuelve null. */
   allow404?: boolean;
+  /** Solo caché: si no está en caché devuelve null sin hacer la petición. */
+  cacheOnly?: boolean;
 }
 
 function cachePath(url: string) {
@@ -65,6 +67,7 @@ export async function fetchText(url: string, opts: FetchOptions = {}): Promise<s
       return txt;
     }
   }
+  if (opts.cacheOnly) return null;
   const host = new URL(url).host;
   let attempt = 0;
   for (;;) {

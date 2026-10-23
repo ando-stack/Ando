@@ -1,17 +1,24 @@
 {
-  "at": "2026-10-23T15:46:16.967Z",
+  "at": "2026-10-23T16:16:51.122Z",
   "results": [
     {
+      "comp": "nba",
+      "single": 1.8846565709999998,
+      "parallel": 1.088393596,
+      "workers": 3,
+      "cores": 4
+    },
+    {
       "comp": "euroleague",
-      "single": 2.907329464,
-      "parallel": 1.664654878,
+      "single": 1.5436433890000003,
+      "parallel": 0.986541338,
       "workers": 3,
       "cores": 4
     },
     {
       "comp": "acb",
-      "single": 2.6795232399999995,
-      "parallel": 1.5222443550000007,
+      "single": 1.3920349100000002,
+      "parallel": 1.0415545959999999,
       "workers": 3,
       "cores": 4
     }

@@ -115,6 +115,12 @@ export interface SimParams {
   scoreEffect: number;
   /** Forma del día: desviación típica (log) de un multiplicador de acierto por equipo y partido. */
   gameFormSd: number;
+  /** Factor de duración de los ataques del equipo que pierde en el último minuto. */
+  lateMinuteHurry: number;
+  /** Multiplicador de triples perdiendo de 3 a 6 en el último minuto. */
+  lateThreeBoost: number;
+  /** Variabilidad (log) del uso de cada jugador en cada partido (noches con más o menos tiros). */
+  usageSd: number;
 }
 
 export const DEFAULT_PARAMS: SimParams = {
@@ -140,6 +146,9 @@ export const DEFAULT_PARAMS: SimParams = {
   teamReboundShare: 0.1,
   scoreEffect: 0.02,
   gameFormSd: 0,
+  lateMinuteHurry: 0.4,
+  lateThreeBoost: 2.5,
+  usageSd: 0.3,
 };
 
 export interface SimGameInput {

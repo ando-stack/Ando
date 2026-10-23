@@ -123,11 +123,16 @@ export function targetsOf(snap: CompetitionSnapshot) {
 const odds = (p: number) => p / (1 - p);
 const clampF = (x: number, lo = 0.5, hi = 2) => Math.min(hi, Math.max(lo, x));
 
-export function calibrate(snap: CompetitionSnapshot, iterations = 8, perPair?: number) {
+export function calibrate(
+  snap: CompetitionSnapshot,
+  iterations = 8,
+  perPair?: number,
+  opts: { start?: SimParams; quiet?: boolean; skipFinal?: boolean } = {},
+) {
   const T = targetsOf(snap);
   const nTeams = snap.teams.length;
   const pp = perPair ?? Math.max(2, Math.round(2500 / (nTeams * (nTeams - 1))));
-  let p: SimParams = { ...DEFAULT_PARAMS };
+  let p: SimParams = { ...DEFAULT_PARAMS, ...(opts.start ?? {}) };
   let S = simulateLeague(snap, p, pp, 1);
   for (let it = 0; it < iterations; it++) {
     const damp = it < 2 ? 1 : 0.7;
@@ -159,12 +164,12 @@ export function calibrate(snap: CompetitionSnapshot, iterations = 8, perPair?: n
     q.homeShootingEdge = Math.min(0.12, Math.max(-0.05, q.homeShootingEdge));
     p = q;
     S = simulateLeague(snap, p, pp, 100 + it);
-    console.log(
+    if (!opts.quiet) console.log(
       `  it ${it + 1}: poss ${S.poss.toFixed(1)}/${T.poss.toFixed(1)} pts ${S.pts.toFixed(1)}/${T.pts.toFixed(1)} pf ${S.pf.toFixed(1)}/${T.pf.toFixed(1)} fta ${S.fta.toFixed(1)}/${T.fta.toFixed(1)} oreb ${S.oreb.toFixed(1)}/${T.oreb.toFixed(1)} margin ${S.homeMargin.toFixed(2)}/${T.homeMargin.toFixed(2)} sd ${S.marginSd.toFixed(2)}/${T.marginSd.toFixed(2)} ot ${S.otPct.toFixed(3)}/${T.otPct.toFixed(3)}`,
     );
   }
   // Verificación final con más partidos
-  const final = simulateLeague(snap, p, pp * 2, 999);
+  const final = opts.skipFinal ? S : simulateLeague(snap, p, pp * 2, 999);
   return { params: p, targets: T, simulated: final, perPair: pp };
 }
 

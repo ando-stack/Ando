@@ -44,6 +44,13 @@ export const DATA_PARAMS = {
   absentGames: 2,
   /** Coeficiente de tiros libres en la fórmula de posesiones. */
   ftPossCoef: 0.44,
+  /**
+   * Peso de la temporada anterior en las MEDIAS DE LA LIGA (objetivos de calibración):
+   * 1 / (1 + partidos de la temporada actual / K). Decae mucho más rápido que el de equipos y
+   * jugadores porque la media de la liga se estabiliza con pocas decenas de partidos y la
+   * anotación cambia de una temporada a otra.
+   */
+  leaguePreviousK: Number(process.env.SIM_LEAGUE_PREV_K ?? 30),
 };
 
 const SOURCES: Record<CompetitionId, SourceRef[]> = {
@@ -467,8 +474,7 @@ export function buildCompetitionSnapshot(input: BuildInput): CompetitionSnapshot
   for (const [pid, info] of Object.entries(input.playerInfo)) positions.set(pid, (info.position as any) ?? null);
   for (const p of input.roster ?? []) positions.set(p.id, (p.position as any) ?? positions.get(p.id) ?? null);
 
-  const avgGpCur = tCur.size ? [...tCur.values()].reduce((a, t) => a + t.gp, 0) / tCur.size : 0;
-  const leagueWPrev = previousWeight(avgGpCur);
+  const leagueWPrev = 1 / (1 + input.gamesCurrent.length / DATA_PARAMS.leaguePreviousK);
   const league = leagueAverages(comp, input.gamesCurrent, input.gamesPrevious, pCur, pPrev, positions, leagueWPrev, input.previousAccum);
 
   // ---- Equipos

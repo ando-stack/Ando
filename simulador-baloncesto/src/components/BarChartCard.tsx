@@ -14,10 +14,10 @@ export default function BarChartCard({ title, data, color = '#f59e0b', refX, hei
       <h3 className="font-semibold text-white mb-2 text-sm">{title}</h3>
       <div style={{ width: '100%', height }}>
         <ResponsiveContainer>
-          <BarChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
+          <BarChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid stroke="#232c3d" vertical={false} />
             <XAxis dataKey="x" tick={{ fill: '#94a3b8', fontSize: 11 }} interval="preserveStartEnd" minTickGap={12} />
-            <YAxis tickFormatter={(v: number) => `${(v * 100).toLocaleString('es-ES', { maximumFractionDigits: v < 0.1 ? 1 : 0 })}%`} tick={{ fill: '#94a3b8', fontSize: 11 }} width={44} />
+            <YAxis tickFormatter={(v: number) => `${(v * 100).toLocaleString('es-ES', { maximumFractionDigits: v < 0.1 ? 1 : 0 })}%`} tick={{ fill: '#94a3b8', fontSize: 11 }} width={48} />
             <Tooltip
               cursor={{ fill: 'rgba(148,163,184,0.08)' }}
               contentStyle={{ background: '#121826', border: '1px solid #232c3d', borderRadius: 8, fontSize: 12 }}
