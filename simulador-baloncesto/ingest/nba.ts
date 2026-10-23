@@ -9,7 +9,7 @@
 import { fetchJson } from './lib/http';
 import type { GameRecord, PlayerInfo, PlayerLine, RosterFile, SeasonGamesFile, TeamInfo } from '../engine/datatypes';
 import { NBA_TEAMS } from '../config/nba-equipos';
-import { log, writeJson } from './lib/util';
+import { log, writeJson, readJson } from './lib/util';
 
 const API = 'https://api.pbpstats.com';
 export const NBA_SOURCE = 'PBP Stats API (api.pbpstats.com), datos derivados del jugada a jugada oficial de NBA.com';
@@ -91,7 +91,7 @@ export async function nbaStartersFromDistribution(season: string, teamPlayers: R
     for (const pid of pids) {
       const d = await fetchJson<any>(
         `${API}/get-playing-time-distribution/nba?Season=${season}&SeasonType=Regular%2BSeason&TeamId=${teamId}&PlayerId=${pid}`,
-        { maxAgeHours: 20 },
+        { maxAgeHours: 6 },
       );
       for (const g of d?.results ?? []) {
         const poss: any[] = g.Possessions ?? [];
@@ -122,16 +122,23 @@ export async function ingestNbaSeason(
   log(`NBA ${season}: ${list.length} partidos jugados`);
   let starterMap: Map<string, Set<string>> | null = null;
   if (opts.exactStarters) {
+    // Titulares ya conocidos de ejecuciones anteriores: solo se consultan los equipos con partidos nuevos
+    const known = readJson<Record<string, string[]>>(`data/games/nba/titulares-${season}.json`) ?? {};
+    starterMap = new Map(Object.entries(known).map(([g, l]) => [g, new Set(l)]));
+    const pending = list.filter((g) => (starterMap!.get(g.GameId)?.size ?? 0) < 10);
+    const teamsToQuery = new Set<string>(pending.flatMap((g) => [g.HomeTeamId, g.AwayTeamId]));
     const teamPlayers: Record<string, string[]> = {};
-    for (const id of Object.keys(teams)) {
-      const tp = await fetchJson<any>(
-        `${API}/get-team-players-for-season?Season=${season}&SeasonType=${st}&TeamId=${id}`,
-        { maxAgeHours: 20 },
-      );
+    for (const id of teamsToQuery) {
+      const tp = await fetchJson<any>(`${API}/get-team-players-for-season?Season=${season}&SeasonType=${st}&TeamId=${id}`, { maxAgeHours: 6 });
       teamPlayers[id] = Object.keys(tp?.players ?? {});
     }
-    log(`NBA ${season}: titulares exactos (distribución de minutos de ${Object.values(teamPlayers).flat().length} jugadores)`);
-    starterMap = await nbaStartersFromDistribution(season, teamPlayers);
+    log(`NBA ${season}: titulares exactos de ${pending.length} partidos nuevos (${Object.values(teamPlayers).flat().length} jugadores)`);
+    const fresh = await nbaStartersFromDistribution(season, teamPlayers);
+    for (const [g, set] of fresh) {
+      if (!starterMap.has(g)) starterMap.set(g, new Set());
+      for (const pid of set) starterMap.get(g)!.add(pid);
+    }
+    writeJson(`data/games/nba/titulares-${season}.json`, Object.fromEntries([...starterMap].map(([g, set]) => [g, [...set]])));
   }
   const players: Record<string, PlayerInfo> = {};
   const games: GameRecord[] = [];
