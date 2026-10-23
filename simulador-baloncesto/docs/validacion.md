@@ -214,6 +214,7 @@ Comprobación independiente adicional (prensa): el partido inaugural de la NBA 2
 ## 5. Coherencia y rendimiento
 
 - **Coherencia en cada simulación** (tests `engine/simulate.test.ts` y `tests/coherencia.test.ts`, este último con los datos reales de las tres competiciones): los puntos de cada jugador son 2·T2 + 3·T3 + TL; los puntos de los jugadores suman el resultado del equipo; los cuartos (y prórrogas) suman el resultado final; los segundos jugados suman exactamente 5 × la duración del partido; ningún jugador supera el límite de faltas; no hay empates finales; en el agregado, todas las estadísticas de los jugadores suman las del equipo.
+- **Supabase y RLS** (test `tests/rls.test.ts`): la migración se ejecuta en un PostgreSQL embebido (PGlite); RLS está activo en las 13 tablas, el rol anónimo lee pero no puede insertar, actualizar ni borrar (aunque tenga permisos de tabla, como en Supabase), y la clave de servicio sí escribe. El mapeo snapshot ↔ tablas se comprueba de ida y vuelta sin pérdida (`tests/supabase-map.test.ts`).
 - **Rendimiento** (2026-10-23, Node.js, CPU de 4 núcleos):
   - nba: 5.000 simulaciones en 1,88 s con un hilo y 1,09 s con 3 workers.
   - euroleague: 5.000 simulaciones en 1,54 s con un hilo y 0,99 s con 3 workers.

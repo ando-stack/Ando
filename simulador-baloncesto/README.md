@@ -135,7 +135,9 @@ la simulación y en **Historial** comparar dos (por ejemplo, con y sin un jugado
 4. En Netlify define `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` como variables
    del sitio (las usan las funciones en el servidor) y `VITE_DATA_MODE=supabase`.
 
-Ninguna clave va en el código ni llega al navegador. `.env` está en `.gitignore`.
+Ninguna clave va en el código ni llega al navegador. `.env` está en `.gitignore`. El test
+`tests/rls.test.ts` ejecuta la migración en un PostgreSQL embebido y comprueba que el rol anónimo
+puede leer pero no escribir.
 
 ## Desarrollo local
 
