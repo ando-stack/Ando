@@ -212,6 +212,7 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
   };
 
   const freeThrows = (t: number, i: number, n: number): boolean => {
+    if (i < 0) return false;
     const p = Math.min(0.99, teams[t].players[i].ft * P.ftFactor);
     let last = false;
     for (let k = 0; k < n; k++) {
@@ -505,6 +506,10 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
     }
     last2Fouls[0] = 0;
     last2Fouls[1] = 0;
+    if (isOT()) {
+      // Cada prórroga reparte sus minutos desde cero (el objetivo es por prórroga)
+      for (let t = 0; t < 2; t++) for (let i = 0; i < np[t]; i++) playedQ[t][i * 5 + 4] = 0;
+    }
     doSubs(0, true);
     doSubs(1, true);
     // Saque inicial de cada periodo (salto en el 1.º y en las prórrogas; alterno en el resto)
