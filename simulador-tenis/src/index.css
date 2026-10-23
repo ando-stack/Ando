@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fondo: #121211;
+  --color-superficie: #1a1a19;
+  --color-superficie-2: #232321;
+  --color-borde: #34332f;
+  --color-texto: #f0efec;
+  --color-texto-2: #c3c2b7;
+  --color-texto-3: #8f8e86;
+  --color-jugador-a: #3987e5;
+  --color-jugador-b: #d95926;
+  --color-acento: #c9e04a;
+  --color-aviso: #c98500;
+  --color-error: #e66767;
+  --color-ok: #199e70;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}

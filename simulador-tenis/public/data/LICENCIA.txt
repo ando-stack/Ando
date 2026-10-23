@@ -1,0 +1,5 @@
+Datos derivados de:
+- Jeff Sackmann, tennis_atp y tennis_wta (https://github.com/JeffSackmann), licencia CC BY-NC-SA 4.0
+  (https://creativecommons.org/licenses/by-nc-sa/4.0/): atribución, uso NO comercial y compartir igual.
+  Estos ficheros (perfiles, Elo, historiales) son obra derivada y se distribuyen con la misma licencia.
+- Wikipedia (CC BY-SA 4.0), WTA (api.wtatennis.com) y ESPN, para calendarios, cuadros y resultados recientes.

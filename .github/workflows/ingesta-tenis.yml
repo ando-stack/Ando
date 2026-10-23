@@ -1,0 +1,54 @@
+# Ingesta programada del simulador de tenis: actualiza torneos, cuadros, órdenes de juego,
+# resultados, rankings y Elo varias veces al día, sincroniza Supabase y despliega en Netlify.
+name: Ingesta simulador de tenis
+
+on:
+  schedule:
+    - cron: '15 6,10,14,18,22 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ingesta-tenis
+  cancel-in-progress: false
+
+jobs:
+  ingesta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    defaults:
+      run:
+        working-directory: simulador-tenis
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: simulador-tenis/package-lock.json
+      - run: npm ci
+      # Caché de descargas: evita repetir peticiones a las fuentes (y respeta sus límites).
+      - uses: actions/cache@v4
+        with:
+          path: |
+            simulador-tenis/ingest/.cache/http
+            simulador-tenis/public/data
+          key: ingesta-${{ github.run_id }}
+          restore-keys: ingesta-
+      - name: Ingesta
+        run: npm run ingesta
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      - name: Despliegue en Netlify
+        if: ${{ env.NETLIFY_AUTH_TOKEN != '' }}
+        run: npx --yes netlify-cli@17 deploy --prod --dir=dist --site "$NETLIFY_SITE_ID"

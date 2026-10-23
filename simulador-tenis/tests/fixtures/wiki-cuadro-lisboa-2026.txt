@@ -1,0 +1,423 @@
+{{Tennis events|2026|Lisboa Belém Open|
+| defchamp = {{flagicon|LTU}} [[Vilius Gaubas]]
+| champ    = 
+| runner   = 
+| score    = 
+| edition  = 
+}}
+
+{{main|2026 Lisboa Belém Open}}
+
+[[Vilius Gaubas]] was the defending champion<ref>{{Cite web|url=https://tennistourtalk.com/126263/gaubas-crowned-lisboa-belem-open-champion|title=Gaubas Crowned Lisboa Belem Open Champion|first=Florian|last=Heer|date=September 28, 2025}}</ref> but lost in the first round to [[Marco Cecchinato]].
+
+==Seeds==
+{{columns-list|colwidth=30em|
+# {{flagicon|ARG}} '''[[Marco Trungelliti]]'''
+# {{flagicon|POR}} [[Henrique Rocha]] ''(quarterfinals)''
+# {{flagicon|HUN}} [[Zsombor Piros]] ''(withdrew)''
+# {{flagicon|ESP}} [[Pedro Martínez (tennis)|Pedro Martínez]] ''(withdrew)''
+# {{flagicon|ESP}} [[Max Alcalá Gurri]] ''(second round)''
+# {{flagicon|LTU}} [[Vilius Gaubas]] ''(first round)''
+# {{flagicon|ITA}} [[Andrea Pellegrino]] ''(quarterfinals)''
+# {{flagicon|ESP}} [[Nikolás Sánchez Izquierdo]] ''(first round)''
+}}
+
+==Draw==
+{{Draw key}}
+
+===Finals===
+{{4TeamBracket-Tennis3
+| RD1=Semifinals
+| RD2=Final
+
+| team-width=175
+
+| RD1-seed1=1
+| RD1-team1={{flagicon|ARG}} [[Marco Trungelliti]]
+| RD1-score1-1=
+| RD1-score1-2=
+| RD1-score1-3=
+| RD1-seed2=Q
+| RD1-team2={{flagicon|SUI}} [[Alexander Ritschard]]
+| RD1-score2-1=
+| RD1-score2-2=
+| RD1-score2-3=
+
+| RD1-seed3=LL
+| RD1-team3={{flagicon|}} Svyatoslav Gulin
+| RD1-score3-1=
+| RD1-score3-2=
+| RD1-score3-3=
+| RD1-seed4=
+| RD1-team4={{flagicon|DEN}} [[Elmer Møller]]
+| RD1-score4-1=
+| RD1-score4-2=
+| RD1-score4-3=
+
+| RD2-seed1=&nbsp;
+| RD2-team1=
+| RD2-score1-1=
+| RD2-score1-2=
+| RD2-score1-3=
+| RD2-seed2=
+| RD2-team2=
+| RD2-score2-1=
+| RD2-score2-2=
+| RD2-score2-3=
+}}
+
+===Top half===
+{{16TeamBracket-Compact-Tennis3
+| RD1=First round
+| RD2=Second round
+| RD3=Quarterfinals
+| RD4=Semifinals
+
+| RD1-seed01=1
+| RD1-team01='''{{flagicon|ARG}} [[Marco Trungelliti|M Trungelliti]]'''
+| RD1-score01-1='''7<sup>7</sup>'''
+| RD1-score01-2=4
+| RD1-score01-3='''6'''
+| RD1-seed02=Alt
+| RD1-team02={{flagicon|POR}} [[Tiago Pereira (tennis)|T Pereira]]
+| RD1-score02-1=6<sup>5</sup>
+| RD1-score02-2='''6'''
+| RD1-score02-3=1
+
+| RD1-seed03=WC
+| RD1-team03={{flagicon|POR}} Diogo Morais
+| RD1-score03-1=0
+| RD1-score03-2=3
+| RD1-score03-3=
+| RD1-seed04=
+| RD1-team04='''{{flagicon|ITA}} [[Carlo Alberto Caniato|CA Caniato]]'''
+| RD1-score04-1='''6'''
+| RD1-score04-2='''6'''
+| RD1-score04-3=
+
+| RD1-seed05=
+| RD1-team05='''{{flagicon|CRO}} [[Matej Dodig|M Dodig]]'''
+| RD1-score05-1='''6'''
+| RD1-score05-2='''6'''
+| RD1-score05-3=
+| RD1-seed06=Q
+| RD1-team06={{flagicon|POR}} [[João Domingues|J Domingues]]
+| RD1-score06-1=1
+| RD1-score06-2=3
+| RD1-score06-3=
+
+| RD1-seed07=
+| RD1-team07='''{{flagicon|ITA}} [[Marco Cecchinato|M Cecchinato]]'''
+| RD1-score07-1='''6'''
+| RD1-score07-2='''6'''
+| RD1-score07-3=
+| RD1-seed08=6
+| RD1-team08={{flagicon|LTU}} [[Vilius Gaubas|V Gaubas]]
+| RD1-score08-1=4
+| RD1-score08-2=3
+| RD1-score08-3=
+
+| RD1-seed09=Q
+| RD1-team09={{flagicon|ESP}} [[Carlos Taberner|C Taberner]]
+| RD1-score09-1=1
+| RD1-score09-2=5
+| RD1-score09-3=
+| RD1-seed10=Q
+| RD1-team10='''{{flagicon|SUI}} [[Alexander Ritschard|A Ritschard]]'''
+| RD1-score10-1='''6'''
+| RD1-score10-2='''7'''
+| RD1-score10-3=
+
+| RD1-seed11=
+| RD1-team11='''{{flagicon|ITA}} [[Raúl Brancaccio|R Brancaccio]]'''
+| RD1-score11-1='''6'''
+| RD1-score11-2='''6'''
+| RD1-score11-3=
+| RD1-seed12=
+| RD1-team12={{flagicon|FRA}} [[Calvin Hemery|C Hemery]]
+| RD1-score12-1=1
+| RD1-score12-2=4
+| RD1-score12-3=
+
+| RD1-seed13=
+| RD1-team13='''{{flagicon|IND}} [[Sumit Nagal|S Nagal]]'''
+| RD1-score13-1='''6'''
+| RD1-score13-2='''6'''
+| RD1-score13-3=
+| RD1-seed14=Q
+| RD1-team14={{flagicon|ESP}} [[Alejo Sánchez Quílez|A Sánchez Quílez]]
+| RD1-score14-1=4
+| RD1-score14-2=2
+| RD1-score14-3=
+
+| RD1-seed15=Q
+| RD1-team15='''{{flagicon|LBN}} [[Benjamin Hassan|B Hassan]]'''
+| RD1-score15-1='''6'''
+| RD1-score15-2=1
+| RD1-score15-3='''6'''
+| RD1-seed16=8
+| RD1-team16={{flagicon|ESP}} [[Nikolás Sánchez Izquierdo|N Sánchez Izquierdo]]
+| RD1-score16-1=3
+| RD1-score16-2='''6'''
+| RD1-score16-3=3
+
+| RD2-seed01=1
+| RD2-team01='''{{flagicon|ARG}} [[Marco Trungelliti|M Trungelliti]]'''
+| RD2-score01-1=4
+| RD2-score01-2='''7<sup>7</sup>'''
+| RD2-score01-3='''6'''
+| RD2-seed02=
+| RD2-team02={{flagicon|ITA}} [[Carlo Alberto Caniato|CA Caniato]]
+| RD2-score02-1='''6'''
+| RD2-score02-2=6<sup>3</sup>
+| RD2-score02-3=3
+
+| RD2-seed03=
+| RD2-team03='''{{flagicon|CRO}} [[Matej Dodig|M Dodig]]'''
+| RD2-score03-1='''6'''
+| RD2-score03-2=4
+| RD2-score03-3='''6'''
+| RD2-seed04=
+| RD2-team04={{flagicon|ITA}} [[Marco Cecchinato|M Cecchinato]]
+| RD2-score04-1=1
+| RD2-score04-2='''6'''
+| RD2-score04-3=2
+
+| RD2-seed05=Q
+| RD2-team05='''{{flagicon|SUI}} [[Alexander Ritschard|A Ritschard]]'''
+| RD2-score05-1='''6'''
+| RD2-score05-2=4
+| RD2-score05-3='''6'''
+| RD2-seed06=
+| RD2-team06={{flagicon|ITA}} [[Raúl Brancaccio|R Brancaccio]]
+| RD2-score06-1=4
+| RD2-score06-2='''6'''
+| RD2-score06-3=4
+
+| RD2-seed07=
+| RD2-team07='''{{flagicon|IND}} [[Sumit Nagal|S Nagal]]'''
+| RD2-score07-1='''7<sup>7</sup>'''
+| RD2-score07-2=2
+| RD2-score07-3=
+| RD2-seed08=Q
+| RD2-team08={{flagicon|LBN}} [[Benjamin Hassan|B Hassan]]
+| RD2-score08-1=6<sup>5</sup>
+| RD2-score08-2=0<sup>r</sup>
+| RD2-score08-3=
+
+| RD3-seed01=1
+| RD3-team01='''{{flagicon|ARG}} [[Marco Trungelliti|M Trungelliti]]'''
+| RD3-score01-1='''6'''
+| RD3-score01-2='''6'''
+| RD3-score01-3=
+| RD3-seed02=
+| RD3-team02={{flagicon|CRO}} [[Matej Dodig|M Dodig]]
+| RD3-score02-1=4
+| RD3-score02-2=2
+| RD3-score02-3=
+
+| RD3-seed03=Q
+| RD3-team03='''{{flagicon|SUI}} [[Alexander Ritschard|A Ritschard]]'''
+| RD3-score03-1='''7'''
+| RD3-score03-2='''6'''
+| RD3-score03-3=
+| RD3-seed04=
+| RD3-team04={{flagicon|IND}} [[Sumit Nagal|S Nagal]]
+| RD3-score04-1=5
+| RD3-score04-2=2
+| RD3-score04-3=
+
+| RD4-seed01=1
+| RD4-team01={{flagicon|ARG}} [[Marco Trungelliti|M Trungelliti]]
+| RD4-score01-1=
+| RD4-score01-2=
+| RD4-score01-3=
+| RD4-seed02=Q
+| RD4-team02={{flagicon|SUI}} [[Alexander Ritschard|A Ritschard]]
+| RD4-score02-1=
+| RD4-score02-2=
+| RD4-score02-3=
+}}
+
+===Bottom half===
+{{16TeamBracket-Compact-Tennis3
+| RD1=First round
+| RD2=Second round
+| RD3=Quarterfinals
+| RD4=Semifinals
+
+| RD1-seed01=7
+| RD1-team01='''{{flagicon|ITA}} [[Andrea Pellegrino|A Pellegrino]]'''
+| RD1-score01-1=1
+| RD1-score01-2=
+| RD1-score01-3=
+| RD1-seed02=
+| RD1-team02={{flagicon|ESP}} [[Pol Martín Tiffon|P Martín Tiffon]]
+| RD1-score02-1=3<sup>r</sup>
+| RD1-score02-2=
+| RD1-score02-3=
+
+| RD1-seed03=
+| RD1-team03='''{{flagicon|ITA}} [[Francesco Passaro|F Passaro]]'''
+| RD1-score03-1='''6'''
+| RD1-score03-2='''6'''
+| RD1-score03-3=
+| RD1-seed04=WC
+| RD1-team04={{flagicon|POR}} [[Gastão Elias|G Elias]]
+| RD1-score04-1=2
+| RD1-score04-2=2
+| RD1-score04-3=
+
+| RD1-seed05=WC
+| RD1-team05={{flagicon|POR}} [[Tiago Torres|T Torres]]
+| RD1-score05-1=3
+| RD1-score05-2=3
+| RD1-score05-3=
+| RD1-seed06=LL
+| RD1-team06='''{{flagicon|SVK}} [[Andrej Martin|A Martin]]'''
+| RD1-score06-1='''6'''
+| RD1-score06-2='''6'''
+| RD1-score06-3=
+
+| RD1-seed07=Q
+| RD1-team07={{flagicon|SUI}} Patrick Schön
+| RD1-score07-1=1
+| RD1-score07-2=1
+| RD1-score07-3=
+| RD1-seed08=LL
+| RD1-team08='''{{flagicon|}} Svyatoslav Gulin'''
+| RD1-score08-1='''6'''
+| RD1-score08-2='''6'''
+| RD1-score08-3=
+
+| RD1-seed09=5
+| RD1-team09='''{{flagicon|ESP}} [[Max Alcalá Gurri|M Alcalá Gurri]]'''
+| RD1-score09-1='''6'''
+| RD1-score09-2='''6'''
+| RD1-score09-3=
+| RD1-seed10=
+| RD1-team10={{flagicon|ECU}} [[Andy Andrade|A Andrade]]
+| RD1-score10-1=4
+| RD1-score10-2=2
+| RD1-score10-3=
+
+| RD1-seed11=
+| RD1-team11={{flagicon|USA}} [[Tristan Boyer|T Boyer]]
+| RD1-score11-1=5
+| RD1-score11-2=2
+| RD1-score11-3=
+| RD1-seed12=
+| RD1-team12='''{{flagicon|DEN}} [[Elmer Møller|E Møller]]'''
+| RD1-score12-1='''7'''
+| RD1-score12-2='''6'''
+| RD1-score12-3=
+
+| RD1-seed13=
+| RD1-team13='''{{flagicon|BRA}} [[Thiago Monteiro (tennis)|T Monteiro]]'''
+| RD1-score13-1='''6'''
+| RD1-score13-2='''7<sup>7</sup>'''
+| RD1-score13-3=
+| RD1-seed14=
+| RD1-team14={{flagicon|ESP}} [[Alejandro Moro Cañas|A Moro Cañas]]
+| RD1-score14-1=3
+| RD1-score14-2=6<sup>4</sup>
+| RD1-score14-3=
+
+| RD1-seed15=Alt
+| RD1-team15={{flagicon|USA}} Dali Blanch
+| RD1-score15-1=4
+| RD1-score15-2=5
+| RD1-score15-3=
+| RD1-seed16=2
+| RD1-team16='''{{flagicon|POR}} [[Henrique Rocha|H Rocha]]'''
+| RD1-score16-1='''6'''
+| RD1-score16-2='''7'''
+| RD1-score16-3=
+
+| RD2-seed01=7
+| RD2-team01='''{{flagicon|ITA}} [[Andrea Pellegrino|A Pellegrino]]'''
+| RD2-score01-1=<small>w/o</small>
+| RD2-score01-2=
+| RD2-score01-3=
+| RD2-seed02=
+| RD2-team02={{flagicon|ITA}} [[Francesco Passaro|F Passaro]]
+| RD2-score02-1=
+| RD2-score02-2=
+| RD2-score02-3=
+
+| RD2-seed03=LL
+| RD2-team03={{flagicon|SVK}} [[Andrej Martin|A Martin]]
+| RD2-score03-1='''6'''
+| RD2-score03-2=0
+| RD2-score03-3=2
+| RD2-seed04=LL
+| RD2-team04='''{{flagicon|}} S Gulin'''
+| RD2-score04-1=1
+| RD2-score04-2='''6'''
+| RD2-score04-3='''6'''
+
+| RD2-seed05=5
+| RD2-team05={{flagicon|ESP}} [[Max Alcalá Gurri|M Alcalá Gurri]]
+| RD2-score05-1=4
+| RD2-score05-2='''6'''
+| RD2-score05-3=3
+| RD2-seed06=
+| RD2-team06='''{{flagicon|DEN}} [[Elmer Møller|E Møller]]'''
+| RD2-score06-1='''6'''
+| RD2-score06-2=2
+| RD2-score06-3='''6'''
+
+| RD2-seed07=
+| RD2-team07={{flagicon|BRA}} [[Thiago Monteiro (tennis)|T Monteiro]]
+| RD2-score07-1=4
+| RD2-score07-2='''6'''
+| RD2-score07-3=3
+| RD2-seed08=2
+| RD2-team08='''{{flagicon|POR}} [[Henrique Rocha|H Rocha]]'''
+| RD2-score08-1='''6'''
+| RD2-score08-2=3
+| RD2-score08-3='''6'''
+
+| RD3-seed01=7
+| RD3-team01={{flagicon|ITA}} [[Andrea Pellegrino|A Pellegrino]]
+| RD3-score01-1=5
+| RD3-score01-2=0
+| RD3-score01-3=
+| RD3-seed02=LL
+| RD3-team02='''{{flagicon|}} S Gulin'''
+| RD3-score02-1='''7'''
+| RD3-score02-2='''6'''
+| RD3-score02-3=
+
+| RD3-seed03=
+| RD3-team03='''{{flagicon|DEN}} [[Elmer Møller|E Møller]]'''
+| RD3-score03-1='''6'''
+| RD3-score03-2='''6'''
+| RD3-score03-3=
+| RD3-seed04=2
+| RD3-team04={{flagicon|POR}} [[Henrique Rocha|H Rocha]]
+| RD3-score04-1=2
+| RD3-score04-2=4
+| RD3-score04-3=
+
+| RD4-seed01=LL
+| RD4-team01={{flagicon|}} S Gulin
+| RD4-score01-1=
+| RD4-score01-2=
+| RD4-score01-3=
+| RD4-seed02=
+| RD4-team02={{flagicon|DEN}} [[Elmer Møller|E Møller]]
+| RD4-score02-1=
+| RD4-score02-2=
+| RD4-score02-3=
+}}
+
+==References==
+{{reflist}}
+
+==External links==
+*[https://www.protennislive.com/posting/2026/7742/mds.pdf Main draw]
+*[https://www.protennislive.com/posting/2026/7742/qs.pdf Qualifying draw]
+
+{{DEFAULTSORT:2026 Lisboa Belem Open - 1}}
+[[Category:2026 ATP Challenger Tour|Lisboa Belém Open - 1]]

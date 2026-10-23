@@ -1,0 +1,27 @@
+{| class=wikitable
+|-valign=top
+|rowspan=10|October 19||rowspan=2|[[2026 Lisboa Belém Open|Lisboa Belém Open]]<br/>[[Lisbon]], Portugal <br/> Clay – Challenger 100 – 32S/24Q/16D<br/>[[2026 Lisboa Belém Open – Men's singles|Singles]] – [[2026 Lisboa Belém Open – Men's doubles|Doubles]] || colspan=2 align=center| {{flagicon|}} vs {{flagicon|}} ||rowspan=2|{{flagicon|ARG}} [[Marco Trungelliti|M Trungelliti]] vs {{flagicon|SUI}} [[Alexander Ritschard|A Ritschard]] <br/> {{flagicon|}} Svyatoslav Gulin vs {{flagicon|DEN}} [[Elmer Møller|E Møller]] ||rowspan=2| {{flagicon|CRO}} [[Matej Dodig]] <br/> {{flagicon|IND}} [[Sumit Nagal]] <br/>{{flagicon|ITA}} [[Andrea Pellegrino]] <br/> {{flagicon|POR}} [[Henrique Rocha]]
+|-valign=top
+|colspan=2 align=center|{{flagicon|}} / {{flagicon|}} <br/> vs <br/> {{flagicon|}} / {{flagicon|}}
+|-valign=top
+|rowspan=2|[[2026 Cali Open|Cali Open]]<br/>[[Cali]], Colombia <br/> Clay – Challenger 75 – 32S/24Q/16D<br/>[[2026 Cali Open – Singles|Singles]] – [[2026 Cali Open – Doubles|Doubles]] || colspan=2 align=center| {{flagicon|}} vs {{flagicon|}} ||rowspan=2|{{flagicon|}} vs {{flagicon|BRA}} [[Matheus Pucinelli de Almeida|M Pucinelli de Almeida]] <br/> {{flagicon|BRA}} [[Felipe Meligeni Alves|F Meligeni Alves]] vs {{flagicon|ARG}} [[Valerio Aboian|V Aboian]] ||rowspan=2| {{flagicon|BRA}} [[Gustavo Heide|G Heide]] vs {{flagicon|ARG}} [[Santiago Rodríguez Taverna|S Rodríguez Taverna]] <br/>{{flagicon|ARG}} [[Juan Manuel La Serna]] <br/> {{flagicon|ARG}} Carlos María Zárate <br/> {{flagicon|COL}} Miguel Tobón
+|-valign=top
+|colspan=2 align=center|{{flagicon|}} / {{flagicon|}} <br/> vs <br/> {{flagicon|}} / {{flagicon|}}
+|-valign=top
+|rowspan=2|[[2026 Fort Worth Challenger|Fort Worth Challenger]]<br/>[[Fort Worth, Texas|Fort Worth]], United States <br/> Hard – Challenger 75 – 32S/24Q/16D<br/>[[2026 Fort Worth Challenger – Singles|Singles]] – [[2026 Fort Worth Challenger – Doubles|Doubles]] || colspan=2 align=center| {{flagicon|}} vs {{flagicon|}} ||rowspan=2|{{flagicon|USA}} vs {{flagicon|FRA}} [[Gabriel Debru|G Debru]] <br/> {{flagicon|}} vs {{flagicon|USA}} [[Darwin Blanch|Dar Blanch]] ||rowspan=2| {{flagicon|USA}} [[Jenson Brooksby|J Brooksby]] vs {{flagicon|USA}} Patrick Maloney <br/> {{flagicon|}} [[Erik Arutiunian]] <br/>{{flagicon|NED}} Sander Jong vs {{flagicon|USA}} [[Aidan Mayo|A Mayo]] <br/> {{flagicon|NED}} [[Mees Röttgering]]
+|-valign=top
+|colspan=2 align=center|{{flagicon|}} / {{flagicon|}} <br/> vs <br/> {{flagicon|}} / {{flagicon|}}
+|-valign=top
+|rowspan=2|[[2026 Guangzhou International Challenger|Guangzhou International Challenger]]<br/>[[Nansha, Guangzhou|Nansha]], China <br/> Hard – Challenger 75 – 32S/24Q/16D<br/>[[2026 Guangzhou International Challenger – Singles|Singles]] – [[2026 Guangzhou International Challenger – Doubles|Doubles]] || colspan=2 align=center| {{flagicon|}} vs {{flagicon|}} ||rowspan=2|{{flagicon|HKG}} [[Coleman Wong|C Wong]] vs {{flagicon|CHN}} [[Zhou Yi (tennis)|Y Zhou]] <br/> {{flagicon|AUS}} [[Tristan Schoolkate|T Schoolkate]] vs {{flagicon|CHN}} [[Cui Jie (tennis)|J Cui]] ||rowspan=2| {{flagicon|JPN}} [[Jay Friend]] <br/>{{flagicon|USA}} Andre Ilagan <br/>{{flagicon|USA}} [[Keegan Smith (tennis)|Keegan Smith]] <br/> {{flagicon|JPN}} [[Akira Santillan]]
+|-valign=top
+|colspan=2 align=center|{{flagicon|TPE}} [[Hsu Yu-hsiou]] / {{flagicon|CHN}} [[Sun Fajing]] <br/> vs <br/> {{flagicon|NED}} [[Thijmen Loof]] / {{flagicon|JPN}} [[Kaito Uesugi]]
+|-valign=top
+|rowspan=2|[[2026 Florence Challenger|Florence Challenger]]<br/>[[Florence]], Italy <br/> Clay – Challenger 50 – 32S/24Q/16D<br/>[[2026 Florence Challenger – Singles|Singles]] – [[2026 Florence Challenger – Doubles|Doubles]] || colspan=2 align=center| {{flagicon|}} vs {{flagicon|}} ||rowspan=2|{{flagicon|}} vs {{flagicon|ITA}} Michele Ribecai <br/> {{flagicon|AUT}} [[Sandro Kopp (tennis)|S Kopp]] vs {{flagicon|ITA}} [[Filippo Romano|F Romano]] ||rowspan=2| {{flagicon|ITA}} [[Francesco Forti|F Forti]] vs {{flagicon|ESP}} [[Oriol Roca Batalla|O Roca Batalla]] <br/>{{flagicon|AUT}} [[Filip Misolic]] <br/>{{flagicon|ESP}} Àlex Martí Pujolràs <br/> {{flagicon|CZE}} Matthew William Donald
+|-valign=top
+|colspan=2 align=center|{{flagicon|}} / {{flagicon|}} <br/> vs <br/> {{flagicon|}} / {{flagicon|}}
+|-valign=top
+|rowspan=10|October 26||rowspan=2|[[Seoul Open Challenger]]<br/>[[Seoul]], South Korea <br/> Hard – Challenger 125 – 32S/24Q/16D<br/>Singles – Doubles || colspan=2 align=center| {{flagicon|}} vs {{flagicon|}} ||rowspan=2|{{flagicon|}} vs {{flagicon|}} <br/> {{flagicon|}} vs {{flagicon|}} ||rowspan=2| {{flagicon|}} vs {{flagicon|}} <br/>{{flagicon|}} vs {{flagicon|}} <br/>{{flagicon|}} vs {{flagicon|}} <br/> {{flagicon|}} vs {{flagicon|}}
+|-valign=top
+|colspan=2 align=center|{{flagicon|}} / {{flagicon|}} <br/> vs <br/> {{flagicon|}} / {{flagicon|}}
+
+|}
