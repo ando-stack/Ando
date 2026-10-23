@@ -8,28 +8,28 @@ Informe generado el 2026-10-23 con `npx tsx engine/report.ts` a partir de los re
 
 | | EuroLiga | Liga Endesa (ACB) | NBA |
 |---|---:|---:|---:|
-| Partidos evaluados | 352 | 282 | 866 |
+| Partidos evaluados | 352 | 282 | 1150 |
 | Simulaciones por partido | 500 | 500 | 300 |
-| Acierto del ganador (modelo) | 62,2 % | 63,8 % | 65,4 % |
-| Acierto «gana el local» | 64,8 % | 55,7 % | 52,9 % |
-| Acierto «gana el de mejor balance» | 58,0 % | 64,9 % | 65,5 % |
-| Brier ganador (modelo) | 0,221 | 0,217 | 0,220 |
-| Brier «tasa de victorias locales» | 0,231 | 0,251 | 0,250 |
-| Brier «balance + factor campo» (log5) | 0,228 | 0,217 | 0,225 |
-| Log loss ganador | 0,632 | 0,622 | 0,633 |
+| Acierto del ganador (modelo) | 62,2 % | 63,8 % | 67,4 % |
+| Acierto «gana el local» | 64,8 % | 55,7 % | 55,0 % |
+| Acierto «gana el de mejor balance» | 58,0 % | 64,9 % | 67,7 % |
+| Brier ganador (modelo) | 0,221 | 0,217 | 0,209 |
+| Brier «tasa de victorias locales» | 0,231 | 0,251 | 0,248 |
+| Brier «balance + factor campo» (log5) | 0,228 | 0,217 | 0,211 |
+| Log loss ganador | 0,632 | 0,622 | 0,608 |
 | Error absoluto medio del total de puntos | 14,1 | 13,7 | 15,4 |
-| Sesgo del total (simulado − real) | -2,1 | -4,2 | -0,3 |
-| Error absoluto medio del margen | 9,2 | 10,3 | 11,3 |
-| Sesgo del margen (simulado − real) | -0,5 | 0,4 | 0,5 |
-| Correlación margen previsto/real | 0,31 | 0,42 | 0,42 |
-| Pendiente real ~ previsto (1 = bien escalado) | 1,03 | 1,13 | 1,01 |
+| Sesgo del total (simulado − real) | -2,1 | -4,2 | -0,9 |
+| Error absoluto medio del margen | 9,2 | 10,3 | 11,6 |
+| Sesgo del margen (simulado − real) | -0,5 | 0,4 | -0,2 |
+| Correlación margen previsto/real | 0,31 | 0,42 | 0,45 |
+| Pendiente real ~ previsto (1 = bien escalado) | 1,03 | 1,13 | 1,11 |
 | Total real dentro del intervalo central 50 % / 80 % | 49 % / 79 % | 54 % / 80 % | 53 % / 82 % |
-| Margen real dentro del intervalo central 50 % / 80 % | 56 % / 82 % | 55 % / 82 % | 54 % / 80 % |
-| Prórrogas: prevista / real | 2,7 % / 4,8 % | 2,2 % / 4,3 % | 2,3 % / 4,4 % |
-| Error medio por jugador: puntos / rebotes / asistencias | 4,08 / 1,53 / 1,13 | 4,02 / 1,55 / 1,05 | 4,66 / 1,96 / 1,38 |
-| Tiempo del backtest | 282 s | 240 s | 462 s |
+| Margen real dentro del intervalo central 50 % / 80 % | 56 % / 82 % | 55 % / 82 % | 53 % / 79 % |
+| Prórrogas: prevista / real | 2,7 % / 4,8 % | 2,2 % / 4,3 % | 2,3 % / 4,2 % |
+| Error medio por jugador: puntos / rebotes / asistencias | 4,08 / 1,53 / 1,13 | 4,02 / 1,55 / 1,05 | 4,69 / 1,95 / 1,39 |
+| Tiempo del backtest | 282 s | 240 s | 556 s |
 
-Lectura: en Brier (calidad de las probabilidades de victoria): en EuroLiga, el modelo mejora a la mejor referencia (0,221 frente a 0,228); en Liga Endesa (ACB), el modelo iguala a la mejor referencia (0,217 frente a 0,217); en NBA, el modelo mejora a la mejor referencia (0,220 frente a 0,225). El acierto «a ganador» depende mucho de la ventaja de campo de cada temporada (en la EuroLiga 2025-26 ganó el local el 65 % de las veces, lo que hace muy difícil batir a «gana el local»). Las predicciones de margen y total están bien escaladas (pendiente ≈ 1) y los intervalos cubren aproximadamente lo que deben (50 % y 80 %).
+Lectura: en Brier (calidad de las probabilidades de victoria): en EuroLiga, el modelo mejora a la mejor referencia (0,221 frente a 0,228); en Liga Endesa (ACB), el modelo iguala a la mejor referencia (0,217 frente a 0,217); en NBA, el modelo mejora a la mejor referencia (0,209 frente a 0,211). El acierto «a ganador» depende mucho de la ventaja de campo de cada temporada (en la EuroLiga 2025-26 ganó el local el 65 % de las veces, lo que hace muy difícil batir a «gana el local»). Las predicciones de margen y total están bien escaladas (pendiente ≈ 1) y los intervalos cubren aproximadamente lo que deben (50 % y 80 %).
 
 ## 2. Calibración de probabilidades (over/under, hándicaps y jugadores)
 
@@ -37,13 +37,13 @@ Para cada partido se calcula la probabilidad simulada de superar varias líneas 
 
 | Mercado | EuroLiga: n · ECE · Brier | Liga Endesa (ACB): n · ECE · Brier | NBA: n · ECE · Brier |
 |---|---:|---:|---:|
-| Ganador | 352 · 0,057 · 0,221 | 282 · 0,056 · 0,217 | 866 · 0,029 · 0,220 |
-| Over/under del total | 3168 · 0,037 · 0,215 | 2538 · 0,092 · 0,210 | 7794 · 0,007 · 0,220 |
-| Hándicap | 2464 · 0,019 · 0,192 | 1974 · 0,021 · 0,200 | 6062 · 0,011 · 0,207 |
-| Puntos de jugador | 36.959 · 0,013 · 0,208 | 30.743 · 0,013 · 0,208 | 90.191 · 0,010 · 0,198 |
-| Rebotes de jugador | 28.808 · 0,015 · 0,200 | 24.141 · 0,014 · 0,200 | 79.718 · 0,037 · 0,194 |
-| Asistencias de jugador | 21.024 · 0,016 · 0,203 | 16.516 · 0,021 · 0,201 | 62.731 · 0,021 · 0,200 |
-| Triples de jugador | 14.385 · 0,011 · 0,192 | 12.001 · 0,015 · 0,189 | 43.038 · 0,014 · 0,197 |
+| Ganador | 352 · 0,057 · 0,221 | 282 · 0,056 · 0,217 | 1150 · 0,044 · 0,209 |
+| Over/under del total | 3168 · 0,037 · 0,215 | 2538 · 0,092 · 0,210 | 10.350 · 0,013 · 0,220 |
+| Hándicap | 2464 · 0,019 · 0,192 | 1974 · 0,021 · 0,200 | 8050 · 0,014 · 0,208 |
+| Puntos de jugador | 36.959 · 0,013 · 0,208 | 30.743 · 0,013 · 0,208 | 119.603 · 0,009 · 0,198 |
+| Rebotes de jugador | 28.808 · 0,015 · 0,200 | 24.141 · 0,014 · 0,200 | 105.621 · 0,036 · 0,194 |
+| Asistencias de jugador | 21.024 · 0,016 · 0,203 | 16.516 · 0,021 · 0,201 | 83.318 · 0,022 · 0,200 |
+| Triples de jugador | 14.385 · 0,011 · 0,192 | 12.001 · 0,015 · 0,189 | 57.225 · 0,013 · 0,197 |
 
 <details><summary>Tablas de fiabilidad · EuroLiga</summary>
 
@@ -113,31 +113,31 @@ Para cada partido se calcula la probabilidad simulada de superar varias líneas 
 
 **Ganador** (previsto → observado, n):
 
-15 % → 14 % (21) · 26 % → 30 % (64) · 36 % → 34 % (117) · 45 % → 40 % (155) · 55 % → 54 % (178) · 65 % → 64 % (158) · 74 % → 79 % (109) · 84 % → 83 % (53) · 92 % → 55 % (11)
+9 % → 50 % (2) · 17 % → 7 % (27) · 26 % → 26 % (87) · 35 % → 28 % (152) · 45 % → 48 % (228) · 55 % → 58 % (198) · 65 % → 68 % (218) · 74 % → 82 % (155) · 84 % → 81 % (70) · 92 % → 69 % (13)
 
 **Over/under del total** (previsto → observado, n):
 
-19 % → 21 % (95) · 24 % → 26 % (1150) · 35 % → 35 % (1312) · 45 % → 44 % (1502) · 55 % → 55 % (1352) · 65 % → 66 % (1273) · 76 % → 76 % (1049) · 81 % → 80 % (61)
+19 % → 28 % (109) · 24 % → 26 % (1561) · 35 % → 35 % (1738) · 45 % → 46 % (1940) · 55 % → 56 % (1846) · 65 % → 66 % (1691) · 76 % → 78 % (1375) · 81 % → 81 % (90)
 
 **Hándicap** (previsto → observado, n):
 
-18 % → 20 % (417) · 25 % → 24 % (957) · 35 % → 34 % (783) · 45 % → 41 % (836) · 55 % → 55 % (858) · 65 % → 66 % (818) · 75 % → 74 % (967) · 82 % → 81 % (426)
+18 % → 21 % (543) · 25 % → 25 % (1269) · 35 % → 34 % (1040) · 45 % → 44 % (1105) · 55 % → 57 % (1125) · 65 % → 68 % (1119) · 75 % → 76 % (1289) · 82 % → 79 % (560)
 
 **Puntos de jugador** (previsto → observado, n):
 
-8 % → 8 % (2247) · 15 % → 14 % (12820) · 26 % → 27 % (13987) · 33 % → 34 % (8970) · 45 % → 45 % (17184) · 56 % → 53 % (9412) · 64 % → 64 % (10180) · 75 % → 70 % (6011) · 85 % → 84 % (8265) · 91 % → 94 % (1115)
+8 % → 8 % (2959) · 15 % → 14 % (16983) · 26 % → 28 % (18644) · 33 % → 34 % (11773) · 45 % → 45 % (22837) · 56 % → 54 % (12622) · 64 % → 64 % (13364) · 75 % → 70 % (7887) · 85 % → 84 % (11091) · 91 % → 93 % (1443)
 
 **Rebotes de jugador** (previsto → observado, n):
 
-8 % → 7 % (4705) · 14 % → 15 % (10849) · 25 % → 24 % (11867) · 34 % → 31 % (8002) · 45 % → 41 % (10086) · 55 % → 49 % (8070) · 65 % → 58 % (9091) · 75 % → 68 % (6156) · 85 % → 78 % (8008) · 92 % → 87 % (2884)
+8 % → 7 % (6098) · 14 % → 16 % (14501) · 25 % → 24 % (15890) · 34 % → 32 % (10459) · 45 % → 42 % (13292) · 55 % → 49 % (10830) · 65 % → 58 % (11890) · 75 % → 69 % (8295) · 85 % → 78 % (10555) · 92 % → 86 % (3811)
 
 **Asistencias de jugador** (previsto → observado, n):
 
-8 % → 15 % (1362) · 15 % → 16 % (10330) · 25 % → 25 % (9841) · 35 % → 34 % (7873) · 45 % → 44 % (7487) · 55 % → 52 % (6829) · 65 % → 61 % (6971) · 75 % → 70 % (5659) · 84 % → 81 % (5750) · 91 % → 92 % (629)
+8 % → 15 % (1789) · 15 % → 17 % (13673) · 25 % → 26 % (13152) · 35 % → 34 % (10427) · 45 % → 43 % (9796) · 55 % → 52 % (9120) · 65 % → 62 % (9385) · 75 % → 70 % (7448) · 84 % → 81 % (7647) · 91 % → 90 % (881)
 
 **Triples de jugador** (previsto → observado, n):
 
-8 % → 6 % (349) · 16 % → 15 % (7940) · 25 % → 23 % (8106) · 35 % → 34 % (6097) · 45 % → 44 % (5407) · 55 % → 53 % (4729) · 65 % → 63 % (4346) · 75 % → 73 % (4253) · 83 % → 80 % (1810) · 91 % → 0 % (1)
+8 % → 5 % (518) · 16 % → 15 % (10411) · 25 % → 24 % (10917) · 35 % → 34 % (8188) · 45 % → 43 % (7030) · 55 % → 53 % (6173) · 65 % → 63 % (5954) · 75 % → 73 % (5597) · 83 % → 78 % (2435) · 90 % → 100 % (2)
 
 </details>
 
@@ -147,48 +147,48 @@ Medias por equipo y partido reales (temporada actual + anterior ponderada) frent
 
 | Estadística | EuroLiga real / simulado | Liga Endesa (ACB) real / simulado | NBA real / simulado |
 |---|---:|---:|---:|
-| Posesiones | 76,0 / 75,8 | 78,6 / 78,3 | 102,0 / 101,9 |
-| Puntos | 86,4 / 85,8 | 89,2 / 88,9 | 115,2 / 115,2 |
-| T2 intentados | 38,0 / 37,5 | 38,0 / 36,9 | 52,2 / 52,6 |
-| T2 anotados | 21,0 / 20,8 | 21,0 / 20,5 | 28,5 / 28,9 |
-| T3 intentados | 26,9 / 26,4 | 27,9 / 28,0 | 36,9 / 36,1 |
-| T3 anotados | 9,6 / 9,5 | 9,9 / 9,9 | 13,2 / 12,9 |
-| TL intentados | 19,8 / 20,3 | 23,1 / 23,8 | 23,7 / 24,0 |
-| TL anotados | 15,5 / 15,9 | 17,6 / 18,1 | 18,5 / 18,7 |
-| Rebotes ofensivos | 9,5 / 9,5 | 9,6 / 9,7 | 11,5 / 11,4 |
-| Rebotes defensivos | 21,9 / 21,9 | 23,0 / 22,9 | 32,5 / 32,4 |
-| Asistencias | 19,0 / 18,8 | 17,5 / 17,2 | 26,5 / 26,6 |
-| Robos | 6,5 / 6,5 | 7,1 / 7,1 | 8,5 / 8,5 |
-| Tapones | 2,6 / 2,6 | 2,8 / 2,7 | 4,9 / 4,9 |
-| Pérdidas | 12,0 / 12,1 | 12,2 / 12,2 | 13,9 / 13,9 |
-| Faltas | 21,1 / 20,9 | 22,6 / 22,4 | 20,0 / 19,9 |
-| Margen medio del local | 3,02 / 3,61 | 4,21 / 4,08 | 1,31 / 0,94 |
-| Desv. típica del margen | 12,06 / 12,01 | 14,61 / 14,62 | 16,00 / 15,58 |
-| Prórrogas | 0,043 / 0,029 | 0,043 / 0,019 | 0,045 / 0,024 |
+| Posesiones | 76,0 / 75,8 | 78,6 / 78,3 | 101,9 / 101,7 |
+| Puntos | 86,4 / 85,8 | 89,2 / 88,9 | 115,5 / 115,2 |
+| T2 intentados | 38,0 / 37,5 | 38,0 / 36,9 | 52,1 / 52,6 |
+| T2 anotados | 21,0 / 20,8 | 21,0 / 20,5 | 28,7 / 29,0 |
+| T3 intentados | 26,9 / 26,4 | 27,9 / 28,0 | 37,0 / 36,1 |
+| T3 anotados | 9,6 / 9,5 | 9,9 / 9,9 | 13,3 / 12,9 |
+| TL intentados | 19,8 / 20,3 | 23,1 / 23,8 | 23,6 / 23,7 |
+| TL anotados | 15,5 / 15,9 | 17,6 / 18,1 | 18,4 / 18,5 |
+| Rebotes ofensivos | 9,5 / 9,5 | 9,6 / 9,7 | 11,4 / 11,3 |
+| Rebotes defensivos | 21,9 / 21,9 | 23,0 / 22,9 | 32,4 / 32,4 |
+| Asistencias | 19,0 / 18,8 | 17,5 / 17,2 | 26,7 / 26,6 |
+| Robos | 6,5 / 6,5 | 7,1 / 7,1 | 8,4 / 8,4 |
+| Tapones | 2,6 / 2,6 | 2,8 / 2,7 | 4,8 / 4,9 |
+| Pérdidas | 12,0 / 12,1 | 12,2 / 12,2 | 13,8 / 13,8 |
+| Faltas | 21,1 / 20,9 | 22,6 / 22,4 | 19,9 / 19,8 |
+| Margen medio del local | 3,02 / 3,61 | 4,21 / 4,08 | 1,86 / 2,44 |
+| Desv. típica del margen | 12,06 / 12,01 | 14,61 / 14,62 | 16,49 / 16,82 |
+| Prórrogas | 0,043 / 0,029 | 0,043 / 0,019 | 0,043 / 0,018 |
 
 Factores resultantes (`config/calibracion.json`):
 
 | Factor | EuroLiga | Liga Endesa (ACB) | NBA |
 |---|---:|---:|---:|
-| paceFactor | 0,951 | 0,943 | 0,948 |
-| fg2Factor | 0,998 | 1,010 | 1,003 |
-| fg3Factor | 1,001 | 0,994 | 1,001 |
-| ftFactor | 0,997 | 1,000 | 0,996 |
-| tovFactor | 1,045 | 1,037 | 1,014 |
-| tripFactor | 0,602 | 0,654 | 0,793 |
-| orebFactor | 1,062 | 1,041 | 1,051 |
-| teamReboundShare | 0,127 | 0,130 | 0,119 |
-| astFactor | 1,014 | 0,990 | 1,009 |
-| stlFactor | 1,147 | 1,153 | 1,137 |
-| blkFactor | 1,046 | 1,055 | 1,008 |
+| paceFactor | 0,951 | 0,943 | 0,947 |
+| fg2Factor | 0,998 | 1,010 | 1,001 |
+| fg3Factor | 1,001 | 0,994 | 0,999 |
+| ftFactor | 0,997 | 1,000 | 0,997 |
+| tovFactor | 1,045 | 1,037 | 1,018 |
+| tripFactor | 0,602 | 0,654 | 0,794 |
+| orebFactor | 1,062 | 1,041 | 1,046 |
+| teamReboundShare | 0,127 | 0,130 | 0,117 |
+| astFactor | 1,014 | 0,990 | 1,010 |
+| stlFactor | 1,147 | 1,153 | 1,135 |
+| blkFactor | 1,046 | 1,055 | 1,002 |
 | nonShootingFoulRate | 0,133 | 0,133 | 0,063 |
-| homeShootingEdge | 0,052 | 0,069 | 0,015 |
-| scoreEffect | 0,049 | 0,015 | 0,020 |
+| homeShootingEdge | 0,052 | 0,069 | 0,025 |
+| scoreEffect | 0,049 | 0,015 | 0,012 |
 | minutesSd | 0,210 | 0,210 | 0,210 |
 
 ## 4. Verificación de datos contra la fuente
 
-Valores calculados a partir de nuestros box scores frente a las estadísticas agregadas que publica cada fuente por otra vía (2026-10-23 16:18 UTC): **16 de 16 coinciden**.
+Valores calculados a partir de nuestros box scores frente a las estadísticas agregadas que publica cada fuente por otra vía (2026-10-23 17:17 UTC): **16 de 16 coinciden**.
 
 | Competición | Dato | Nuestro | Fuente | ¿Coincide? |
 |---|---|---:|---:|:---:|
