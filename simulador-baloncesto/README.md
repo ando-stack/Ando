@@ -13,7 +13,8 @@ mayor a menor frecuencia, con buscador, filtro por equipo, exportación a CSV y 
 > personal y no comercial**. Si activas la «cuota justa» (1/probabilidad) verás un aviso: no es
 > asesoramiento de apuestas; juego responsable, solo mayores de 18 años.
 
-<!-- RESUMEN-VALIDACION -->
+<!-- RESUMEN-VALIDACION:INICIO -->
+<!-- RESUMEN-VALIDACION:FIN -->
 
 ## Fuentes de datos y condiciones
 
@@ -134,7 +135,8 @@ npm test             # tests del motor, la agregación y coherencia con datos re
 npm run build        # typecheck + build de producción en dist/
 npm run backtest     # validación de la temporada pasada (tarda varios minutos)
 npm run bench        # rendimiento de 5.000 simulaciones
-npx tsx ingest/verify.ts   # verificación de datos contra la fuente
+npm run verify       # verificación de datos contra la fuente
+npm run report       # regenera docs/validacion.md y el resumen del README
 ```
 
 Antes de `npm run dev` por primera vez, copia los snapshots con `npm run data:copy` (el build lo

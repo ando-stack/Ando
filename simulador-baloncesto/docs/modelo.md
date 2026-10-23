@@ -122,10 +122,12 @@ rival sea un robo y de taponar un fallo de 2.
      en el último 60 % de la ventana (60 s NBA / 50 s FIBA); de 7 a 9, en toda la ventana. La falta
      se hace sobre un atacante elegido por uso y por mal porcentaje de tiros libres.
    - En los dos últimos minutos el que gana agota la posesión (≥ 18 s de media) y el que pierde
-     acelera (×0,6).
+     acelera (×0,6; ×0,4 en el último minuto, que reproduce los saques en campo contrario tras
+     tiempo muerto y el reloj parado tras canasta).
    - Con empate o perdiendo de 1-3 y el reloj por debajo de 24 s, se juega el último tiro; perdiendo
-     de 3 en los últimos 30 s se buscan triples (×5); perdiendo de 1-2 en los últimos 24 s, tiros de
-     2 (×1,8); perdiendo de 4 o más en el último minuto, más triples (×1,6).
+     de 3 en los últimos 30 s se buscan triples (×5); perdiendo de 3 a 6 en el último minuto, ×2,5;
+     perdiendo de 1-2 en los últimos 24 s, tiros de 2 (×1,8); perdiendo de 7 o más en el último
+     minuto, más triples (×1,6).
 10. **Efecto marcador.** En los partidos reales la dispersión del margen es menor que la de
     posesiones independientes (el que va ganando se relaja y el que pierde aprieta). El acierto del
     equipo que va *por encima de la ventaja esperada a esas alturas del partido* se reduce un
@@ -182,7 +184,7 @@ idéntico.
 - No se modelan emparejamientos individuales, alineaciones concretas ni cansancio dentro del
   partido; la defensa es a nivel de equipo.
 - La ventaja de campo es la media de la liga (no específica de cada equipo).
-- La tasa de prórrogas simulada es más baja que la real (≈ 2-3 % frente a ≈ 4-5 %): el modelo de
-  final de partido no reproduce del todo la acumulación de empates al final del tiempo
-  reglamentario.
+- La tasa de prórrogas simulada es algo más baja que la real (≈ 3 % frente a ≈ 4-5 %): el modelo
+  de final de partido no reproduce del todo la acumulación de empates al final del tiempo
+  reglamentario (ver docs/validacion.md).
 - Los cruces entre competiciones no están soportados (solo partidos dentro de la misma liga).

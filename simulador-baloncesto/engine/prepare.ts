@@ -16,6 +16,10 @@ export interface TeamSetupPlayer {
 export interface TeamSetup {
   teamId: string;
   players: TeamSetupPlayer[];
+  /** Estado del quinteto elegido por el usuario (por defecto, el probable calculado). */
+  lineupStatus?: 'probable' | 'confirmado';
+  /** Fuente indicada por el usuario al marcarlo como confirmado. */
+  lineupSource?: string;
 }
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));

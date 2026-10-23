@@ -53,6 +53,10 @@ export default function ResultadosPage({ runOverride }: { runOverride?: SimRun }
           <div className="text-sm text-slate-300">
             Victoria local {fmtPct(a.homeWins / a.n)} · visitante {fmtPct(a.awayWins / a.n)} · prórroga {fmtPct(a.overtime / a.n)}
           </div>
+          <div className="text-xs text-slate-500 mt-1">
+            Quintetos: {run.home.short} {run.setups.home.lineupStatus === 'confirmado' ? `confirmado${run.setups.home.lineupSource ? ` (${run.setups.home.lineupSource})` : ''}` : 'probable'} ·{' '}
+            {run.away.short} {run.setups.away.lineupStatus === 'confirmado' ? `confirmado${run.setups.away.lineupSource ? ` (${run.setups.away.lineupSource})` : ''}` : 'probable'}
+          </div>
           {(run.outs.home.length > 0 || run.outs.away.length > 0) && (
             <div className="text-xs text-slate-500 mt-1">
               Bajas: {run.home.short}: {run.outs.home.join(', ') || 'ninguna'} · {run.away.short}: {run.outs.away.join(', ') || 'ninguna'}

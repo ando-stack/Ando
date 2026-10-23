@@ -14,7 +14,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import type { CompetitionId, GameRecord, PlayerInfo, SeasonGamesFile } from './datatypes';
 import { PL } from './datatypes';
-import { buildCompetitionSnapshot } from '../ingest/build';
+import { buildCompetitionSnapshot, newTeamAccum, type PreviousAccum } from '../ingest/build';
 import { buildGameInput, type TeamSetup } from './prepare';
 import { runSimulations } from './run';
 import { DEFAULT_PARAMS, type SimParams } from './types';
@@ -57,6 +57,55 @@ export interface BacktestResult {
   reliability: Record<string, { bins: { lo: number; hi: number; n: number; pred: number; obs: number }[]; ece: number; brier: number; n: number }>;
   elapsedSec: number;
   perGame: { id: string; date: string; home: string; away: string; pHome: number; predTotal: number; predMargin: number; total: number; margin: number }[];
+}
+
+/** Temporada previa como totales agregados (data/games/<comp>/totals-<temporada>.json). */
+function loadTotalsAccum(comp: CompetitionId): PreviousAccum | undefined {
+  const path = `data/games/${comp}/totals-${BACKTEST_PRIOR_SEASON}.json`;
+  if (!existsSync(path)) return undefined;
+  const f = JSON.parse(readFileSync(path, 'utf8'));
+  const teams = new Map<string, ReturnType<typeof newTeamAccum>>();
+  for (const t of f.teams) {
+    const a = newTeamAccum();
+    a.gp = t.gp;
+    a.poss = t.poss;
+    a.own = t.own;
+    teams.set(String(t.id), a);
+  }
+  for (const o of f.opponents) {
+    const a = teams.get(String(o.id));
+    if (a) a.opp = o.opp;
+  }
+  let hm = 0;
+  let hm2 = 0;
+  let hw = 0;
+  for (const g of f.games) {
+    const m = g.hs - g.as;
+    hm += m;
+    hm2 += m * m;
+    if (m > 0) hw++;
+    const h = teams.get(String(g.home));
+    const a = teams.get(String(g.away));
+    if (h) {
+      if (m > 0) h.w++;
+      else h.l++;
+      h.home.gp++;
+      if (m > 0) h.home.w++;
+      h.home.ptsFor += g.hs;
+      h.home.ptsAgainst += g.as;
+    }
+    if (a) {
+      if (m < 0) a.w++;
+      else a.l++;
+      a.away.gp++;
+      if (m < 0) a.away.w++;
+      a.away.ptsFor += g.as;
+      a.away.ptsAgainst += g.hs;
+    }
+  }
+  const players = new Map<string, { gp: number; gs: number; tot: any; q: number[]; qGames: number; teamId: string }>();
+  for (const p of f.players) players.set(String(p.id), { gp: p.gp, gs: 0, tot: p.tot, q: [0, 0, 0, 0], qGames: 0, teamId: String(p.teamId) });
+  return { teams, players, games: f.games.length, homeMargin: hm, homeMargin2: hm2, homeWins: hw };
 }
 
 function reliability(pairs: Pair[]) {
@@ -113,7 +162,9 @@ export function runBacktest(comp: CompetitionId, sims: number, params: SimParams
   const file: SeasonGamesFile = JSON.parse(readFileSync(`data/games/${comp}/${PREVIOUS_SEASON}.json`, 'utf8'));
   const priorPath = `data/games/${comp}/${BACKTEST_PRIOR_SEASON}.json`;
   const priorFile: SeasonGamesFile | null = existsSync(priorPath) ? JSON.parse(readFileSync(priorPath, 'utf8')) : null;
-  if (!priorFile) log(`  (sin ${BACKTEST_PRIOR_SEASON}: el backtest de ${comp} no tiene temporada previa)`);
+  const previousAccum = priorFile ? undefined : loadTotalsAccum(comp);
+  if (!priorFile && !previousAccum) log(`  (sin ${BACKTEST_PRIOR_SEASON}: el backtest de ${comp} no tiene temporada previa)`);
+  if (previousAccum) log(`  temporada previa ${BACKTEST_PRIOR_SEASON} a partir de totales agregados`);
   const games = [...file.games].sort((a, b) => a.date.localeCompare(b.date));
   const regMin = comp === 'nba' ? 48 : 40;
   const dayOf = (d: string) => d.slice(0, 10);
@@ -176,6 +227,7 @@ export function runBacktest(comp: CompetitionId, sims: number, params: SimParams
           previousSeason: BACKTEST_PRIOR_SEASON,
           gamesCurrent: prior,
           gamesPrevious: priorFile?.games ?? [],
+          previousAccum,
           teams: file.teams,
           playerInfo,
           roster: [...rosterMap.values()],

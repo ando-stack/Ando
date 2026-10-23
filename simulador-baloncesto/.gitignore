@@ -8,3 +8,4 @@ scripts-tmp
 *.log
 .netlify
 public/data
+*.tsbuildinfo

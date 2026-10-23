@@ -232,3 +232,32 @@ export async function ingestNbaRoster(season: string, gamesFile: SeasonGamesFile
   log(`NBA plantillas ${season}: ${teams.length} equipos, ${file.players.length} jugadores`);
   return file;
 }
+
+/**
+ * Totales agregados de una temporada (jugadores, equipos y rivales) y resultados, con muy pocas
+ * peticiones (get-totals ×3 + get-games). Se usan como temporada previa en el backtest de la NBA.
+ */
+export async function ingestNbaSeasonTotals(season: string) {
+  const q = (type: string) => fetchJson<any>(`${API}/get-totals/nba?Season=${season}&SeasonType=Regular%2BSeason&Type=${type}`, { maxAgeHours: 24 * 30 });
+  const players = (await q('Player'))?.multi_row_table_data ?? [];
+  const teams = (await q('Team'))?.multi_row_table_data ?? [];
+  const opps = (await q('Opponent'))?.multi_row_table_data ?? [];
+  const games = (await fetchJson<any>(`${API}/get-games/nba?Season=${season}&SeasonType=Regular%2BSeason`, { maxAgeHours: 24 * 30 }))?.results ?? [];
+  const pick = (r: any) => ({
+    min: n(r.SecondsPlayed) / 60, pts: n(r.Points), fg2m: n(r.FG2M), fg2a: n(r.FG2A), fg3m: n(r.FG3M), fg3a: n(r.FG3A), ftm: n(r.FtPoints), fta: n(r.FTA),
+    oreb: n(r.OffRebounds), dreb: n(r.DefRebounds), ast: n(r.Assists), stl: n(r.Steals), blk: n(r.Blocks), tov: n(r.Turnovers), pf: n(r.Fouls), pfd: n(r.FoulsDrawn),
+  });
+  const file = {
+    comp: 'nba',
+    season,
+    fetchedAt: new Date().toISOString(),
+    source: NBA_SOURCE,
+    players: players.map((r: any) => ({ id: r.EntityId, name: r.Name, teamId: r.TeamId, gp: n(r.GamesPlayed), tot: pick(r) })),
+    teams: teams.map((r: any) => ({ id: r.EntityId ?? r.TeamId, gp: n(r.GamesPlayed), poss: (n(r.OffPoss) + n(r.DefPoss)) / 2, own: pick(r) })),
+    opponents: opps.map((r: any) => ({ id: r.EntityId ?? r.TeamId, opp: pick(r) })),
+    games: games.map((g: any) => ({ id: g.GameId, date: g.Date, home: g.HomeTeamId, away: g.AwayTeamId, hs: g.HomePoints, as: g.AwayPoints })),
+  };
+  writeJson(`data/games/nba/totals-${season}.json`, file);
+  log(`NBA totales ${season}: ${file.players.length} jugadores, ${file.teams.length} equipos, ${file.games.length} partidos`);
+  return file;
+}

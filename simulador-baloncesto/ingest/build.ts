@@ -120,7 +120,7 @@ function sideTotals(side: GameRecord['home']): Counting {
   return t;
 }
 
-interface TeamAccum {
+export interface TeamAccum {
   gp: number;
   w: number;
   l: number;
@@ -133,7 +133,7 @@ interface TeamAccum {
   away: { gp: number; w: number; ptsFor: number; ptsAgainst: number };
 }
 
-function newTeamAccum(): TeamAccum {
+export function newTeamAccum(): TeamAccum {
   return {
     gp: 0,
     w: 0,
@@ -246,7 +246,7 @@ export function previousWeight(gpCurrent: number) {
 
 // ---------------------------------------------------------------------------------------------
 
-interface PlayerAccum {
+export interface PlayerAccum {
   gp: number;
   gs: number;
   tot: Counting;
@@ -291,6 +291,7 @@ function leagueAverages(
   pPrev: Map<string, PlayerAccum>,
   positions: Map<string, 'G' | 'F' | 'C' | null>,
   wPrev: number,
+  prevAccum?: PreviousAccum,
 ): LeagueAverages {
   const rules = REGLAS[comp];
   const regMin = regulationSeconds(rules) / 60;
@@ -302,9 +303,21 @@ function leagueAverages(
   let homeWins = 0;
   let ot = 0;
   let ng = 0;
+  let ngOt = 0;
+  if (prevAccum) {
+    for (const t of prevAccum.teams.values()) {
+      addInto(tot, t.own, wPrev);
+      poss += t.poss * wPrev;
+      n += t.gp * wPrev;
+    }
+    ng += prevAccum.games * wPrev;
+    homeMargin += prevAccum.homeMargin * wPrev;
+    homeMargin2 += prevAccum.homeMargin2 * wPrev;
+    homeWins += prevAccum.homeWins * wPrev;
+  }
   for (const [games, w] of [
     [gamesCur, 1],
-    [gamesPrev, wPrev],
+    [prevAccum ? [] : gamesPrev, wPrev],
   ] as const) {
     for (const g of games) {
       const ht = sideTotals(g.home);
@@ -319,6 +332,7 @@ function leagueAverages(
       homeMargin2 += (g.home.score - g.away.score) ** 2 * w;
       if (g.home.score > g.away.score) homeWins += w;
       if (g.home.periods.length > 4) ot += w;
+      ngOt += w;
     }
   }
   const per = scaled(tot, 1 / Math.max(n, 1));
@@ -373,7 +387,7 @@ function leagueAverages(
     homeMargin: homeMargin / Math.max(ng, 1),
     marginSd: Math.sqrt(Math.max(0, homeMargin2 / Math.max(ng, 1) - (homeMargin / Math.max(ng, 1)) ** 2)),
     homeWinPct: homeWins / Math.max(ng, 1),
-    otPct: ot / Math.max(ng, 1),
+    otPct: ot / Math.max(ngOt, 1),
     fg2Pct: div(tot.fg2m, tot.fg2a),
     fg3Pct: div(tot.fg3m, tot.fg3a),
     ftPct: div(tot.ftm, tot.fta),
@@ -402,12 +416,24 @@ export interface CrossCompPrior {
   position: 'G' | 'F' | 'C' | null;
 }
 
+/** Temporada previa dada como totales agregados (cuando no hay partidos individuales). */
+export interface PreviousAccum {
+  teams: Map<string, TeamAccum>;
+  players: Map<string, PlayerAccum>;
+  games: number;
+  homeMargin: number; // suma de márgenes local - visitante
+  homeMargin2: number;
+  homeWins: number;
+}
+
 export interface BuildInput {
   comp: CompetitionId;
   season: string;
   previousSeason: string;
   gamesCurrent: GameRecord[];
   gamesPrevious: GameRecord[];
+  /** Alternativa a gamesPrevious: totales agregados de la temporada previa. */
+  previousAccum?: PreviousAccum;
   teams: Record<string, { id: string; name: string; short: string; logo?: string | null }>;
   /** Información de jugadores (nombres, posición...). */
   playerInfo: Record<string, PlayerInfo>;
@@ -433,9 +459,9 @@ export function buildCompetitionSnapshot(input: BuildInput): CompetitionSnapshot
   const generatedAt = input.generatedAt ?? new Date().toISOString();
 
   const tCur = accumulateTeams(input.gamesCurrent);
-  const tPrev = accumulateTeams(input.gamesPrevious);
+  const tPrev = input.previousAccum?.teams ?? accumulateTeams(input.gamesPrevious);
   const pCur = accumulatePlayers(input.gamesCurrent);
-  const pPrev = accumulatePlayers(input.gamesPrevious);
+  const pPrev = input.previousAccum?.players ?? accumulatePlayers(input.gamesPrevious);
 
   const positions = new Map<string, 'G' | 'F' | 'C' | null>();
   for (const [pid, info] of Object.entries(input.playerInfo)) positions.set(pid, (info.position as any) ?? null);
@@ -443,7 +469,7 @@ export function buildCompetitionSnapshot(input: BuildInput): CompetitionSnapshot
 
   const avgGpCur = tCur.size ? [...tCur.values()].reduce((a, t) => a + t.gp, 0) / tCur.size : 0;
   const leagueWPrev = previousWeight(avgGpCur);
-  const league = leagueAverages(comp, input.gamesCurrent, input.gamesPrevious, pCur, pPrev, positions, leagueWPrev);
+  const league = leagueAverages(comp, input.gamesCurrent, input.gamesPrevious, pCur, pPrev, positions, leagueWPrev, input.previousAccum);
 
   // ---- Equipos
   const teamIds = new Set<string>(Object.keys(input.teams));

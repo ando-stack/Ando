@@ -2,13 +2,14 @@
  * Rendimiento: tiempo de 5.000 simulaciones en un hilo y estimación con N workers.
  *   npx tsx tests/bench.ts [comp]
  */
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { Worker } from 'node:worker_threads';
 import os from 'node:os';
 import { buildGameInput, defaultTeamSetup } from '../engine/prepare';
 import { runSimulations } from '../engine/run';
 import { DEFAULT_PARAMS } from '../engine/types';
 
+const results: { comp: string; single: number; parallel: number; workers: number; cores: number }[] = [];
 const comps = process.argv[2] ? [process.argv[2]] : ['nba', 'euroleague', 'acb'];
 const calib = existsSync('config/calibracion.json') ? JSON.parse(readFileSync('config/calibracion.json', 'utf8')) : {};
 for (const comp of comps) {
@@ -27,16 +28,17 @@ for (const comp of comps) {
   await Promise.all(
     Array.from({ length: w }, (_, i) =>
       new Promise<void>((resolve, reject) => {
-        const worker = new Worker(
-          `import { runSimulations } from './engine/run.ts'; import { workerData, parentPort } from 'node:worker_threads';
-           runSimulations(workerData.input, workerData.n, workerData.seed); parentPort.postMessage('ok');`,
-          { eval: true, workerData: { input, n: Math.ceil(5000 / w), seed: i + 1 }, execArgv: ['--import', 'tsx'] },
-        );
+        const worker = new Worker(new URL('./bench-worker.mjs', import.meta.url), {
+          workerData: { input, n: Math.ceil(5000 / w), seed: i + 1 },
+        });
         worker.on('message', () => resolve());
         worker.on('error', reject);
       }),
     ),
   );
   const msPar = performance.now() - t1;
+  results.push({ comp, single: ms / 1000, parallel: msPar / 1000, workers: w, cores });
   console.log(`${comp}: 5.000 simulaciones en 1 hilo: ${(ms / 1000).toFixed(2)} s · con ${w} workers: ${(msPar / 1000).toFixed(2)} s (${cores} núcleos)`);
 }
+
+if (!process.argv[2]) writeFileSync('data/bench.json', JSON.stringify({ at: new Date().toISOString(), results }, null, 2));

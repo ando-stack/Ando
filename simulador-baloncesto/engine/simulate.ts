@@ -75,8 +75,10 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
     periods[t][period] += pts;
   };
 
+  let marginAt60: number | undefined;
   const tick = (dur: number) => {
     if (dur <= 0) return;
+    if (marginAt60 === undefined && period === rules.periodos - 1 && rem - dur < 60) marginAt60 = score[0] - score[1];
     const qi = period < 4 ? period : 4;
     for (let t = 0; t < 2; t++) {
       const oc = onCourt[t];
@@ -113,8 +115,8 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
     if (q === 2) return pf >= foulLimit - 1;
     return pf >= foulLimit - 1 && rem > 0.5 * len;
   };
-  const needs = new Float64Array(16);
-  const order = new Int32Array(16);
+  const needs = new Float64Array(Math.max(np[0], np[1], 5));
+  const top = new Int32Array(5);
   const doSubs = (t: number, periodStart = false) => {
     const pl = teams[t].players;
     const n = np[t];
@@ -124,7 +126,6 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
     let avail = 0;
     for (let i = 0; i < n; i++) if (!out[t][i]) avail++;
     for (let i = 0; i < n; i++) {
-      order[i] = i;
       if (out[t][i] && avail >= 5) {
         needs[i] = -1e9;
         continue;
@@ -138,22 +139,43 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
       if (out[t][i]) need -= 100; // eliminado, pero el equipo no tiene 5 disponibles
       needs[i] = need;
     }
-    const ord = Array.from(order.subarray(0, n)).sort((a, b) => needs[b] - needs[a]);
-    let chosen = ord.slice(0, 5);
     if (periodStart && (period === 0 || period === 2)) {
-      // Titulares designados al inicio del 1.er y 3.er cuarto
-      const st: number[] = [];
-      for (let i = 0; i < n; i++) if (pl[i].starter && !out[t][i]) st.push(i);
-      if (st.length) {
-        const rest = ord.filter((i) => !st.includes(i));
-        chosen = [...st.slice(0, 5), ...rest].slice(0, 5);
+      // Titulares designados al inicio del 1.er y 3.er cuarto: se les da prioridad máxima
+      for (let i = 0; i < n; i++) if (pl[i].starter && !out[t][i]) needs[i] += 1000;
+    }
+    // Selección directa de los 5 con mayor necesidad (n <= 15, sin ordenar arrays)
+    let cnt = 0;
+    for (let i = 0; i < n; i++) {
+      const v = needs[i];
+      if (cnt < 5) {
+        let j = cnt++;
+        while (j > 0 && needs[top[j - 1]] < v) {
+          top[j] = top[j - 1];
+          j--;
+        }
+        top[j] = i;
+      } else if (v > needs[top[4]]) {
+        let j = 4;
+        while (j > 0 && needs[top[j - 1]] < v) {
+          top[j] = top[j - 1];
+          j--;
+        }
+        top[j] = i;
       }
     }
-    isOn[t].fill(0);
+    const oc = onCourt[t];
+    const on = isOn[t];
+    let changed = false;
     for (let j = 0; j < 5; j++) {
-      const i = chosen[j] ?? -1;
-      onCourt[t][j] = i;
-      if (i >= 0) isOn[t][i] = 1;
+      const i = j < cnt ? top[j] : -1;
+      if (i >= 0 && !on[i]) changed = true;
+    }
+    if (!changed && !periodStart) return;
+    on.fill(0);
+    for (let j = 0; j < 5; j++) {
+      const i = j < cnt ? top[j] : -1;
+      oc[j] = i;
+      if (i >= 0) on[i] = 1;
     }
   };
 
@@ -284,7 +306,7 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
       let mean = segment === 0 ? avgPossDur : avgPossDur * 0.55;
       if (fast) mean *= 0.6;
       if (isLate && margin > 0) mean = Math.max(mean, 18); // agotar posesión
-      if (isLate && margin < 0) mean *= 0.6; // prisa
+      if (isLate && margin < 0) mean *= rem <= 60 ? 0.4 : 0.6; // prisa (en el último minuto, ataques muy rápidos)
       const cap = segment === 0 ? rules.relojPosesion : rules.relojTrasReboteOfensivo;
       let dur = Math.min(cap, Math.max(1.5, rng.erlang(3, mean)));
       // Último tiro: empate o perdiendo por 1-3 con el reloj por debajo del de posesión
@@ -339,6 +361,8 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
       if (late() && rem <= 30 && margin === -3) {
         w3 *= 5;
         w2 *= 0.4;
+      } else if (late() && rem <= 60 && margin <= -3 && margin >= -6) {
+        w3 *= 2.5; // perdiendo de 3-6 en el último minuto: se buscan triples
       } else if (late() && rem <= 24 && (margin === -2 || margin === -1)) {
         w2 *= 1.8; // buscar el empate / la canasta segura
         wT *= 0.7;
@@ -490,5 +514,6 @@ export function simulateGame(input: SimGameInput, rng: Rng): GameResult {
     homeStats: stats[0],
     awayStats: stats[1],
     possessions: [poss[0], poss[1]],
+    marginAt60,
   };
 }

@@ -30,9 +30,11 @@ export default function DataTable<T>({ title, rows, columns, csvName, search, te
   const [team, setTeam] = useState('');
   const [limit, setLimit] = useState(pageSize);
   const [sort, setSort] = useState<{ key: string; dir: 1 | -1 } | null>(null);
+  // Buscador en todas las tablas: por defecto busca en el texto de todas las columnas
+  const searchFn = useMemo(() => search ?? ((x: T) => columns.map((c) => String(c.value(x))).join(' ')), [search, columns]);
   const filtered = useMemo(() => {
     let r = rows;
-    if (q && search) r = r.filter((x) => norm(search(x)).includes(norm(q)));
+    if (q) r = r.filter((x) => norm(searchFn(x)).includes(norm(q)));
     if (team && teamOf) r = r.filter((x) => teamOf(x) === team);
     if (sort) {
       const col = columns.find((c) => c.key === sort.key);
@@ -44,7 +46,7 @@ export default function DataTable<T>({ title, rows, columns, csvName, search, te
         });
     }
     return r;
-  }, [rows, q, team, search, teamOf, sort, columns]);
+  }, [rows, q, team, searchFn, teamOf, sort, columns]);
   const exportCsv = () =>
     downloadCsv(
       `${csvName}.csv`,
@@ -56,7 +58,7 @@ export default function DataTable<T>({ title, rows, columns, csvName, search, te
       <div className="flex flex-wrap items-center gap-2">
         {title && <h3 className="font-semibold text-white mr-auto">{title}</h3>}
         {extra}
-        {search && <input className="w-44" placeholder="Buscar…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar en la tabla" />}
+        <input className="w-36 sm:w-44" placeholder="Buscar…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar en la tabla" />
         {teamOf && teamOptions && (
           <select value={team} onChange={(e) => setTeam(e.target.value)} aria-label="Filtrar por equipo">
             <option value="">Todos</option>

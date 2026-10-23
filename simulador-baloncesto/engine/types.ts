@@ -161,4 +161,6 @@ export interface GameResult {
   homeStats: Float64Array;
   awayStats: Float64Array;
   possessions: [number, number];
+  /** Margen (local - visitante) al pasar por el último minuto del 4.º cuarto (diagnóstico). */
+  marginAt60?: number;
 }

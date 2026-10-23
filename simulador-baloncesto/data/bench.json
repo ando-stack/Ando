@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-23T15:46:16.967Z",
+  "results": [
+    {
+      "comp": "euroleague",
+      "single": 2.907329464,
+      "parallel": 1.664654878,
+      "workers": 3,
+      "cores": 4
+    },
+    {
+      "comp": "acb",
+      "single": 2.6795232399999995,
+      "parallel": 1.5222443550000007,
+      "workers": 3,
+      "cores": 4
+    }
+  ]
+}

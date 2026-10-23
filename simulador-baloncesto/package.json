@@ -22,7 +22,9 @@
     "ingest:upload": "tsx ingest/upload-supabase.ts",
     "calibrate": "tsx engine/calibrate.ts",
     "backtest": "tsx engine/backtest.ts",
-    "bench": "tsx tests/bench.ts"
+    "bench": "tsx tests/bench.ts",
+    "report": "tsx engine/report.ts",
+    "verify": "tsx ingest/verify.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

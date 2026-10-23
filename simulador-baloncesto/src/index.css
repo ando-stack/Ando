@@ -11,7 +11,7 @@
   td { @apply px-2 py-1 border-b border-borde/60 whitespace-nowrap; }
 }
 @layer components {
-  .card { @apply bg-panel border border-borde rounded-xl p-4; }
+  .card { @apply bg-panel border border-borde rounded-xl p-4 min-w-0; }
   .btn { @apply inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium border border-borde bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed; }
   .btn-primary { @apply bg-acento text-slate-950 border-acento hover:bg-amber-400; }
   .chip { @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs border; }

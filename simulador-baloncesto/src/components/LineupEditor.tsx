@@ -78,6 +78,28 @@ export default function LineupEditor({ snap, teamId, setup, out, side, onChange 
           </button>
         </div>
       </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <label className="flex items-center gap-1 text-slate-400">
+          Estado del quinteto
+          <select
+            value={setup.lineupStatus ?? 'probable'}
+            onChange={(e) => onChange({ ...setup, lineupStatus: e.target.value as 'probable' | 'confirmado' }, out)}
+            aria-label="Estado del quinteto"
+          >
+            <option value="probable">probable (calculado)</option>
+            <option value="confirmado">confirmado (lo indico yo)</option>
+          </select>
+        </label>
+        {setup.lineupStatus === 'confirmado' && (
+          <input
+            className="flex-1 min-w-[12rem]"
+            placeholder="Fuente de la confirmación (p. ej., acta oficial, club)"
+            value={setup.lineupSource ?? ''}
+            onChange={(e) => onChange({ ...setup, lineupSource: e.target.value }, out)}
+            aria-label="Fuente del quinteto confirmado"
+          />
+        )}
+      </div>
       {lineup && (
         <div className="text-xs text-slate-400 space-y-1">
           <div>

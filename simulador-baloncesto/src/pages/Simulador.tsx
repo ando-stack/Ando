@@ -162,7 +162,7 @@ export default function SimuladorPage() {
           </div>
           {error && <div className="card border-red-800 text-red-300 text-sm">{error}</div>}
 
-          <div className="grid xl:grid-cols-2 gap-4">
+          <div className="grid xl:grid-cols-2 gap-4 [&>*]:min-w-0">
             {sel.homeId && sel.homeSetup && (
               <LineupEditor snap={snap} teamId={sel.homeId} setup={sel.homeSetup} out={sel.homeOut} side="local" onChange={(s, o) => setSel({ homeSetup: s, homeOut: o })} />
             )}
