@@ -51,7 +51,19 @@ Configurables en [config/formatos.ts](config/formatos.ts) (incluye además mejor
 
 ## Resultados de la validación
 
-RESULTADOS_VALIDACION
+Backtest **fuera de muestra** de la temporada **2025** (parámetros calibrados con 2024; cada partido se predice sólo con datos anteriores a él):
+
+| Grupo | Partidos | Log loss modelo | Log loss sólo Elo | Brier | Aciertos |
+|---|---:|---:|---:|---:|---:|
+| Todos | 19.147 | **0,607** | 0,612 | 0,211 | 66,2 % |
+| ATP | 3.755 | 0,613 | 0,619 | 0,213 | 66,4 % |
+| ATP Challenger | 9.834 | 0,610 | 0,613 | 0,212 | 65,6 % |
+| WTA | 3.707 | 0,603 | 0,609 | 0,209 | 66,8 % |
+| WTA 125 | 1.851 | 0,589 | 0,596 | 0,203 | 67,8 % |
+
+Calibración de la probabilidad de victoria: en cada tramo de 10 puntos, la frecuencia real queda a 1-3 puntos de lo predicho (p. ej. 74,6 % predicho → 73,8 % real; 15,5 % → 16,4 %).
+
+Medias simuladas frente a reales (9.823 partidos con estadísticas, 300 simulaciones cada uno): juegos 22,86 / 22,96 · set decisivo 33,3 % / 33,9 % · aces 7,67 / 7,73 · dobles faltas 6,48 / 6,61 · breaks 6,50 / 6,51 · tie-breaks 0,34 / 0,33. Desviaciones conocidas: los Challenger de 2025 tuvieron más aces que los de 2024 (el modelo con parámetros de 2024 se queda un 9 % corto) y los grupos de hierba, con pocos partidos, son más ruidosos. Los parámetros de producción se recalibran con 2025.
 
 Informe completo: [docs/validacion.md](docs/validacion.md). Verificación de 10 datos contra la fuente: [docs/verificacion.md](docs/verificacion.md).
 

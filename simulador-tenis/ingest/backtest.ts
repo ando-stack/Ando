@@ -149,7 +149,7 @@ Generado automáticamente por \`npm run backtest\` el ${new Date().toISOString()
 - **Sin mirar el futuro:** el histórico se recorre en orden y cada partido se predice con los perfiles, el Elo y la forma calculados sólo con partidos anteriores. Las medias del circuito se calculan con las tres temporadas previas.
 - **Parámetros:** \`${base.version}\` — calibrados con la temporada ${TEMPORADA - 1} (\`npm run calibrar\`), que no se solapa con la evaluada.
 - **Partidos:** ${preds.length.toLocaleString('es-ES')} para la probabilidad de victoria (cálculo exacto) y ${dist.length.toLocaleString('es-ES')} con estadísticas detalladas para las distribuciones (simulación punto a punto, ${S} simulaciones por partido; hasta ${POR_GRUPO} por circuito y superficie). Se excluyen retiradas y walkovers.
-- Peso del Elo ${M.pesoElo}, escala del logit ${M.escalaVictoria}, peso de la superficie en el Elo ${M.pesoSuperficieElo}, forma ${M.gammaForma}, σ dominancia = ${M.sigma}, σ común = ${M.sigmaComun}, σ aces = ${M.sigmaAces}.
+- Peso del Elo ${M.pesoElo}, escala del logit ${M.escalaVictoria}, peso de la superficie en el Elo ${M.pesoSuperficieElo}, forma ${M.gammaForma}, σ dominancia = ${M.sigma} (por defecto; cada circuito y superficie tiene la suya), σ común = ${M.sigmaComun}, σ aces = ${M.sigmaAces}.
 
 ## 1. Probabilidad de victoria
 
@@ -188,9 +188,16 @@ ${tablaCal(calSets)}
 
 ${tablaCal(calAces)}
 
-## 3. Lectura de los resultados
+## 3. Lectura de los resultados y ajustes hechos
 
-Ver la sección «Interpretación» de docs/modelo.md: qué significa cada métrica, qué grupos tienen menos datos y los ajustes hechos tras el backtest.
+- **Probabilidad de victoria.** El modelo combinado mejora al Elo de superficie solo y a las estadísticas solas en casi todos los grupos con muchos partidos. Los grupos de hierba (pocos partidos, temporada corta) son los más ruidosos: ahí el Elo o las estadísticas solas a veces ganan por poco.
+- **Juegos, breaks, dobles faltas y tie-breaks.** Las medias simuladas quedan muy cerca de las reales en el conjunto y en los grupos grandes. Las desviaciones mayores están en los grupos pequeños de hierba.
+- **Aces.** En los Challenger de 2025 hubo más aces que en 2024 (la temporada de calibración) y el modelo se queda algo corto; también por eso la P(over aces) queda por debajo de la frecuencia real. La calibración de producción se hace con la temporada más reciente (2025) para recoger esa tendencia.
+- **Ajustes hechos a partir de las validaciones** (historial en docs/modelo.md §6 y §3):
+  1. La variabilidad partido a partido pasó de desplazamientos independientes por jugador a dos componentes (dominancia y condiciones), porque con la primera versión los partidos simulados duraban ≈ 1,5 juegos de más.
+  2. Se añadió la escala del logit (k) porque el primer backtest mostró un modelo poco seguro en los extremos.
+  3. La probabilidad «por estadísticas» se calcula sin variabilidad: con variabilidad, los pesos ajustados con una σ no servían para otra y el segundo backtest salió demasiado seguro (85 % predicho → 80 % real).
+- **Parámetros en producción:** los mismos pasos, calibrados con la temporada 2025 (\`engine/calibracion.json\`). Este informe usa los de 2024 para que la evaluación sea fuera de muestra.
 `;
   mkdirSync(join(import.meta.dirname, '..', 'docs'), { recursive: true });
   writeFileSync(join(import.meta.dirname, '..', 'docs', 'validacion.md'), md);

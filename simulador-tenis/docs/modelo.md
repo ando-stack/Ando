@@ -43,11 +43,13 @@ valor_todas      = (suma_todas + K · prior) / (n_todas + K)
 p_A = media_saque_sup + exceso_saque_A − exceso_resto_B   (+ desplazamiento de calibración)
 ```
 
-**Ajuste al Elo:** con `p_A`, `p_B` se calcula de forma exacta (cadenas de Markov, `engine/analitico.ts`) la probabilidad de victoria al mejor de 3 integrando la variabilidad partido a partido (Gauss-Hermite) → `P_est`. El Elo de superficie con la forma da `P_elo`. La probabilidad objetivo es
+**Ajuste al Elo:** con `p_A`, `p_B` se calcula de forma exacta (cadenas de Markov, `engine/analitico.ts`) la probabilidad de victoria al mejor de 3 → `P_est` (sin variabilidad: es una medida de fuerza, y así los pesos calibrados no dependen de σ). El Elo de superficie con la forma da `P_elo`. La probabilidad objetivo es
 
 ```
-logit P = w_elo · logit P_elo + (1 − w_elo) · logit P_est
+logit P = k · [ w_elo · logit P_elo + (1 − w_elo) · logit P_est ]
 ```
+
+`k` (escala) corrige que la mezcla sea poco segura de sí misma: en el primer backtest (sin escala) el modelo daba 74 % a favoritos que ganaron el 78 % de las veces y 7 % a jugadores que ganaron el 2 %. `k` se ajusta con la temporada de calibración junto a los demás pesos.
 
 y se busca `δ` tal que `p_A' = σ(logit p_A + δ)`, `p_B' = σ(logit p_B − δ)` den exactamente esa probabilidad al mejor de 3. Ese mismo `δ` se usa en el formato real: al mejor de 5 la ventaja se amplifica de forma natural. Así la probabilidad de victoria hereda la buena calibración del Elo, y las estadísticas deciden *cómo* se gana (más o menos breaks, tie-breaks, aces).
 
@@ -81,33 +83,35 @@ La probabilidad de victoria NO cambia por esta variabilidad: el ajuste al Elo de
 
 ## 7. Calibración por circuito y superficie
 
-`npm run calibrar` usa la temporada **2024** (18.535 partidos; perfiles, Elo y medias calculados sólo con datos anteriores a cada partido):
+`npm run calibrar` (por defecto con la temporada 2024; `TEMPORADA_CALIBRACION=2025` para producción). Perfiles, Elo y medias se calculan sólo con datos anteriores a cada partido.
 
-1. **Probabilidad de victoria** (17.000+ partidos al mejor de 3): rejilla de `w_elo` ∈ [0,3; 1], peso de la superficie ∈ [0; 0,7] y `γ` de forma ∈ [0; 0,25], minimizando el log loss. Resultado: `w_elo = 0,8`, superficie `0,2`, `γ = 0` (la forma reciente no mejora al Elo, que ya pondera más lo reciente; se deja el término a 0 y se sigue mostrando en la ficha).
+1. **Probabilidad de victoria** (partidos al mejor de 3): rejilla de `w_elo` ∈ [0,3; 1], peso de la superficie ∈ [0; 0,7], `γ` de forma ∈ [0; 0,25] y escala `k` ∈ [0,9; 2], minimizando el log loss.
 2. **Medias por grupo** (circuito × superficie, hasta 1.000 partidos con estadísticas por grupo, 200 simulaciones por partido), 4 + 3 iteraciones de ajuste conjunto:
    - desplazamiento del saque → iguala los **breaks** por partido;
    - **σ de dominancia** del grupo → iguala el **total de juegos** (≈ −14 juegos por unidad de σ);
    - factor de **aces** y de **dobles faltas** → iguala sus medias.
-3. **σ común** (rejilla 0,05 / 0,15 / 0,25) y **σ_aces** (0,2 / 0,3 / 0,4) por log score del total de juegos y de aces: 0,05 y 0,2.
+3. **σ común** (0,05 / 0,15 / 0,25) y **σ_aces** (0,2 / 0,3 / 0,4) por log score del total de juegos y de aces.
 
-Medias de 2024 tras la calibración (simulado / real, por partido):
+**Calibración con 2024** (la que evalúa el backtest de 2025): `w_elo = 0,6`, superficie `0,1`, `γ = 0`, `k = 1,1` (log loss 2024: 0,6068), σ común 0,05, σ_aces 0,2. La forma reciente no mejora al Elo (que ya pondera más lo reciente): `γ` queda en 0 y la forma se sigue mostrando en la ficha. Medias de 2024 tras calibrar (simulado / real, por partido):
 
 | Grupo | Breaks | Aces | Dobles faltas | Juegos | σ dominancia |
 |---|---|---|---|---|---|
-| ATP · dura | 4,75 / 4,75 | 13,71 / 13,74 | 5,76 / 5,76 | 24,84 / 24,89 | 0,204 |
-| ATP · tierra | 5,73 / 5,74 | 8,20 / 8,20 | 4,97 / 4,97 | 24,54 / 24,56 | 0,165 |
-| ATP · hierba | 4,48 / 4,50 | 17,56 / 17,54 | 6,38 / 6,37 | 28,33 / 28,37 | 0,130 |
-| Challenger · dura | 5,16 / 5,17 | 10,28 / 10,28 | 6,09 / 6,08 | 22,52 / 22,54 | 0,222 |
-| Challenger · tierra | 6,30 / 6,31 | 6,05 / 6,04 | 6,05 / 6,04 | 22,27 / 22,28 | 0,198 |
-| Challenger · hierba | 4,34 / 4,34 | 13,53 / 13,50 | 5,39 / 5,40 | 23,84 / 23,86 | 0,190 |
-| WTA · dura | 7,41 / 7,42 | 5,71 / 5,71 | 7,68 / 7,68 | 21,70 / 21,72 | 0,205 |
-| WTA · tierra | 8,34 / 8,33 | 3,57 / 3,57 | 6,88 / 6,88 | 21,65 / 21,65 | 0,198 |
-| WTA · hierba | 6,56 / 6,55 | 6,89 / 6,88 | 7,18 / 7,15 | 22,23 / 22,20 | 0,202 |
-| WTA 125 · dura | 7,69 / 7,68 | 5,39 / 5,40 | 8,39 / 8,38 | 21,70 / 21,68 | 0,211 |
-| WTA 125 · tierra | 8,76 / 8,75 | 2,71 / 2,71 | 7,35 / 7,35 | 21,31 / 21,31 | 0,217 |
-| WTA 125 · hierba | 7,07 / 7,00 | 7,20 / 7,14 | 8,36 / 8,28 | 22,37 / 22,21 | 0,214 |
+| ATP · dura | 4,74 / 4,75 | 13,75 / 13,74 | 5,77 / 5,76 | 24,86 / 24,89 | 0,191 |
+| ATP · tierra | 5,73 / 5,74 | 8,22 / 8,20 | 4,97 / 4,97 | 24,56 / 24,56 | 0,155 |
+| ATP · hierba | 4,49 / 4,50 | 17,62 / 17,54 | 6,39 / 6,37 | 28,36 / 28,37 | 0,117 |
+| Challenger · dura | 5,16 / 5,17 | 10,30 / 10,28 | 6,10 / 6,08 | 22,54 / 22,54 | 0,209 |
+| Challenger · tierra | 6,29 / 6,31 | 6,03 / 6,04 | 6,03 / 6,04 | 22,25 / 22,28 | 0,184 |
+| Challenger · hierba | 4,33 / 4,34 | 13,54 / 13,50 | 5,44 / 5,40 | 23,84 / 23,86 | 0,174 |
+| WTA · dura | 7,42 / 7,42 | 5,71 / 5,71 | 7,69 / 7,68 | 21,73 / 21,72 | 0,190 |
+| WTA · tierra | 8,33 / 8,33 | 3,58 / 3,57 | 6,88 / 6,88 | 21,66 / 21,65 | 0,183 |
+| WTA · hierba | 6,54 / 6,55 | 6,85 / 6,88 | 7,13 / 7,15 | 22,16 / 22,20 | 0,183 |
+| WTA 125 · dura | 7,68 / 7,68 | 5,39 / 5,40 | 8,39 / 8,38 | 21,67 / 21,68 | 0,194 |
+| WTA 125 · tierra | 8,76 / 8,75 | 2,71 / 2,71 | 7,35 / 7,35 | 21,31 / 21,31 | 0,199 |
+| WTA 125 · hierba | 7,03 / 7,00 | 7,17 / 7,14 | 8,34 / 8,28 | 22,33 / 22,21 | 0,195 |
 
-Estas igualdades son en la muestra de calibración (2024); la comprobación fuera de muestra es el backtest (apartado 8).
+Estas igualdades son en la muestra de calibración; la comprobación fuera de muestra es el backtest (apartado 8).
+
+**Calibración de producción con 2025** (`engine/calibracion.json`, la que usa la web): `w_elo = 0,65`, superficie `0,2`, `γ = 0`, `k = 1` (log loss 2025: 0,6077), σ común 0,15, σ_aces 0,2, σ de dominancia por grupo entre 0,17 y 0,22. Medias de 2025 tras calibrar (simulado / real): ATP dura 25,19 / 25,20 juegos y 13,86 / 13,86 aces; Challenger dura 22,70 / 22,72 juegos y 10,20 / 10,21 aces; WTA tierra 21,46 / 21,44 juegos y 8,04 / 8,04 breaks; WTA 125 tierra 21,01 / 21,02 juegos (los 12 grupos, en el registro de `npm run calibrar`).
 
 ## 8. Validación
 

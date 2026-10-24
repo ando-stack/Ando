@@ -3,7 +3,7 @@
  * Explicación completa en docs/modelo.md.
  */
 import { FORMATOS, type Circuito, type FormatoPartido, type Superficie } from '../config/formatos';
-import { probPartidoConVariabilidad } from './analitico';
+import { probPartido, probPartidoConVariabilidad } from './analitico';
 import { probElo, ratingCombinado, type RatingJugador } from './elo';
 import type { ParametrosPartido, ParametrosSaque } from './tipos';
 
@@ -321,7 +321,9 @@ export function parametrosPartido(
   const bo3 = FORMATOS.BO3_TB7;
   const sigma = cal.sigma ?? M.sigma;
   const sc = M.sigmaComun ?? 0;
-  const pEst = probPartidoConVariabilidad(pA, pB, bo3, sigma, sc);
+  // Probabilidad «de fuerza» según las estadísticas, sin variabilidad: así los pesos calibrados
+  // no dependen de σ (la variabilidad se integra después, al ajustar δ).
+  const pEst = probPartido(pA, pB, bo3);
   const formaDif = M.gammaForma * (A.forma - B.forma);
   const pEloBase = probElo(eA.eloCombinado, eB.eloCombinado);
   const pElo = sigm(logit(clamp(pEloBase, 1e-4, 1 - 1e-4)) + formaDif);

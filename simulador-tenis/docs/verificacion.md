@@ -1,6 +1,6 @@
 # Verificación de datos
 
-Generado por `npm run verificar` el 2026-10-23 23:25 UTC. Cada dato publicado se compara con una descarga nueva (sin caché) de la fuente original o con una fuente independiente.
+Generado por `npm run verificar` el 2026-10-24 02:17 UTC. Cada dato publicado se compara con una descarga nueva (sin caché) de la fuente original o con una fuente independiente.
 
 | # | Dato | Publicado en la web | Fuente de contraste | Valor en la fuente | ¿Coincide? |
 |---|---|---|---|---|---|

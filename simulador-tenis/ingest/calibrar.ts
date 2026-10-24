@@ -12,7 +12,7 @@
  */
 import { writeFileSync } from 'node:fs';
 import { FORMATOS } from '../config/formatos';
-import { probPartidoConVariabilidad } from '../engine/analitico';
+import { probPartido } from '../engine/analitico';
 import { probElo } from '../engine/elo';
 import { claveCalibracion, estimarJugador, PARAMS_POR_DEFECTO, type CalibracionGrupo, type ParamsModelo } from '../engine/modelo';
 import { cargarHistoricoCache } from './historico';
@@ -43,7 +43,7 @@ function main() {
     const pB = Math.min(0.92, Math.max(0.3, m.saque + eB.exSaque - eA.exResto));
     return {
       y: c.real.ganaA ? 1 : 0,
-      lEst: logit(cl(probPartidoConVariabilidad(pA, pB, FORMATOS.BO3_TB7, M0.sigma, M0.sigmaComun))),
+      lEst: logit(cl(probPartido(pA, pB, FORMATOS.BO3_TB7))),
       gA: c.A.elo.g,
       gB: c.B.elo.g,
       sA: c.A.elo.s[c.sup],
