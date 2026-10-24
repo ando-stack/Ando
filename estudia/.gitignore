@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.netlify/
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+tests/db/.pgdata/
+scripts/salida/
+dist-e2e/
+tests/e2e/capturas/
+*.tsbuildinfo

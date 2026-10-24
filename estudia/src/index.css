@@ -1,0 +1,80 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+@theme {
+  --font-sans: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-marca-50: #f5f3ff;
+  --color-marca-100: #ede9fe;
+  --color-marca-200: #ddd6fe;
+  --color-marca-300: #c4b5fd;
+  --color-marca-400: #a78bfa;
+  --color-marca-500: #8b5cf6;
+  --color-marca-600: #7c3aed;
+  --color-marca-700: #6d28d9;
+  --color-marca-800: #5b21b6;
+  --color-marca-900: #4c1d95;
+  --color-fondo: #faf8ff;
+  --shadow-suave: 0 1px 2px rgb(76 29 149 / 0.04), 0 4px 16px rgb(76 29 149 / 0.06);
+  --shadow-flota: 0 8px 30px rgb(76 29 149 / 0.16);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  @apply bg-fondo text-slate-800 antialiased;
+  font-family: var(--font-sans);
+}
+
+@utility tarjeta {
+  @apply rounded-3xl bg-white p-4 shadow-suave ring-1 ring-marca-100/70 sm:p-5;
+}
+@utility boton {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility boton-primario {
+  @apply boton bg-gradient-to-r from-marca-600 to-fuchsia-500 text-white shadow-md shadow-marca-500/25 hover:brightness-110;
+}
+@utility boton-secundario {
+  @apply boton bg-marca-50 text-marca-700 ring-1 ring-marca-200 hover:bg-marca-100;
+}
+@utility boton-fantasma {
+  @apply boton text-slate-600 hover:bg-slate-100;
+}
+@utility campo {
+  @apply w-full rounded-2xl border-0 bg-white px-4 py-3 text-base text-slate-800 ring-1 ring-slate-200 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-marca-400;
+}
+@utility etiqueta {
+  @apply mb-1.5 block text-sm font-semibold text-slate-700;
+}
+@utility chip {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+}
+
+/* Contenido generado (Markdown + KaTeX) */
+.prosa {
+  @apply text-[15px] leading-relaxed text-slate-700;
+}
+.prosa h1, .prosa h2, .prosa h3, .prosa h4 { @apply mt-4 mb-2 font-bold text-slate-900; }
+.prosa h1 { @apply text-xl; }
+.prosa h2 { @apply text-lg; }
+.prosa h3 { @apply text-base; }
+.prosa p { @apply my-2; }
+.prosa ul { @apply my-2 list-disc pl-5; }
+.prosa ol { @apply my-2 list-decimal pl-5; }
+.prosa li { @apply my-0.5; }
+.prosa strong { @apply font-bold text-slate-900; }
+.prosa blockquote { @apply my-3 rounded-2xl border-l-4 border-amber-400 bg-amber-50 px-4 py-2 text-amber-900; }
+.prosa table { @apply my-3 w-full border-collapse overflow-hidden rounded-xl text-sm; }
+.prosa th, .prosa td { @apply border border-slate-200 px-2 py-1 text-left; }
+.prosa th { @apply bg-marca-50; }
+.prosa code { @apply rounded bg-slate-100 px-1 py-0.5 text-[13px]; }
+.prosa .katex-display { @apply my-3 overflow-x-auto overflow-y-hidden py-1; }
+.prosa mark { @apply rounded bg-amber-200 px-0.5 text-amber-950; }
+
+.sin-barra::-webkit-scrollbar { display: none; }
+.sin-barra { scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Estudia",
+  "short_name": "Estudia",
+  "lang": "es",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8ff",
+  "theme_color": "#7c3aed",
+  "icons": [{ "src": "/icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

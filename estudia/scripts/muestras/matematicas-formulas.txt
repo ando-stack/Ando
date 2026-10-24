@@ -1,0 +1,8 @@
+Ecuaciones de 2º grado
+Forma general: ax^2 + bx + c = 0 (a ≠ 0)
+Fórmula: x = (-b ± √(b^2 - 4ac)) / 2a
+Discriminante Δ = b^2 - 4ac
+Δ > 0 → 2 soluciones reales
+Δ = 0 → 1 solución doble
+Δ < 0 → no hay soluciones reales
+Ejemplo: x^2 - 5x + 6 = 0 → Δ = 25 - 24 = 1 → x = 3, x = 2
