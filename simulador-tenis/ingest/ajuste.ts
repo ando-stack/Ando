@@ -120,9 +120,13 @@ export function ajustarRankingElo(
 }
 
 /** Parámetros calibrados (si existe engine/calibracion.json) sobre los por defecto. */
-export function cargarCalibracion(): Partial<ParamsModelo> {
-  if (!existsSync(RUTA_CALIBRACION)) return {};
-  return JSON.parse(readFileSync(RUTA_CALIBRACION, 'utf8')) as Partial<ParamsModelo>;
+export function cargarCalibracion(temporada?: number): Partial<ParamsModelo> {
+  const ruta = temporada ? RUTA_CALIBRACION.replace('.json', `-${temporada}.json`) : RUTA_CALIBRACION;
+  if (!existsSync(ruta)) {
+    if (temporada) throw new Error(`Falta ${ruta}: ejecuta antes TEMPORADA_CALIBRACION=${temporada} npm run calibrar`);
+    return {};
+  }
+  return JSON.parse(readFileSync(ruta, 'utf8')) as Partial<ParamsModelo>;
 }
 
 export function construirParams(base: Partial<ParamsModelo>, medias: ParamsModelo['medias']): ParamsModelo {

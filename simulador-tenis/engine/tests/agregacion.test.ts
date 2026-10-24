@@ -9,7 +9,7 @@ import { tiebreaksDelMarcador } from '../perfiles';
 import { ANCHO, R, type ParametrosSaque } from '../tipos';
 
 const s = (p: number): ParametrosSaque => ({ pPrimerDentro: 0.62, pAce1: 0.1, pGana1: p + 0.08, pSegundoDentro: 0.92, pAce2: 0.02, pGana2: p - 0.12 });
-const params = { a: s(0.66), b: s(0.62), sigma: 0.15, sigmaAces: 0.3 };
+const params = { a: s(0.66), b: s(0.62), sigma: 0.15, sigmaComun: 0.1, sigmaAces: 0.3 };
 
 describe('agregación', () => {
   const f = FORMATOS.BO3_TB7;
@@ -146,8 +146,8 @@ describe('modelo', () => {
     const o = simularLote(p, FORMATOS.BO5_TB10, n, 9);
     let ga = 0;
     for (let i = 0; i < n; i++) if (o[i * ANCHO] === 0) ga++;
-    // El motor aplica la variabilidad a primer y segundo saque por separado: tolerancia 1,5 puntos.
-    expect(Math.abs(ga / n - detalle.pFormato)).toBeLessThan(0.015);
+    const se = Math.sqrt((detalle.pFormato * (1 - detalle.pFormato)) / n);
+    expect(Math.abs(ga / n - detalle.pFormato)).toBeLessThan(4 * se);
   });
 
   it('tie-breaks del marcador', () => {

@@ -43,7 +43,7 @@ function main() {
     const pB = Math.min(0.92, Math.max(0.3, m.saque + eB.exSaque - eA.exResto));
     return {
       y: c.real.ganaA ? 1 : 0,
-      lEst: logit(cl(probPartidoConVariabilidad(pA, pB, FORMATOS.BO3_TB7, M0.sigma))),
+      lEst: logit(cl(probPartidoConVariabilidad(pA, pB, FORMATOS.BO3_TB7, M0.sigma, M0.sigmaComun))),
       gA: c.A.elo.g,
       gB: c.B.elo.g,
       sA: c.A.elo.s[c.sup],
@@ -52,25 +52,27 @@ function main() {
     };
   });
   log('Componentes de victoria calculados', comp.length);
-  let mejor = { w: 0.75, ps: 0.5, g: 0, ll: Infinity };
+  let mejor = { w: 0.75, ps: 0.5, g: 0, k: 1, ll: Infinity };
   for (const ps of [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]) {
     const lElo = comp.map((x) => logit(cl(probElo((1 - ps) * x.gA + ps * x.sA, (1 - ps) * x.gB + ps * x.sB))));
     for (const w of [0.3, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]) {
       for (const g of [0, 0.05, 0.1, 0.15, 0.25]) {
-        let ll = 0;
-        comp.forEach((x, i) => {
-          const p = cl(sigm(w * (lElo[i] + g * x.f) + (1 - w) * x.lEst));
-          ll -= x.y * Math.log(p) + (1 - x.y) * Math.log(1 - p);
-        });
-        ll /= comp.length;
-        if (ll < mejor.ll) mejor = { w, ps, g, ll };
+        for (const k of [0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 2]) {
+          let ll = 0;
+          comp.forEach((x, i) => {
+            const p = cl(sigm(k * (w * (lElo[i] + g * x.f) + (1 - w) * x.lEst)));
+            ll -= x.y * Math.log(p) + (1 - x.y) * Math.log(1 - p);
+          });
+          ll /= comp.length;
+          if (ll < mejor.ll) mejor = { w, ps, g, k, ll };
+        }
       }
     }
   }
-  log('Victoria: peso Elo', mejor.w, 'peso superficie', mejor.ps, 'forma', mejor.g, 'log loss', mejor.ll.toFixed(4));
+  log('Victoria: peso Elo', mejor.w, 'peso superficie', mejor.ps, 'forma', mejor.g, 'escala', mejor.k, 'log loss', mejor.ll.toFixed(4));
 
   // ---------- 2) y 3) Distribuciones ----------
-  const M: ParamsModelo = { ...M0, pesoElo: mejor.w, pesoSuperficieElo: mejor.ps, gammaForma: mejor.g, calibracion: {} };
+  const M: ParamsModelo = { ...M0, pesoElo: mejor.w, pesoSuperficieElo: mejor.ps, gammaForma: mejor.g, escalaVictoria: mejor.k, calibracion: {} };
   const muestra = muestrear(casos, 1000, (c) => c.conStats);
   const grupos = [...new Set(muestra.map((c) => claveCalibracion(c.circuito, c.sup)))];
   for (const g of grupos) M.calibracion[g] = { saque: 0, aces: 1, dobles: 1, n: muestra.filter((c) => claveCalibracion(c.circuito, c.sup) === g).length };
@@ -111,34 +113,39 @@ function main() {
         const cal = M.calibracion[g] as CalibracionGrupo;
         // Breaks: más saque → menos breaks. Paso proporcional a la diferencia relativa.
         if (e.sim.breaks > 0 && e.real.breaks > 0) cal.saque += 0.35 * Math.log(e.sim.breaks / e.real.breaks);
+        // Dominancia: más dominancia → partidos más desequilibrados → menos juegos (≈ −14 juegos por unidad).
+        cal.sigma = Math.max(0.05, Math.min(0.5, (cal.sigma ?? M.sigma) + (e.sim.juegos - e.real.juegos) / 14));
         if (e.sim.aces > 0) cal.aces *= e.real.aces / e.sim.aces;
         if (e.sim.dobles > 0) cal.dobles *= e.real.dobles / e.sim.dobles;
         cal.saque = Math.max(-0.5, Math.min(0.5, cal.saque));
         cal.aces = Math.max(0.5, Math.min(2, cal.aces));
         cal.dobles = Math.max(0.5, Math.min(2, cal.dobles));
-        log(`  ${g} it${it}: breaks ${e.sim.breaks.toFixed(2)}/${e.real.breaks.toFixed(2)} aces ${e.sim.aces.toFixed(2)}/${e.real.aces.toFixed(2)} df ${e.sim.dobles.toFixed(2)}/${e.real.dobles.toFixed(2)} juegos ${e.sim.juegos.toFixed(2)}/${e.real.juegos.toFixed(2)} → saque ${cal.saque.toFixed(3)} aces×${cal.aces.toFixed(3)} df×${cal.dobles.toFixed(3)}`);
+        log(`  ${g} it${it}: breaks ${e.sim.breaks.toFixed(2)}/${e.real.breaks.toFixed(2)} aces ${e.sim.aces.toFixed(2)}/${e.real.aces.toFixed(2)} df ${e.sim.dobles.toFixed(2)}/${e.real.dobles.toFixed(2)} juegos ${e.sim.juegos.toFixed(2)}/${e.real.juegos.toFixed(2)} → saque ${cal.saque.toFixed(3)} aces×${cal.aces.toFixed(3)} df×${cal.dobles.toFixed(3)} σ ${cal.sigma?.toFixed(3)}`);
       }
     }
   };
 
-  ajustarGrupos(3);
-  // σ y σ_aces por log score (sobre la muestra completa).
+  // Condiciones del día (común) y dominancia inicial: valores de la exploración en rejilla
+  // (docs/modelo.md §6); la dominancia se ajusta después en cada grupo.
+  M.sigma = 0.2;
+  M.sigmaComun = 0.15;
+  ajustarGrupos(4);
   const sub = muestrear(muestra, 300);
-  let mejorSigma = { sigma: M.sigma, ls: -Infinity };
-  for (const sigma of [0, 0.08, 0.15, 0.22, 0.3]) {
-    const e = evaluar({ ...M, sigma }, sub);
-    log('σ', sigma, 'log score juegos', e.lsJuegos.toFixed(4));
-    if (e.lsJuegos > mejorSigma.ls) mejorSigma = { sigma, ls: e.lsJuegos };
+  let mejorSC = { s: M.sigmaComun, ls: -Infinity };
+  for (const sc of [0.05, 0.15, 0.25]) {
+    const e = evaluar({ ...M, sigmaComun: sc }, sub);
+    log('σ común', sc, 'log score juegos', e.lsJuegos.toFixed(4), 'juegos', e.sim.juegos.toFixed(2), '/', e.real.juegos.toFixed(2));
+    if (e.lsJuegos > mejorSC.ls) mejorSC = { s: sc, ls: e.lsJuegos };
   }
-  M.sigma = mejorSigma.sigma;
+  M.sigmaComun = mejorSC.s;
   let mejorSA = { s: M.sigmaAces, ls: -Infinity };
-  for (const s of [0.1, 0.2, 0.3, 0.4, 0.5]) {
+  for (const s of [0.2, 0.3, 0.4]) {
     const e = evaluar({ ...M, sigmaAces: s }, sub);
     log('σ aces', s, 'log score aces', e.lsAces.toFixed(4));
     if (e.lsAces > mejorSA.ls) mejorSA = { s, ls: e.lsAces };
   }
   M.sigmaAces = mejorSA.s;
-  ajustarGrupos(2);
+  ajustarGrupos(3);
 
   const salida: Partial<ParamsModelo> = {
     version: `calibrado-${TEMPORADA}`,
@@ -146,16 +153,22 @@ function main() {
     vidaMediaDias: M.vidaMediaDias,
     pesoSuperficieElo: M.pesoSuperficieElo,
     pesoElo: M.pesoElo,
+    escalaVictoria: M.escalaVictoria,
     gammaForma: M.gammaForma,
     sigma: M.sigma,
+    sigmaComun: M.sigmaComun,
     sigmaAces: M.sigmaAces,
     rhoAce2: M.rhoAce2,
     K: M.K,
     calibracion: M.calibracion,
     minPartidosReales: PARAMS_POR_DEFECTO.minPartidosReales,
   };
-  writeFileSync(RUTA_CALIBRACION, JSON.stringify(salida, null, 2));
-  log('Calibración guardada en', RUTA_CALIBRACION, `(${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  // Copia por temporada (la usa el backtest de la temporada siguiente) y versión de producción
+  // (la usa la ingesta): la de la temporada más reciente calibrada.
+  const rutaTemporada = RUTA_CALIBRACION.replace('.json', `-${TEMPORADA}.json`);
+  writeFileSync(rutaTemporada, JSON.stringify(salida, null, 2));
+  if (process.env.CALIBRACION_PRODUCCION !== '0') writeFileSync(RUTA_CALIBRACION, JSON.stringify(salida, null, 2));
+  log('Calibración guardada en', rutaTemporada, process.env.CALIBRACION_PRODUCCION !== '0' ? `y ${RUTA_CALIBRACION}` : '', `(${((Date.now() - t0) / 1000).toFixed(0)} s)`);
 }
 
 main();

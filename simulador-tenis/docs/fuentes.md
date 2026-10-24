@@ -33,6 +33,8 @@ Investigación hecha el 23-10-2026. Todas las fuentes usadas son **gratuitas**; 
 - **Revés (una o dos manos):** ninguna de las fuentes abiertas lo ofrece; se muestra «no disponible».
 - **Ranking ATP actual:** ESPN publica el top 150. Para el resto se muestra el último ranking del histórico (con su fecha, junio de 2026).
 - **Cubierta/exterior en el histórico:** Sackmann no lo indica. El modelo no lo usa (sólo la superficie); se muestra como dato del torneo.
+- **Torneos cancelados:** se leen las secciones «Cancelled tournaments» de los calendarios de Wikipedia. Un Challenger cancelado no se muestra. Si la WTA sigue listando un torneo que Wikipedia da por cancelado y no hay cuadro (p. ej. Río y Miami WTA 125, octubre-noviembre de 2026), se muestra con un aviso de que las fuentes no coinciden.
+- **WTA 125 sin marcador en directo de la WTA:** su cuadro se toma, si existe, de la página de Wikipedia del torneo (sin horarios).
 - **Wikipedia** puede ir con horas de retraso respecto a los resultados oficiales y la IP del servidor de ingesta puede recibir límites (429): se reintenta con espera y se usa la caché.
 
 ## Actualización
@@ -43,4 +45,4 @@ Investigación hecha el 23-10-2026. Todas las fuentes usadas son **gratuitas**; 
 
 ## Verificación manual de datos
 
-Ver la sección «Verificación manual» de `docs/arquitectura.md` (10 datos comparados con la fuente original).
+Ver `docs/verificacion.md` (10 datos publicados comparados con la fuente original o con una fuente independiente; se regenera con `npm run verificar`).

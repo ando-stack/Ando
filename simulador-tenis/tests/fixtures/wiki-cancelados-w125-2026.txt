@@ -1,0 +1,15 @@
+==Cancelled tournaments==
+The following tournaments were formally announced by the WTA before being cancelled.
+{|class=wikitable style=font-size:85%
+!width=75|Week of
+!width=250|Tournament
+|-style="vertical-align:top"
+|March 9||[[Cancún Tennis Open]]<br />[[Cancún]], Mexico <br /> Hard
+|-style="vertical-align:top"
+|March 23||[[Puerto Vallarta Open]]<br />[[Puerto Vallarta]], Mexico <br /> Hard
+|-style="vertical-align:top"
+|October 19||[[Rio Ladies Open]]<br />[[Rio de Janeiro]], Brazil <br /> Clay
+|-style="vertical-align:top"
+|November 2||American Tennis Open<br />[[Miami]], United States <br /> Hard
+|}
+

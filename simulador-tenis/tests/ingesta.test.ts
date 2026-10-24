@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { leerMarcador } from '../ingest/evaluacion';
-import { parsearCalendario, parsearCuadro } from '../ingest/fuentes/wikipedia';
+import { fechaSemana, parsearCalendario, parsearCancelados, parsearCuadro } from '../ingest/fuentes/wikipedia';
 import { validarHistorico } from '../ingest/historico';
 import { Registro } from '../ingest/lib/registro';
 import { claveNombre, dias, fechaDeDias, horaMadrid, superficie } from '../ingest/lib/util';
@@ -56,6 +56,15 @@ describe('Wikipedia', () => {
     expect(lisboa.categoria).toBe('Challenger 100');
     expect(lisboa.paginaIndividual).toBe("2026 Lisboa Belém Open – Men's singles");
     expect(e.find((x) => x.ciudad === 'Fort Worth')?.superficie).toBe('dura');
+  });
+
+  it('lee los torneos cancelados y los dos formatos de fecha de semana', () => {
+    const c = parsearCancelados(fx('wiki-cancelados-w125-2026.txt'), 2026);
+    expect(c).toContainEqual({ semana: '2026-10-19', nombre: 'Rio Ladies Open', ciudad: 'Rio de Janeiro' });
+    expect(c.find((x) => x.ciudad === 'Miami')?.semana).toBe('2026-11-02');
+    expect(fechaSemana('19 Oct', 2026)).toBe('2026-10-19');
+    expect(fechaSemana('October 19', 2026)).toBe('2026-10-19');
+    expect(fechaSemana('Doubles', 2026)).toBeNull();
   });
 
   it('lee el cuadro: rondas, cabezas de serie, marcadores con tie-break y ganadores', () => {

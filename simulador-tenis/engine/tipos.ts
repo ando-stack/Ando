@@ -17,8 +17,15 @@ export interface ParametrosSaque {
 export interface ParametrosPartido {
   a: ParametrosSaque;
   b: ParametrosSaque;
-  /** Desviación típica (en escala logit) del nivel de cada jugador en cada simulación. */
+  /**
+   * Variabilidad partido a partido (escala logit), en dos componentes independientes:
+   *  - sigma: dominancia del día (D): el saque de A se desplaza +D y el de B −D (un jugador
+   *    en buena forma saca y resta mejor a la vez);
+   *  - sigmaComun: condiciones del día (C): el saque de ambos se desplaza +C (pista rápida,
+   *    viento...).
+   */
   sigma: number;
+  sigmaComun: number;
   /** Desviación típica (log) del ritmo de aces de cada jugador en cada simulación. */
   sigmaAces: number;
 }

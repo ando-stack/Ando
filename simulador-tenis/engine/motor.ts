@@ -27,8 +27,29 @@ interface SaqueEfectivo {
 }
 
 function efectivo(s: ParametrosSaque, desplazamiento: number, multAces: number, dst: SaqueEfectivo) {
-  const gana1 = clamp(sigm(logit(clamp(s.pGana1, 1e-4, 1 - 1e-4)) + desplazamiento), 1e-4, 1 - 1e-4);
-  const gana2 = clamp(sigm(logit(clamp(s.pGana2, 1e-4, 1 - 1e-4)) + desplazamiento), 1e-4, 1 - 1e-4);
+  const l1 = logit(clamp(s.pGana1, 1e-4, 1 - 1e-4));
+  const l2 = logit(clamp(s.pGana2, 1e-4, 1 - 1e-4));
+  const w1 = s.pPrimerDentro;
+  const w2 = (1 - s.pPrimerDentro) * s.pSegundoDentro;
+  // El día del jugador desplaza su probabilidad TOTAL de ganar el punto al saque (igual que el
+  // cálculo exacto); se reparte entre primer y segundo saque con un mismo desplazamiento τ.
+  let tau = 0;
+  if (desplazamiento !== 0) {
+    const total = w1 * sigm(l1) + w2 * sigm(l2);
+    const objetivo = clamp(sigm(logit(clamp(total, 1e-4, 1 - 1e-4)) + desplazamiento), 1e-4, w1 + w2 - 1e-4);
+    tau = desplazamiento;
+    for (let i = 0; i < 8; i++) {
+      const a = sigm(l1 + tau);
+      const b = sigm(l2 + tau);
+      const f = w1 * a + w2 * b - objetivo;
+      const d = w1 * a * (1 - a) + w2 * b * (1 - b);
+      if (d < 1e-9) break;
+      tau -= f / d;
+      if (Math.abs(f) < 1e-10) break;
+    }
+  }
+  const gana1 = clamp(sigm(l1 + tau), 1e-4, 1 - 1e-4);
+  const gana2 = clamp(sigm(l2 + tau), 1e-4, 1 - 1e-4);
   const a1 = clamp(s.pAce1 * multAces, 0, gana1 * 0.95);
   const a2 = clamp(s.pAce2 * multAces, 0, gana2 * 0.95);
   dst.p1 = s.pPrimerDentro;
@@ -138,8 +159,10 @@ export class Simulador {
     const rng = this.rng;
     const f = this.formato;
     // Variación del nivel de cada jugador en esta simulación.
-    const despA = p.sigma > 0 ? p.sigma * rng.normal() : 0;
-    const despB = p.sigma > 0 ? p.sigma * rng.normal() : 0;
+    const D = p.sigma > 0 ? p.sigma * rng.normal() : 0;
+    const C = p.sigmaComun > 0 ? p.sigmaComun * rng.normal() : 0;
+    const despA = D + C;
+    const despB = -D + C;
     const sa = p.sigmaAces;
     const multA = sa > 0 ? Math.exp(sa * rng.normal() - (sa * sa) / 2) : 1;
     const multB = sa > 0 ? Math.exp(sa * rng.normal() - (sa * sa) / 2) : 1;

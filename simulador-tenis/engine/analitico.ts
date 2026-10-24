@@ -168,30 +168,38 @@ export function probPartido(pa: number, pb: number, f: FormatoPartido, primero: 
   return rec(0, 0, primero);
 }
 
-// Nodos y pesos de Gauss-Hermite (5 puntos) para integrar sobre N(0,1).
-const GH_X = [-2.020182870456086, -0.9585724646138185, 0, 0.9585724646138185, 2.020182870456086];
-const GH_W = [0.01995324205904591, 0.3936193231522412, 0.9453087204829419, 0.3936193231522412, 0.01995324205904591];
+// Nodos y pesos de Gauss-Hermite para integrar sobre N(0,1): 10 puntos para la dominancia
+// (el integrando es empinado porque mueve a los dos jugadores en sentidos opuestos) y 3 para
+// las condiciones comunes (efecto suave). Diferencia frente a 16×5 nodos: ≤ 0,4 puntos
+// porcentuales en el caso extremo (σ = 0,3 al mejor de 5), mucho menos en casos normales.
+const GHD_X = [-3.4361591188377374, -2.5327316742327897, -1.7566836492998816, -1.0366108297895136, -0.3429013272237046, 0.3429013272237046, 1.0366108297895136, 1.7566836492998816, 2.5327316742327897, 3.4361591188377374];
+const GHD_W = [7.640432855232641e-6, 0.0013436457467812324, 0.033874394455481106, 0.2401386110823147, 0.6108626337353258, 0.6108626337353258, 0.2401386110823147, 0.033874394455481106, 0.0013436457467812324, 7.640432855232641e-6];
+const GHC_X = [-1.224744871391589, 0, 1.224744871391589];
+const GHC_W = [0.2954089751509194, 1.1816359006036772, 0.2954089751509194];
 const SQRT2 = Math.SQRT2;
 
 const logit = (p: number) => Math.log(p / (1 - p));
 const sigm = (x: number) => 1 / (1 + Math.exp(-x));
 
 /**
- * P(A gana) integrando la variabilidad partido a partido: el logit de la probabilidad de saque
- * de cada jugador se desplaza con N(0, sigma²) independientes, igual que en el motor.
+ * P(A gana) integrando la variabilidad partido a partido igual que el motor: el logit del saque
+ * de A se desplaza D + C y el de B −D + C, con D ~ N(0, sigma²) y C ~ N(0, sigmaComun²).
  */
-export function probPartidoConVariabilidad(pa: number, pb: number, f: FormatoPartido, sigma: number): number {
-  if (sigma <= 0) return probPartido(pa, pb, f);
+export function probPartidoConVariabilidad(pa: number, pb: number, f: FormatoPartido, sigma: number, sigmaComun = 0): number {
+  if (sigma <= 0 && sigmaComun <= 0) return probPartido(pa, pb, f);
   const la = logit(pa);
   const lb = logit(pb);
+  const nodosC = sigmaComun > 0 ? GHC_X.length : 1;
   let s = 0;
   let w = 0;
-  for (let i = 0; i < GH_X.length; i++) {
-    const za = la + sigma * SQRT2 * GH_X[i];
-    for (let j = 0; j < GH_X.length; j++) {
-      const zb = lb + sigma * SQRT2 * GH_X[j];
-      s += GH_W[i] * GH_W[j] * probPartido(sigm(za), sigm(zb), f);
-      w += GH_W[i] * GH_W[j];
+  const nodosD = sigma > 0 ? GHD_X.length : 1;
+  for (let i = 0; i < nodosD; i++) {
+    const d = sigma > 0 ? sigma * SQRT2 * GHD_X[i] : 0;
+    for (let j = 0; j < nodosC; j++) {
+      const c = sigmaComun > 0 ? sigmaComun * SQRT2 * GHC_X[j] : 0;
+      const peso = (sigma > 0 ? GHD_W[i] : 1) * (sigmaComun > 0 ? GHC_W[j] : 1);
+      s += peso * probPartido(sigm(la + d + c), sigm(lb - d + c), f);
+      w += peso;
     }
   }
   return s / w;

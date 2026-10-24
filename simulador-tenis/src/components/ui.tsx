@@ -3,7 +3,7 @@ import { NOMBRE_CIRCUITO, NOMBRE_SUPERFICIE, type Circuito, type Superficie } fr
 
 export function Tarjeta({ titulo, children, extra, className = '' }: { titulo?: ReactNode; children: ReactNode; extra?: ReactNode; className?: string }) {
   return (
-    <section className={`rounded-xl border border-borde bg-superficie p-4 ${className}`}>
+    <section className={`min-w-0 rounded-xl border border-borde bg-superficie p-4 ${className}`}>
       {(titulo || extra) && (
         <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
           {titulo && <h2 className="text-base font-semibold text-texto">{titulo}</h2>}

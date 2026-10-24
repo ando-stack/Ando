@@ -8,7 +8,7 @@ import { ANCHO, R, type ParametrosPartido, type ParametrosSaque } from '../tipos
 
 /** Sacador "plano": todos los puntos con la misma probabilidad p, sin aces ni dobles faltas. */
 const plano = (p: number): ParametrosSaque => ({ pPrimerDentro: 1, pAce1: 0, pGana1: p, pSegundoDentro: 1, pAce2: 0, pGana2: p });
-const partido = (pa: number, pb: number, sigma = 0): ParametrosPartido => ({ a: plano(pa), b: plano(pb), sigma, sigmaAces: 0 });
+const partido = (pa: number, pb: number, sigma = 0, sigmaComun = 0): ParametrosPartido => ({ a: plano(pa), b: plano(pb), sigma, sigmaComun, sigmaAces: 0 });
 
 function sims(params: ParametrosPartido, formato = FORMATOS.BO3_TB7, n = 20000, semilla = 7) {
   return simularLote(params, formato, n, semilla);
@@ -108,7 +108,7 @@ describe('motor punto a punto: reglas', () => {
   it('tie-break: alterna el saque correctamente (1, 2, 2, 2...)', () => {
     // A gana siempre sus puntos de saque y B nunca: en un tie-break que empieza sacando A, A
     // gana el 1.º, B saca 2.º y 3.º (los pierde) → A gana el tie-break 7-0 siempre.
-    const params: ParametrosPartido = { a: plano(1 - 1e-12), b: plano(1e-12), sigma: 0, sigmaAces: 0 };
+    const params: ParametrosPartido = { a: plano(1 - 1e-12), b: plano(1e-12), sigma: 0, sigmaComun: 0, sigmaAces: 0 };
     const o = sims(params, FORMATOS.BO3_TB7, 50);
     for (let i = 0; i < 50; i++) {
       // A gana todos los juegos: 6-0 6-0
@@ -197,9 +197,18 @@ describe('motor: convergencia con el cálculo exacto', () => {
     expect(Math.abs(ga / n - exacta)).toBeLessThan(0.01);
   });
 
+  it('con dominancia y condiciones del día, la simulación coincide con la integral 2D', () => {
+    const n = 40000;
+    const o = sims(partido(0.64, 0.6, 0.3, 0.2), FORMATOS.BO5_TB10, n, 8);
+    let ga = 0;
+    for (let i = 0; i < n; i++) if (o[i * ANCHO] === 0) ga++;
+    const exacta = probPartidoConVariabilidad(0.64, 0.6, FORMATOS.BO5_TB10, 0.3, 0.2);
+    expect(Math.abs(ga / n - exacta)).toBeLessThan(0.01);
+  });
+
   it('aces, dobles faltas y porcentajes coherentes con los parámetros', () => {
     const s: ParametrosSaque = { pPrimerDentro: 0.62, pAce1: 0.12, pGana1: 0.74, pSegundoDentro: 0.92, pAce2: 0.02, pGana2: 0.54 };
-    const params: ParametrosPartido = { a: s, b: s, sigma: 0, sigmaAces: 0 };
+    const params: ParametrosPartido = { a: s, b: s, sigma: 0, sigmaComun: 0, sigmaAces: 0 };
     const n = 5000;
     const o = sims(params, FORMATOS.BO3_TB7, n, 3);
     let pts = 0;

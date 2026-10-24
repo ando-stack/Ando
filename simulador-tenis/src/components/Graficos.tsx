@@ -86,7 +86,7 @@ export function GraficoEvolucion({ puntos, etiqueta, invertido = false }: { punt
         <LineChart data={datos} margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
           <CartesianGrid vertical={false} stroke={REJILLA} />
           <XAxis dataKey="f" stroke={EJE} tick={{ fontSize: 11 }} minTickGap={40} />
-          <YAxis stroke={EJE} tick={{ fontSize: 11 }} reversed={invertido} domain={['auto', 'auto']} width={48} axisLine={false} tickLine={false} />
+          <YAxis stroke={EJE} tick={{ fontSize: 11 }} reversed={invertido} domain={['auto', 'auto']} allowDecimals={false} width={48} axisLine={false} tickLine={false} />
           <Tooltip contentStyle={estiloTooltip.contentStyle} labelStyle={estiloTooltip.labelStyle} formatter={(v: number) => [v.toLocaleString('es-ES'), etiqueta]} />
           <Line type="monotone" dataKey="v" stroke={COLOR_A} strokeWidth={2} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
         </LineChart>

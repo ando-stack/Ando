@@ -57,7 +57,16 @@ Informe completo: [docs/validacion.md](docs/validacion.md). Verificación de 10 
 
 ## Rendimiento
 
-RENDIMIENTO
+Medido en este entorno (contenedor Linux, Node 22 / Chromium headless):
+
+| Prueba | Tiempo |
+|---|---|
+| 5.000 simulaciones al mejor de 3, un solo hilo (`npm run rendimiento`) | ≈ 0,1 s + 0,03 s de agregación y comprobación de coherencia |
+| 5.000 simulaciones en la web (Web Workers en paralelo, de pulsar «Simular» a ver resultados) | **0,19 s** |
+| 20.000 simulaciones al mejor de 5 en la web | 0,66 s |
+| 100.000 simulaciones al mejor de 5, un solo hilo | ≈ 2,3 s (en la web se reparten entre varios workers) |
+
+En un ordenador normal, 5.000 simulaciones tardan muy por debajo de un segundo y la interfaz no se bloquea en ningún momento.
 
 ## Configuración de Supabase
 

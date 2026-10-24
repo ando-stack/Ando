@@ -78,6 +78,8 @@ export interface CalibracionGrupo {
   saque: number;
   aces: number;
   dobles: number;
+  /** Dominancia del día (σ) propia del grupo; si falta, se usa la general. */
+  sigma?: number;
   /** Número de partidos usados en la calibración. */
   n?: number;
 }
@@ -89,8 +91,11 @@ export interface ParamsModelo {
   pesoSuperficieElo: number;
   /** Peso del Elo en la probabilidad de victoria (en escala logit). */
   pesoElo: number;
+  /** Factor que multiplica el logit combinado (corrige un modelo poco o demasiado seguro). */
+  escalaVictoria: number;
   gammaForma: number;
   sigma: number;
+  sigmaComun: number;
   sigmaAces: number;
   /** P(ace | segundo dentro) = rhoAce2 · P(ace | primero dentro). */
   rhoAce2: number;
@@ -125,8 +130,10 @@ export const PARAMS_POR_DEFECTO: ParamsModelo = {
   vidaMediaDias: 365,
   pesoSuperficieElo: 0.5,
   pesoElo: 0.75,
+  escalaVictoria: 1,
   gammaForma: 0,
-  sigma: 0.15,
+  sigma: 0.25,
+  sigmaComun: 0,
   sigmaAces: 0.25,
   rhoAce2: 0.15,
   K: { saque: 600, resto: 600, primeros: 300, ganados1: 300, ganados2: 300, aces: 600, dobles: 300, acesC: 800, superficie: 400 },
@@ -312,25 +319,26 @@ export function parametrosPartido(
   let pA = clamp(media + eA.exSaque - eB.exResto, 0.3, 0.92);
   let pB = clamp(media + eB.exSaque - eA.exResto, 0.3, 0.92);
   const bo3 = FORMATOS.BO3_TB7;
-  const sigma = M.sigma;
-  const pEst = probPartidoConVariabilidad(pA, pB, bo3, sigma);
+  const sigma = cal.sigma ?? M.sigma;
+  const sc = M.sigmaComun ?? 0;
+  const pEst = probPartidoConVariabilidad(pA, pB, bo3, sigma, sc);
   const formaDif = M.gammaForma * (A.forma - B.forma);
   const pEloBase = probElo(eA.eloCombinado, eB.eloCombinado);
   const pElo = sigm(logit(clamp(pEloBase, 1e-4, 1 - 1e-4)) + formaDif);
-  const objetivo = sigm(M.pesoElo * logit(pElo) + (1 - M.pesoElo) * logit(clamp(pEst, 1e-4, 1 - 1e-4)));
+  const objetivo = sigm((M.escalaVictoria ?? 1) * (M.pesoElo * logit(pElo) + (1 - M.pesoElo) * logit(clamp(pEst, 1e-4, 1 - 1e-4))));
   const lA = logit(pA);
   const lB = logit(pB);
-  const d = resolver((x) => probPartidoConVariabilidad(sigm(lA + x), sigm(lB - x), bo3, sigma), objetivo, -2, 2);
+  const d = resolver((x) => probPartidoConVariabilidad(sigm(lA + x), sigm(lB - x), bo3, sigma, sc), objetivo, -2, 2);
   pA = sigm(lA + d);
   pB = sigm(lB - d);
-  const pFormato = ctx.formato.id === bo3.id ? objetivo : probPartidoConVariabilidad(pA, pB, ctx.formato, sigma);
+  const pFormato = ctx.formato.id === bo3.id ? objetivo : probPartidoConVariabilidad(pA, pB, ctx.formato, sigma, sc);
 
   const multAcesA = medias.acesC > 0 ? eB.acesC / medias.acesC : 1;
   const multAcesB = medias.acesC > 0 ? eA.acesC / medias.acesC : 1;
   const sa = componentesSaque(pA, eA.primeros, eA.ganados1, eA.ganados2, eA.aces * multAcesA * cal.aces, eA.dobles * cal.dobles, M.rhoAce2);
   const sb = componentesSaque(pB, eB.primeros, eB.ganados1, eB.ganados2, eB.aces * multAcesB * cal.aces, eB.dobles * cal.dobles, M.rhoAce2);
   return {
-    params: { a: sa, b: sb, sigma, sigmaAces: M.sigmaAces },
+    params: { a: sa, b: sb, sigma, sigmaComun: sc, sigmaAces: M.sigmaAces },
     detalle: { estA: eA, estB: eB, pElo, pEstadisticas: pEst, pObjetivoBo3: objetivo, pFormato, pSaqueA: pA, pSaqueB: pB, calibracion: cal },
   };
 }

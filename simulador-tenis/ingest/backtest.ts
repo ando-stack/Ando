@@ -60,7 +60,7 @@ const p1 = (x: number) => `${(100 * x).toFixed(1)} %`;
 function main() {
   const t0 = Date.now();
   const partidos = cargarHistoricoCache();
-  const base = construirParams(cargarCalibracion(), mediasDesde(partidos, dias(`${TEMPORADA - 3}-01-01`), dias(`${TEMPORADA}-01-01`)));
+  const base = construirParams(cargarCalibracion(TEMPORADA - 1), mediasDesde(partidos, dias(`${TEMPORADA - 3}-01-01`), dias(`${TEMPORADA}-01-01`)));
   const { casos, M } = recolectar(partidos, base, TEMPORADA, { desdeStats: dias(`${TEMPORADA - 2}-01-01`) });
   log(`Backtest ${TEMPORADA}: ${casos.length} partidos; parámetros ${base.version}`);
 
@@ -149,7 +149,7 @@ Generado automáticamente por \`npm run backtest\` el ${new Date().toISOString()
 - **Sin mirar el futuro:** el histórico se recorre en orden y cada partido se predice con los perfiles, el Elo y la forma calculados sólo con partidos anteriores. Las medias del circuito se calculan con las tres temporadas previas.
 - **Parámetros:** \`${base.version}\` — calibrados con la temporada ${TEMPORADA - 1} (\`npm run calibrar\`), que no se solapa con la evaluada.
 - **Partidos:** ${preds.length.toLocaleString('es-ES')} para la probabilidad de victoria (cálculo exacto) y ${dist.length.toLocaleString('es-ES')} con estadísticas detalladas para las distribuciones (simulación punto a punto, ${S} simulaciones por partido; hasta ${POR_GRUPO} por circuito y superficie). Se excluyen retiradas y walkovers.
-- Peso del Elo ${M.pesoElo}, peso de la superficie en el Elo ${M.pesoSuperficieElo}, forma ${M.gammaForma}, σ = ${M.sigma}, σ aces = ${M.sigmaAces}.
+- Peso del Elo ${M.pesoElo}, escala del logit ${M.escalaVictoria}, peso de la superficie en el Elo ${M.pesoSuperficieElo}, forma ${M.gammaForma}, σ dominancia = ${M.sigma}, σ común = ${M.sigmaComun}, σ aces = ${M.sigmaAces}.
 
 ## 1. Probabilidad de victoria
 

@@ -5,6 +5,17 @@ import { cargarMeta } from '../lib/datos';
 import { fechaHora, num, pct } from '../lib/formato';
 import type { MetaDatos } from '../lib/tiposDatos';
 
+const NOMBRE_COBERTURA: Record<string, string> = {
+  'M-ATP': 'ATP',
+  'M-CH': 'ATP Challenger',
+  'F-WTA': 'WTA',
+  'F-W125': 'WTA 125',
+  'M-ITF': 'ITF masculino',
+  'F-ITF': 'ITF femenino',
+  'M-OTRO': 'Copa Davis',
+  'F-OTRO': 'Billie Jean King Cup',
+};
+
 interface FilaValidacion {
   grupo: string;
   n: number;
@@ -81,7 +92,7 @@ export default function Acerca() {
           </table>
           <p className="mt-2 text-xs text-texto-3">
             Histórico: {meta.historico.partidos.toLocaleString('es-ES')} partidos desde {meta.historico.desde} ({meta.historico.conEstadisticas.toLocaleString('es-ES')} con estadísticas
-            detalladas). Último dato por circuito: {Object.entries(meta.historico.hasta).map(([k, v]) => `${k} ${v}`).join(' · ')}.
+            detalladas). Último partido por circuito: {Object.entries(meta.historico.hasta).map(([k, v]) => `${NOMBRE_COBERTURA[k] ?? k} ${v}`).join(' · ')}.
           </p>
         </Tarjeta>
       )}

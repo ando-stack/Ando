@@ -68,15 +68,46 @@ Formatos verificados (ver cabecera de `config/formatos.ts`): ATP y Challenger al
 
 ## 6. Variabilidad partido a partido
 
-En cada simulación el logit de la probabilidad de saque de cada jugador se desplaza con `N(0, σ²)` independientes (cubre tanto días buenos/malos como partidos más o menos dominados por el saque) y el ritmo de aces de cada jugador se multiplica por un lognormal de media 1 y desviación `σ_aces`. La probabilidad de victoria NO cambia por ello: el ajuste al Elo del apartado 3 ya integra esa variabilidad. Lo que cambia es la dispersión (más sorpresas en el número de juegos, sets y aces), y `σ` y `σ_aces` se eligen por log score del total de juegos y de aces.
+En cada simulación se sortean dos desplazamientos (en escala logit) de la probabilidad TOTAL de ganar un punto al saque:
+
+- **Dominancia del día** `D ~ N(0, σ²)`: el saque de A se desplaza `+D` y el de B `−D` (un jugador en buena forma saca y resta mejor a la vez). Hace los partidos más o menos desequilibrados.
+- **Condiciones del día** `C ~ N(0, σ_común²)`: el saque de ambos se desplaza `+C` (pista más rápida o lenta, viento, bolas). Cambia cuántos juegos al saque se ganan, no quién gana.
+
+El desplazamiento se reparte entre primer y segundo saque con un mismo `τ` (Newton, en cada simulación), de modo que el motor y el cálculo exacto usan exactamente la misma probabilidad total. Además, el ritmo de aces de cada jugador se multiplica por un lognormal de media 1 y desviación `σ_aces`.
+
+La probabilidad de victoria NO cambia por esta variabilidad: el ajuste al Elo del apartado 3 la integra (Gauss-Hermite de 10 nodos en `D` y 3 en `C`; los tests comprueban que la simulación y la integral coinciden). Lo que cambia es la dispersión (más sorpresas en el número de juegos, sets y aces). `σ`, `σ_común` y `σ_aces` se eligen por log score del total de juegos y de aces.
+
+**Por qué dos componentes:** con desplazamientos independientes por jugador (primera versión), la calibración igualaba los breaks por partido pero los partidos simulados duraban ≈ 1,5 juegos más que los reales en todos los circuitos (y el log score seguía mejorando al subir σ hasta 0,3 sin quitar el sesgo): los breaks se repartían demasiado entre los dos jugadores. Con la dominancia separada, una σ de dominancia ≈ 0,2 iguala a la vez breaks y juegos en los 12 grupos de 2024 (diferencias ≤ 0,2 juegos; ver la tabla del apartado 7).
 
 ## 7. Calibración por circuito y superficie
 
-`npm run calibrar` usa la temporada **2024** (perfiles calculados sólo con datos anteriores a cada partido):
+`npm run calibrar` usa la temporada **2024** (18.535 partidos; perfiles, Elo y medias calculados sólo con datos anteriores a cada partido):
 
-1. Rejilla de `w_elo`, peso de la superficie en el Elo y `γ` de forma, minimizando el log loss de la probabilidad de victoria.
-2. Para cada circuito × superficie se simulan hasta 1.000 partidos con estadísticas (200 simulaciones cada uno) y se ajustan iterativamente: desplazamiento del saque (para igualar los **breaks** por partido, y con ellos juegos y tie-breaks), factor de **aces** y factor de **dobles faltas**, hasta que las medias simuladas coinciden con las reales.
-3. Rejilla de `σ` y `σ_aces`.
+1. **Probabilidad de victoria** (17.000+ partidos al mejor de 3): rejilla de `w_elo` ∈ [0,3; 1], peso de la superficie ∈ [0; 0,7] y `γ` de forma ∈ [0; 0,25], minimizando el log loss. Resultado: `w_elo = 0,8`, superficie `0,2`, `γ = 0` (la forma reciente no mejora al Elo, que ya pondera más lo reciente; se deja el término a 0 y se sigue mostrando en la ficha).
+2. **Medias por grupo** (circuito × superficie, hasta 1.000 partidos con estadísticas por grupo, 200 simulaciones por partido), 4 + 3 iteraciones de ajuste conjunto:
+   - desplazamiento del saque → iguala los **breaks** por partido;
+   - **σ de dominancia** del grupo → iguala el **total de juegos** (≈ −14 juegos por unidad de σ);
+   - factor de **aces** y de **dobles faltas** → iguala sus medias.
+3. **σ común** (rejilla 0,05 / 0,15 / 0,25) y **σ_aces** (0,2 / 0,3 / 0,4) por log score del total de juegos y de aces: 0,05 y 0,2.
+
+Medias de 2024 tras la calibración (simulado / real, por partido):
+
+| Grupo | Breaks | Aces | Dobles faltas | Juegos | σ dominancia |
+|---|---|---|---|---|---|
+| ATP · dura | 4,75 / 4,75 | 13,71 / 13,74 | 5,76 / 5,76 | 24,84 / 24,89 | 0,204 |
+| ATP · tierra | 5,73 / 5,74 | 8,20 / 8,20 | 4,97 / 4,97 | 24,54 / 24,56 | 0,165 |
+| ATP · hierba | 4,48 / 4,50 | 17,56 / 17,54 | 6,38 / 6,37 | 28,33 / 28,37 | 0,130 |
+| Challenger · dura | 5,16 / 5,17 | 10,28 / 10,28 | 6,09 / 6,08 | 22,52 / 22,54 | 0,222 |
+| Challenger · tierra | 6,30 / 6,31 | 6,05 / 6,04 | 6,05 / 6,04 | 22,27 / 22,28 | 0,198 |
+| Challenger · hierba | 4,34 / 4,34 | 13,53 / 13,50 | 5,39 / 5,40 | 23,84 / 23,86 | 0,190 |
+| WTA · dura | 7,41 / 7,42 | 5,71 / 5,71 | 7,68 / 7,68 | 21,70 / 21,72 | 0,205 |
+| WTA · tierra | 8,34 / 8,33 | 3,57 / 3,57 | 6,88 / 6,88 | 21,65 / 21,65 | 0,198 |
+| WTA · hierba | 6,56 / 6,55 | 6,89 / 6,88 | 7,18 / 7,15 | 22,23 / 22,20 | 0,202 |
+| WTA 125 · dura | 7,69 / 7,68 | 5,39 / 5,40 | 8,39 / 8,38 | 21,70 / 21,68 | 0,211 |
+| WTA 125 · tierra | 8,76 / 8,75 | 2,71 / 2,71 | 7,35 / 7,35 | 21,31 / 21,31 | 0,217 |
+| WTA 125 · hierba | 7,07 / 7,00 | 7,20 / 7,14 | 8,36 / 8,28 | 22,37 / 22,21 | 0,214 |
+
+Estas igualdades son en la muestra de calibración (2024); la comprobación fuera de muestra es el backtest (apartado 8).
 
 ## 8. Validación
 

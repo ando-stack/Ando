@@ -89,7 +89,11 @@ export function parsearCalendario(texto: string, anio: number): EntradaCalendari
       continue;
     }
     if (!semana || !/<br\s*\/?>/i.test(celda)) continue;
-    const lineas = celda.split(/<br\s*\/?>/i).map((l) => l.trim());
+    // Un <br> dentro de un enlace ([[Página|Nombre<br>largo]]) no separa líneas.
+    const lineas = celda
+      .replace(/\[\[[^\]]*\]\]/g, (m) => m.replace(/<br\s*\/?>/gi, ' '))
+      .split(/<br\s*\/?>/i)
+      .map((l) => l.trim());
     const lineaSup = lineas.find((l) => /\b(Hard|Clay|Grass|Carpet)\b/i.test(limpiar(l)) && /(–|-)/.test(l));
     if (!lineaSup) continue;
     const textoSup = limpiar(lineaSup);
@@ -116,6 +120,31 @@ export function parsearCalendario(texto: string, anio: number): EntradaCalendari
       categoria,
       paginaIndividual: enlaceInd ? enlaceInd[1].trim() : primero ? `${primero.destino} – Singles` : null,
     });
+  }
+  return res;
+}
+
+export interface TorneoCancelado {
+  semana: string;
+  nombre: string;
+  ciudad: string;
+}
+
+/** Sección «Cancelled tournaments» de las páginas de calendario. */
+export function parsearCancelados(texto: string, anio: number): TorneoCancelado[] {
+  const i = texto.search(/==\s*Cancell?ed tournaments\s*==/i);
+  if (i < 0) return [];
+  const resto = texto.slice(i);
+  const fin = resto.slice(3).search(/\n==[^=]/);
+  const bloque = fin > 0 ? resto.slice(0, fin + 3) : resto;
+  const res: TorneoCancelado[] = [];
+  for (const fila of bloque.split(/\n\|-[^\n]*\n/)) {
+    const m = fila.match(/^\|\s*([A-Za-z]+\s+\d{1,2}|\d{1,2}\s+[A-Za-z]+)\s*\|\|(.*)$/m);
+    if (!m) continue;
+    const semana = fechaSemana(m[1].trim(), anio);
+    if (!semana) continue;
+    const partes = m[2].split(/<br\s*\/?>/i).map((x) => limpiar(x));
+    res.push({ semana, nombre: partes[0] ?? '', ciudad: (partes[1] ?? '').split(',')[0].trim() });
   }
   return res;
 }
