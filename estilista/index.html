@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Percha</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: un probador. Arriba la semana como fila de días; cada día es un perchero con etiquetas de precio colgadas. */
+:root{
+  --bg:#F2F2F5; --surface:#FFFFFF; --ink:#18171D; --muted:#686673; --line:#DEDDE5; --tile:#ECECF1;
+  --accent:#2A44D4; --accent-ink:#FFFFFF; --accent-soft:#E5E8FB;
+  --sport:#12784F; --sport-soft:#DDF2E8; --warn:#A84A16; --warn-soft:#FBE9DD;
+  --ico-stroke:#2A2930;
+  --f-display:"Bricolage Grotesque","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111115; --surface:#1A1A20; --ink:#EDECF2; --muted:#A3A1AE; --line:#2E2D37; --tile:#26262E;
+    --accent:#8C9CFF; --accent-ink:#0E1030; --accent-soft:#232848;
+    --sport:#5BCB98; --sport-soft:#173A2A; --warn:#F2A374; --warn-soft:#3D2416;
+    --ico-stroke:#D9D8E0; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111115; --surface:#1A1A20; --ink:#EDECF2; --muted:#A3A1AE; --line:#2E2D37; --tile:#26262E;
+  --accent:#8C9CFF; --accent-ink:#0E1030; --accent-soft:#232848;
+  --sport:#5BCB98; --sport-soft:#173A2A; --warn:#F2A374; --warn-soft:#3D2416;
+  --ico-stroke:#D9D8E0; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+
+/* barra superior */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:20px 8px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.brand span{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-weight:600;font-size:14px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.tabs .count{font-family:var(--f-mono);font-size:12px;margin-left:4px;opacity:.8}
+
+/* botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);
+  padding:9px 16px;border-radius:999px;font-weight:600;font-size:14px;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:6px 12px;font-size:13px}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--warn);border-color:var(--warn)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* resumen */
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-block:14px 8px}
+.summary > div{background:var(--surface);padding:12px 16px;min-width:0}
+.summary .lab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.summary .val{font-family:var(--f-mono);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums}
+.summary .val.ok{color:var(--sport)}
+.summary .val.over{color:var(--warn)}
+.summary .act{display:flex;align-items:center;justify-content:center}
+@media (max-width:760px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.summary .act{grid-column:1/-1}}
+
+/* semana */
+.weekbar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-block:14px 6px}
+.weekbar button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.weekbar b{font-family:var(--f-display);font-size:18px}
+.weekbar small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.weekbar button.off{opacity:.4;cursor:default}
+.weekbar button.sport{border-color:var(--sport)}
+.weekbar button.sport small{color:var(--sport);font-weight:600}
+.weekbar button.today{box-shadow:inset 0 -3px 0 var(--accent)}
+
+.day{padding-block:26px 4px;border-top:1px solid var(--line);scroll-margin-top:12px}
+.day:first-of-type{border-top:0}
+.day-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.day-head h3{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.day-head .spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--tile);color:var(--muted);letter-spacing:.02em}
+.chip.sport{background:var(--sport-soft);color:var(--sport)}
+.chip.today{background:var(--accent-soft);color:var(--accent)}
+.day-total{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.tip{margin:12px 0 0;padding:10px 14px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 10px 10px 0;max-width:68ch;font-size:14px}
+.tip b{font-weight:700}
+.kit{margin-top:18px}
+.kit h4{font-size:15px;font-family:var(--f-body);font-weight:700;color:var(--sport);margin-bottom:10px;display:flex;gap:8px;align-items:center}
+
+/* etiquetas de prenda */
+.tags{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.tag{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.tag::before{content:"";position:absolute;top:10px;right:12px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}
+.tag.have{border-style:dashed}
+.tag-top{display:flex;gap:12px;align-items:flex-start;min-width:0}
+.ico{flex:none;width:58px;height:58px;border-radius:10px;background:var(--tile);display:grid;place-items:center}
+.ico svg{width:46px;height:46px}
+.tag-info{min-width:0;display:flex;flex-direction:column;gap:1px;padding-right:12px}
+.role{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tag-name{font-family:var(--f-body);font-size:14.5px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.store{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.price{font-family:var(--f-mono);font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}
+.tag.have .price{text-decoration:line-through;color:var(--muted);font-size:13px}
+.tag-actions{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.buy{display:flex;justify-content:center;align-items:center;gap:6px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:600;font-size:13.5px;padding:8px 10px;border-radius:9px}
+.buy:hover{filter:brightness(1.15)}
+.havebadge{display:flex;justify-content:center;align-items:center;gap:6px;background:var(--sport-soft);color:var(--sport);font-weight:700;font-size:13.5px;padding:8px 10px;border-radius:9px}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+.check input{width:17px;height:17px;accent-color:var(--sport);margin:0;flex:none}
+
+/* listas */
+.section-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-block:28px 12px}
+.section-title h2{font-size:26px;font-weight:800;letter-spacing:-.01em}
+.rows{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:grid;grid-template-columns:52px minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .ico{width:52px;height:52px}
+.row .ico svg{width:40px;height:40px}
+.row .price{text-align:right}
+.row-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:620px){.row{grid-template-columns:52px minmax(0,1fr) auto}.row-actions{grid-column:2/-1;justify-content:flex-start}}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:22px;color:var(--muted)}
+
+/* formulario armario */
+.addform{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) minmax(0,1fr) auto;gap:10px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.addform label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+.addform input,.addform select{border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:9px 10px;font-size:14px;width:100%;min-width:0}
+@media (max-width:700px){.addform{grid-template-columns:1fr 1fr}.addform label:first-child{grid-column:1/-1}.addform .btn{grid-column:1/-1}}
+
+/* respuestas */
+.answers{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.answers > div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.answers dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.answers dd{margin:4px 0 0;font-weight:600}
+.confirm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--warn-soft);color:var(--warn);padding:10px 14px;border-radius:12px;font-weight:600}
+
+/* cuestionario */
+.wizard{max-width:720px;margin:0 auto;padding-block:28px}
+.wiz-intro{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
+.wiz-intro h1{font-size:clamp(34px,7vw,52px);font-weight:800;letter-spacing:-.03em}
+.wiz-intro p{margin:0;color:var(--muted);max-width:56ch;font-size:16px}
+.progress{display:flex;gap:4px;margin-bottom:14px}
+.progress i{flex:1;height:4px;border-radius:4px;background:var(--line)}
+.progress i.on{background:var(--accent)}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px}
+.qstep{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.qcard h2{font-size:clamp(24px,4.5vw,32px);font-weight:700;letter-spacing:-.015em;margin:6px 0 4px}
+.qhelp{margin:0 0 18px;color:var(--muted)}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.opt b{font-size:15.5px}
+.opt span{font-size:13px;color:var(--muted)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt[aria-pressed="true"] b{color:var(--accent)}
+.dayopts{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dayopt{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 2px;display:flex;flex-direction:column;align-items:center;min-width:0}
+.dayopt b{font-family:var(--f-display);font-size:20px}
+.dayopt span{font-size:11px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dayopt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.dayopt.sportsel[aria-pressed="true"]{border-color:var(--sport);background:var(--sport-soft);color:var(--sport)}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.sub{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.sub h3{font-family:var(--f-body);font-size:16px;font-weight:700;margin-bottom:10px}
+.money{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.money label{font-weight:600;font-size:14px}
+.money .field{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);padding:0 12px}
+.money input{border:0;background:transparent;width:110px;padding:10px 4px;font-family:var(--f-mono);font-size:18px}
+.money input:focus{outline:none}
+.money .field:focus-within{border-color:var(--accent)}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px 6px 6px;font-size:14px;font-weight:600}
+.sw i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(128,128,128,.45)}
+.sw[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.qnav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px}
+.qerr{color:var(--warn);font-weight:600;font-size:14px;min-height:21px;margin-top:10px}
+
+.foot{margin-top:40px;color:var(--muted);font-size:13px;max-width:72ch}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;
+  background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px);text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}html{scroll-behavior:auto}}
+@media (max-width:520px){.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;border-radius:14px}.tabs button{padding:7px 2px;font-size:13px;border-radius:10px}.tabs .count{display:none}.buy .long{display:none}.day-head h3{font-size:28px}.tags{grid-template-columns:1fr 1fr;gap:8px}.tag{padding:10px}.ico{width:46px;height:46px}.ico svg{width:38px;height:38px}.tag-top{flex-direction:column;gap:8px}.tag-info{padding-right:0}.qcard{padding:18px}.dayopt b{font-size:17px}}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+const KEY = 'percha.v1';
+const DAYS = [
+  {k:'lun',n:'Lunes',s:'L'},{k:'mar',n:'Martes',s:'M'},{k:'mie',n:'Miércoles',s:'X'},
+  {k:'jue',n:'Jueves',s:'J'},{k:'vie',n:'Viernes',s:'V'},{k:'sab',n:'Sábado',s:'S'},{k:'dom',n:'Domingo',s:'D'}
+];
+const STYLES = {
+  cas:{n:'Casual', d:'Vaqueros, sudaderas y zapatillas. Cómodo para el día a día.'},
+  min:{n:'Minimalista', d:'Básicos, colores neutros y líneas limpias.'},
+  str:{n:'Streetwear', d:'Oversize, cargo, sudaderas y sneakers.'},
+  ele:{n:'Elegante', d:'Sastrería, camisas, punto fino y mocasines.'},
+  pre:{n:'Preppy', d:'Punto, cuadros, polos y aire universitario.'},
+  rom:{n:'Romántico / boho', d:'Volantes, flores, encaje y faldas midi.'},
+  roc:{n:'Rockero', d:'Negro, efecto piel, camisetas de grupos y botas.'},
+  ath:{n:'Sporty', d:'Chándal con estilo, sneakers y mucha comodidad.'}
+};
+// nombre, hex, neutro, grupo para "colores favoritos"
+const COLORS = {
+  blanco:['Blanco','#F7F7F4',1,'blanco'], crema:['Crema','#EFE6D2',1,'blanco'], negro:['Negro','#1E1F22',1,'negro'],
+  gris:['Gris','#9A9DA3',1,'gris'], beige:['Beige','#D9C7A7',1,'beige'], camel:['Camel','#B9875A',1,'beige'],
+  marron:['Marrón','#6E4A32',1,'marron'], marino:['Azul marino','#24314F',1,'marino'], vaquero:['Vaquero','#4F6E99',1,'vaquero'],
+  oliva:['Verde oliva','#6B6F3E',1,'verde'], dorado:['Dorado','#C9A54A',1,''], plata:['Plateado','#C4C7CC',1,''],
+  azulclaro:['Azul claro','#A8C3E0',0,'azulclaro'], verde:['Verde','#3F7D5A',0,'verde'], rosa:['Rosa','#E9A7BC',0,'rosa'],
+  rojo:['Rojo','#C63B35',0,'rojo'], burdeos:['Burdeos','#6E1F2E',0,'rojo'], lila:['Lila','#B9A3D9',0,'lila'], amarillo:['Amarillo','#E8C547',0,'amarillo']
+};
+const COLOR_GROUPS = [
+  ['negro','Negro','#1E1F22'],['blanco','Blanco y crema','#F7F7F4'],['gris','Gris','#9A9DA3'],['beige','Beige y camel','#CDB48E'],
+  ['marron','Marrón','#6E4A32'],['marino','Azul marino','#24314F'],['vaquero','Vaquero','#4F6E99'],['azulclaro','Azul claro','#A8C3E0'],
+  ['verde','Verde','#4E7A4C'],['rosa','Rosa','#E9A7BC'],['rojo','Rojo y burdeos','#B23A3A'],['lila','Lila','#B9A3D9'],['amarillo','Amarillo','#E8C547']
+];
+const enc = encodeURIComponent;
+const viaGoogle = site => q => 'https://www.google.com/search?q=' + enc('site:' + site + ' ' + q);
+const STORES = {
+  zara:{n:'Zara', u:q=>'https://www.zara.com/es/es/search?searchTerm=' + enc(q)},
+  hm:{n:'H&M', u:q=>'https://www2.hm.com/es_es/search-results.html?q=' + enc(q)},
+  pull:{n:'Pull&Bear', u:viaGoogle('pullandbear.com')},
+  bershka:{n:'Bershka', u:viaGoogle('bershka.com')},
+  stradi:{n:'Stradivarius', u:viaGoogle('stradivarius.com')},
+  mango:{n:'Mango', u:viaGoogle('shop.mango.com')},
+  massimo:{n:'Massimo Dutti', u:viaGoogle('massimodutti.com')},
+  springfield:{n:'Springfield', u:viaGoogle('myspringfield.com')},
+  uniqlo:{n:'Uniqlo', u:q=>'https://www.uniqlo.com/es/es/search?q=' + enc(q)},
+  decathlon:{n:'Decathlon', u:q=>'https://www.decathlon.es/es/search?Ntt=' + enc(q)},
+  nike:{n:'Nike', u:q=>'https://www.nike.com/es/w?q=' + enc(q)},
+  adidas:{n:'adidas', u:q=>'https://www.adidas.es/search?q=' + enc(q)},
+  asos:{n:'ASOS', u:q=>'https://www.asos.com/es/search/?q=' + enc(q)},
+  levis:{n:"Levi's", u:viaGoogle('levi.com')},
+  converse:{n:'Converse', u:viaGoogle('converse.com')},
+  vans:{n:'Vans', u:viaGoogle('vans.es')},
+  nb:{n:'New Balance', u:viaGoogle('newbalance.es')},
+  drm:{n:'Dr. Martens', u:viaGoogle('drmartens.com')},
+  carhartt:{n:'Carhartt WIP', u:viaGoogle('carhartt-wip.com')},
+  eastpak:{n:'Eastpak', u:viaGoogle('eastpak.com')},
+  casio:{n:'Casio', u:viaGoogle('casio.com')},
+  own:{n:'Tu armario', u:null}
+};
+const CAT = {
+  top:'Arriba', dress:'Vestido', bottom:'Abajo', outer:'Abrigo / chaqueta', shoes:'Calzado', acc:'Complemento',
+  stop:'Deporte · arriba', sbot:'Deporte · abajo', sshoe:'Deporte · zapatillas', sout:'Deporte · sudadera'
+};
+const CAT_ORDER = ['outer','top','dress','bottom','shoes','acc','sout','stop','sbot','sshoe'];
+
+// Catálogo: nombre | categoría | público (m=mujer, h=hombre, u=unisex) | estilos | color | precio € | tienda | temporada (c=calor, t=entretiempo y frío, f=frío) | búsqueda
+const RAW = `
+Camiseta básica de algodón|top|u|cas min str|blanco|7.99|hm||camiseta algodón regular fit blanca
+Camiseta básica negra|top|u|cas min roc str|negro|7.99|hm||camiseta algodón negra
+Camiseta oversize|top|u|str cas ath|gris|12.99|pull||camiseta oversize gris
+Camiseta oversize con estampado gráfico|top|u|str roc|negro|15.99|bershka||camiseta oversize estampado
+Camiseta de grupo vintage|top|u|roc str|negro|17.99|pull||camiseta grupo música
+Camiseta manga larga de rayas|top|u|pre cas min|marino|15.99|hm||camiseta rayas manga larga
+Camiseta Supima de algodón|top|u|min ele cas|crema|14.90|uniqlo||camiseta supima algodón
+Sudadera con capucha|top|u|str ath cas|gris|25.99|pull|t|sudadera capucha gris
+Sudadera cuello redondo|top|u|cas pre ath min|marino|19.90|uniqlo|t|sudadera
+Sudadera universitaria|top|u|pre str cas|burdeos|29.99|hm|t|sudadera college
+Jersey de punto trenzado|top|u|cas rom pre|crema|29.95|zara|t|jersey punto ochos
+Jersey cuello alto|top|u|min ele roc|negro|29.90|uniqlo|t|jersey cuello alto
+Polo de piqué|top|u|pre ele cas|blanco|19.99|springfield||polo piqué
+Camisa vaquera|top|u|cas roc|vaquero|29.95|zara||camisa denim
+Camisa de franela de cuadros|top|u|cas roc str|rojo|25.99|pull|t|camisa cuadros franela
+Camisa Oxford|top|u|pre ele cas|azulclaro|29.90|uniqlo||camisa oxford
+Cárdigan de punto|top|u|pre rom min|gris|29.99|hm|t|cárdigan punto
+Vaquero recto|bottom|u|cas str min|vaquero|29.95|zara||jeans straight
+Vaquero baggy|bottom|u|str cas|vaquero|35.99|bershka||jeans baggy
+Vaquero negro|bottom|u|roc min cas|negro|29.99|pull||jeans negros
+Levi's 501 Original|bottom|u|cas roc pre|vaquero|110|levis||501 original
+Pantalón cargo|bottom|u|str cas|beige|29.99|pull||pantalón cargo beige
+Pantalón cargo negro|bottom|u|str roc|negro|29.99|bershka||pantalón cargo negro
+Pantalón parachute|bottom|u|str ath|oliva|32.99|bershka||pantalón parachute
+Jogger de felpa|bottom|u|ath str cas|gris|19.99|hm||jogger felpa
+Pantalón chino|bottom|u|pre ele cas min|beige|29.99|springfield||chino
+Bermuda vaquera|bottom|u|cas str|vaquero|22.99|pull|c|bermuda vaquera
+Bermuda chino|bottom|u|pre cas|beige|19.99|springfield|c|bermuda chino
+Chaqueta vaquera|outer|u|cas roc str|vaquero|39.95|zara|t|cazadora denim
+Bomber|outer|u|str cas roc|negro|39.99|pull|t|bomber
+Sobrecamisa de pana|outer|u|cas min pre|camel|35.95|zara|t|sobrecamisa pana
+Plumífero corto|outer|u|str cas ath|negro|59.99|pull|f|plumífero
+Parka|outer|u|cas str|oliva|69.99|hm|f|parka
+Chaqueta cortavientos Adicolor|outer|u|ath str|negro|80|adidas|t|adicolor chaqueta
+Abrigo largo de paño|outer|u|ele min|gris|89.95|zara|f|abrigo paño
+Chaqueta de plumas ultraligera|outer|u|min cas|marino|59.90|uniqlo|t|ultra light down
+Cazadora biker efecto piel|outer|u|roc str|negro|49.99|bershka|t|cazadora efecto piel
+Chaqueta Detroit|outer|u|str cas|marron|199|carhartt|t|detroit jacket
+Converse Chuck Taylor All Star|shoes|u|cas roc str min|blanco|75|converse||chuck taylor all star
+Converse Chuck Taylor negras|shoes|u|roc cas|negro|75|converse||chuck taylor all star negro
+Vans Old Skool|shoes|u|str roc cas|negro|80|vans||old skool
+adidas Samba OG|shoes|u|str cas min pre|blanco|120|adidas||samba og
+adidas Gazelle|shoes|u|str cas pre|verde|110|adidas||gazelle
+Nike Air Force 1 '07|shoes|u|str cas ath|blanco|119.99|nike||air force 1
+New Balance 530|shoes|u|ath str cas|plata|120|nb||530
+Zapatillas de lona|shoes|u|cas min|blanco|19.99|pull||zapatillas lona blancas
+Zapatillas retro de running|shoes|u|ath str cas|gris|29.99|hm||zapatillas retro
+Dr. Martens 1460|shoes|u|roc str|negro|199|drm|t|1460
+Botas Chelsea|shoes|u|ele min roc|negro|49.95|zara|t|botas chelsea
+Botas de montaña urbanas|shoes|u|str cas|marron|45.99|pull|t|botas montaña
+Mocasines|shoes|u|pre ele min|negro|39.95|zara||mocasines
+Gorra de béisbol|acc|u|str cas ath|negro|9.99|hm||gorra
+Gorro de punto|acc|u|str cas roc|gris|9.99|pull|t|gorro punto
+Bufanda de punto|acc|u|cas pre rom|camel|12.99|hm|f|bufanda
+Bandolera de nylon|acc|u|str ath min|negro|15.99|pull||bandolera
+Tote bag de lona|acc|u|cas min rom|crema|9.99|hm||tote bag
+Mochila Padded Pak'r|acc|u|cas str pre|negro|55|eastpak||padded pakr
+Cinturón de piel|acc|u|ele pre roc min|negro|15.95|zara||cinturón piel
+Reloj digital vintage|acc|u|min str pre|plata|39|casio||A168
+Gafas de sol|acc|u|cas str ele|negro|12.99|hm|c|gafas de sol
+Top básico de canalé|top|m|min cas|blanco|9.99|stradi||top canalé
+Top de tirantes satinado|top|m|ele rom|negro|19.99|mango|c|top satinado
+Body de manga larga|top|m|min ele roc|negro|15.99|bershka||body manga larga
+Blusa de volantes|top|m|rom ele|blanco|25.99|mango||blusa volantes
+Blusa estampado floral|top|m|rom|rosa|22.99|stradi||blusa flores
+Camisa de popelín oversize|top|m|min ele pre cas|blanco|29.95|zara||camisa popelín
+Top de encaje|top|m|rom ele|crema|19.99|stradi||top encaje
+Jersey de punto suave|top|m|rom cas|rosa|25.99|stradi|t|jersey punto suave
+Jersey de lana merino cuello pico|top|m|ele min pre|camel|49.95|massimo|t|jersey merino pico
+Cárdigan corto de botones|top|m|rom pre|lila|25.99|stradi|t|cárdigan corto
+Chaleco de punto|top|m|pre|gris|22.99|mango|t|chaleco punto
+Top corsé|top|m|rom roc ele|negro|22.99|bershka||top corsé
+Baby tee con estampado|top|m|str cas|blanco|9.99|bershka||baby tee
+Sudadera cropped|top|m|ath str|gris|19.99|bershka|t|sudadera cropped
+Vestido midi satinado|dress|m|ele rom min|negro|39.95|zara||vestido satinado midi
+Vestido camisero vaquero|dress|m|cas|vaquero|35.99|mango||vestido camisero denim
+Vestido midi de flores|dress|m|rom|azulclaro|29.99|stradi||vestido midi flores
+Vestido de punto canalé|dress|m|min cas ele|gris|29.99|hm|t|vestido punto
+Vestido corto básico|dress|m|min roc ele|negro|19.99|hm||vestido corto negro
+Vestido boho estampado|dress|m|rom|burdeos|35.99|mango||vestido estampado boho
+Pantalón wide leg de traje|bottom|m|ele min pre|negro|35.95|zara||pantalón wide leg
+Pantalón de traje fluido|bottom|m|ele min|beige|35.99|mango||pantalón traje
+Falda midi satinada|bottom|m|ele rom min|camel|29.99|mango||falda satinada
+Falda vaquera corta|bottom|m|cas str roc|vaquero|19.99|pull||falda vaquera
+Falda plisada|bottom|m|pre ath|gris|17.99|stradi||falda plisada
+Falda larga boho|bottom|m|rom|crema|25.99|stradi||falda larga
+Vaquero mom fit|bottom|m|cas str rom|vaquero|29.99|stradi||jeans mom
+Vaquero flare|bottom|m|cas rom roc|vaquero|29.99|bershka||jeans flare
+Falda efecto piel|bottom|m|roc ele|negro|25.99|bershka||falda efecto piel
+Short vaquero|bottom|m|cas str|vaquero|17.99|pull|c|short vaquero
+Pantalón flare de punto|bottom|m|ath cas|negro|19.99|bershka||pantalón flare
+Blazer oversize|outer|m|ele min pre|negro|49.95|zara|t|blazer oversize
+Blazer de cuadros|outer|m|pre ele|gris|45.99|mango|t|blazer cuadros
+Gabardina|outer|m|ele pre min rom|beige|69.99|mango|t|gabardina trench
+Abrigo largo|outer|m|ele min|camel|89.99|mango|f|abrigo lana
+Chaqueta de borreguito|outer|m|cas rom|crema|39.99|stradi|f|chaqueta borreguito
+Bailarinas|shoes|m|rom ele pre min|negro|29.95|zara||bailarinas
+Merceditas con plataforma|shoes|m|pre roc rom|negro|35.99|bershka||mary jane plataforma
+Botas cowboy|shoes|m|rom roc|marron|49.99|stradi|t|botas cowboy
+Botines de tacón ancho|shoes|m|ele min|negro|45.99|mango|t|botines tacón
+Sandalias planas|shoes|m|rom cas min|marron|19.99|pull|c|sandalias planas
+Zapatillas de plataforma|shoes|m|str cas|blanco|29.99|bershka||zapatillas plataforma
+Botas altas|shoes|m|ele roc|negro|59.95|zara|f|botas altas
+Mocasines con plataforma|shoes|m|pre roc min|negro|39.99|stradi||mocasines plataforma
+Bolso de hombro|acc|m|ele min rom|negro|25.99|mango||bolso hombro
+Collar dorado|acc|m|ele rom min|dorado|9.99|stradi||collar dorado
+Pañuelo estampado|acc|m|rom pre|rojo|7.99|hm||pañuelo
+Bolso tote de piel|acc|m|min ele pre|camel|35.99|mango||bolso shopper
+Aros dorados|acc|m|ele min str rom|dorado|7.99|stradi||pendientes aro
+Polo de punto|top|h|ele min pre|beige|29.95|zara||polo punto
+Camisa de lino|top|h|ele min cas|blanco|29.95|zara|c|camisa lino
+Camisa estampada de manga corta|top|h|str cas|verde|25.99|pull|c|camisa estampada manga corta
+Camiseta boxy de algodón grueso|top|h|str min|crema|17.99|pull||camiseta boxy fit
+Jersey de lana merino|top|h|ele min pre|marino|49.95|massimo|t|jersey merino
+Camiseta henley manga larga|top|h|cas roc|gris|15.99|springfield||henley
+Jersey con cremallera|top|h|pre ele cas|gris|35.99|springfield|t|jersey cuello cremallera
+Camisa de rayas|top|h|pre ele|azulclaro|29.99|springfield||camisa rayas
+Pantalón de pinzas|bottom|h|ele min pre|gris|39.95|zara||pantalón pinzas
+Chino slim|bottom|h|pre ele|marino|29.99|springfield||chino slim
+Vaquero slim|bottom|h|cas min|vaquero|29.99|springfield||vaquero slim
+Pantalón carpenter|bottom|h|str|marron|39.99|pull||pantalón carpenter
+Blazer|outer|h|ele pre|marino|69.95|zara|t|blazer
+Abrigo de lana|outer|h|ele min|camel|99.95|zara|f|abrigo lana
+Chaqueta Harrington|outer|h|pre cas|beige|49.99|springfield|t|harrington
+Chaleco acolchado|outer|h|pre cas ath|marino|35.99|springfield|t|chaleco acolchado
+Cazadora de ante|outer|h|roc cas|marron|69.99|pull|t|cazadora ante
+Zapatos derby de piel|shoes|h|ele pre|negro|49.95|zara||zapatos derby
+Botas desert|shoes|h|cas pre min|beige|45.95|zara|t|botas desert
+Zapatillas de piel minimalistas|shoes|h|min ele cas|blanco|39.95|zara||zapatillas piel blancas
+Náuticos|shoes|h|pre|marron|39.99|springfield|c|náuticos
+Cadena plateada|acc|h|str roc|plata|12.99|pull||cadena
+Camiseta técnica de fitness|stop|u|cas min str ele pre rom roc ath|negro|6.99|decathlon||camiseta fitness domyos
+Camiseta transpirable de running|stop|u|cas min str ele pre rom roc ath|blanco|7.99|decathlon||camiseta running kalenji
+Camiseta Nike Dri-FIT|stop|u|cas min str ele pre rom roc ath|negro|30|nike||camiseta dri-fit
+Camiseta adidas Train Essentials|stop|u|cas min str ele pre rom roc ath|blanco|25|adidas||train essentials camiseta
+Camiseta deportiva DryMove|stop|u|cas min str ele pre rom roc ath|gris|9.99|hm||drymove camiseta
+Camiseta térmica de manga larga|stop|u|cas min str ele pre rom roc ath|negro|9.99|decathlon|t|camiseta térmica
+Mallas deportivas|sbot|m|cas min str ele pre rom roc ath|negro|12.99|decathlon||mallas fitness
+Leggings DryMove|sbot|m|cas min str ele pre rom roc ath|negro|17.99|hm||leggings drymove
+Biker deportivo|sbot|m|cas min str ele pre rom roc ath|negro|9.99|decathlon|c|mallas cortas
+Pantalón corto deportivo|sbot|u|cas min str ele pre rom roc ath|negro|7.99|decathlon||pantalón corto fitness
+Pantalón de chándal|sbot|u|cas min str ele pre rom roc ath|gris|14.99|decathlon||pantalón chándal
+Pantalón adidas Tiro|sbot|u|cas min str ele pre rom roc ath|negro|40|adidas||pantalón tiro
+Pantalón corto Nike Dri-FIT|sbot|u|cas min str ele pre rom roc ath|negro|30|nike||pantalón corto dri-fit
+Pantalón Nike Club Fleece|sbot|u|cas min str ele pre rom roc ath|gris|55|nike|t|club fleece pantalón
+Zapatillas de running Run Active|sshoe|u|cas min str ele pre rom roc ath|gris|34.99|decathlon||zapatillas run active
+Nike Revolution 7|sshoe|u|cas min str ele pre rom roc ath|negro|64.99|nike||revolution 7
+adidas Runfalcon 5|sshoe|u|cas min str ele pre rom roc ath|blanco|55|adidas||runfalcon 5
+New Balance Fresh Foam Arishi|sshoe|u|cas min str ele pre rom roc ath|gris|85|nb||arishi
+Sudadera deportiva con capucha|sout|u|cas min str ele pre rom roc ath|gris|14.99|decathlon|t|sudadera capucha fitness
+Chaqueta de chándal adidas Tiro|sout|u|cas min str ele pre rom roc ath|negro|55|adidas|t|chaqueta tiro
+Chaqueta cortavientos de running|sout|u|cas min str ele pre rom roc ath|negro|19.99|decathlon|t|cortavientos running
+Sudadera Nike Club Fleece|sout|u|cas min str ele pre rom roc ath|gris|55|nike|t|club fleece sudadera
+`;
+const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const CATALOG = RAW.trim().split('\n').map(line => {
+  const [name,cat,g,st,color,price,store,season,q] = line.split('|');
+  return {id: slug(store + ' ' + name + ' ' + color), name, cat, g, st: st.split(' '), color, price: +price, store, season: season || '', q: q || name};
+});
+
+// ---------- estado ----------
+function blank(){ return {v:1, answers:null, owned:{}, custom:[], plan:null, tab:'semana'}; }
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && s.v === 1) return Object.assign(blank(), s);
+  }catch(e){}
+  return blank();
+}
+let S = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+function allItems(){ return CATALOG.concat(S.custom || []); }
+function byId(id){ return allItems().find(i => i.id === id); }
+const isNeutral = c => !!(COLORS[c] && COLORS[c][2]);
+const colorHex = c => (COLORS[c] || ['', '#999'])[1];
+const euro = n => n.toLocaleString('es-ES', {style:'currency', currency:'EUR', minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2});
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+function seasonOk(it, w){
+  const s = it.season;
+  if (!s) return true;
+  if (w === 'calor') return s === 'c';
+  if (w === 'templado') return s === 't';
+  return s === 't' || s === 'f';
+}
+function genderOk(it, a){ return a.gender === 'x' || it.g === 'u' || it.g === a.gender; }
+
+function scheduleOf(a){
+  const isSport = d => a.sport && a.sportDays.includes(d);
+  const show = DAYS.map(d => d.k).filter(d => a.days.includes(d) || isSport(d));
+  const main = show.filter(d => !isSport(d) || a.sportMode === 'change');
+  const sport = show.filter(isSport);
+  return {show, main, sport, isSport};
+}
+
+// ---------- la estilista: elegir prendas ----------
+const WEIGHT = {top:1, dress:1.6, bottom:1.5, outer:2.4, shoes:2.6, acc:.6, stop:.5, sbot:.7, sshoe:1.8, sout:1};
+const MAIN_CATS = ['top','dress','bottom','outer','shoes','acc'];
+const SPORT_CATS = ['stop','sbot','sshoe','sout'];
+
+function generatePlan(a, seed){
+  const rng = mulberry32(seed);
+  const sch = scheduleOf(a);
+  const nM = sch.main.length, nS = sch.sport.length, w = a.weather;
+  const slots = [];
+  const add = (cat, req) => slots.push({cat, req});
+  if (nM){ add('top',1); add('bottom',1); add('shoes',1); if (w === 'frio') add('outer',1); }
+  if (nS){ add('stop',1); add('sbot',1); add('sshoe',1); }
+  if (nM){
+    const nTops = Math.min(nM, 5), nBot = nM <= 2 ? 1 : nM <= 4 ? 2 : 3;
+    const dress = a.gender !== 'h' && nM >= 3;
+    for (let i = 1; i < nTops - (dress ? 1 : 0); i++) add('top',0);
+    if (dress) add('dress',0);
+    for (let i = 1; i < nBot; i++) add('bottom',0);
+    if (w === 'templado') add('outer',0);
+  }
+  if (nS && w !== 'calor') add('sout',0);
+  if (nS >= 2) add('stop',0);
+  if (nS >= 3) add('sbot',0);
+  if (nM >= 4) add('shoes',0);
+  if (nM) add('acc',0);
+  if (nM && a.budget >= 300) add('acc',0);
+
+  // primero lo que ya tienes: no cuesta nada
+  const picks = [];
+  const relevant = it => (MAIN_CATS.includes(it.cat) && nM) || (SPORT_CATS.includes(it.cat) && nS);
+  const owned = allItems().filter(it => S.owned[it.id] && relevant(it) && seasonOk(it, w));
+  owned.forEach(it => {
+    let idx = slots.findIndex(s => s.cat === it.cat);
+    if (idx < 0 && it.cat === 'dress') idx = slots.findIndex(s => s.cat === 'top' && !s.req);
+    if (idx >= 0) slots.splice(idx, 1);
+    picks.push(it);
+  });
+
+  const ordered = slots.filter(s => s.req).concat(slots.filter(s => !s.req));
+  let remaining = a.budget;
+  const picked = new Set(picks.map(p => p.id));
+  const firstWord = it => it.name.split(' ')[0].toLowerCase();
+
+  function score(it, cap){
+    let s = 0;
+    const ov = it.st.filter(x => a.styles.includes(x)).length;
+    s += ov ? 2.5 + ov * 1.2 : -5;
+    if (a.colors.length && COLORS[it.color] && a.colors.includes(COLORS[it.color][3])) s += 1.6;
+    s += Math.min(it.price / Math.max(cap, 1), 1) * 1.2;
+    s += rng() * 1.8;
+    const same = picks.filter(p => p.cat === it.cat);
+    if (same.some(p => p.color === it.color)) s -= 2.2;
+    if (same.some(p => firstWord(p) === firstWord(it))) s -= 1.2;
+    if (!isNeutral(it.color)){
+      const loud = picks.filter(p => ['top','dress','bottom','outer'].includes(p.cat) && !isNeutral(p.color)).length;
+      s -= loud * 0.9;
+      if (it.cat === 'bottom' && !picks.some(p => p.cat === 'bottom' && isNeutral(p.color))) s -= 3;
+      if (it.cat === 'shoes' && !picks.some(p => p.cat === 'shoes' && isNeutral(p.color))) s -= 3;
+    }
+    picks.filter(p => p.store === it.store).forEach(() => { s -= 0.25; });
+    return s;
+  }
+
+  ordered.forEach((slot, k) => {
+    const restW = ordered.slice(k).reduce((t, s) => t + WEIGHT[s.cat], 0);
+    const cap = remaining * WEIGHT[slot.cat] / restW;
+    const cands = CATALOG.filter(it => it.cat === slot.cat && genderOk(it, a) && seasonOk(it, w) && !picked.has(it.id));
+    if (!cands.length) return;
+    const scored = cands.map(it => ({it, s: score(it, cap)}));
+    const pool = scored.filter(x => x.it.price <= Math.min(cap * 1.5, remaining));
+    let choice = null;
+    if (pool.length) choice = pool.reduce((b, x) => x.s > b.s ? x : b);
+    else if (slot.req){
+      // no llega: lo más barato, y entre precios parecidos el que más pega con tu estilo
+      const minP = Math.min(...scored.map(x => x.it.price));
+      const cheap = scored.filter(x => x.it.price <= minP * 1.2 + 2);
+      choice = cheap.reduce((b, x) => x.s > b.s ? x : b);
+    }
+    if (!choice) return;
+    picks.push(choice.it); picked.add(choice.it.id); remaining -= choice.it.price;
+  });
+
+  return {seed, items: picks.map(p => p.id), preOwned: picks.filter(p => S.owned[p.id]).map(p => p.id), shifts: {}, created: Date.now()};
+}
+
+// ---------- la estilista: combinar por días ----------
+function wardrobe(plan){
+  const W = {top:[], bottom:[], shoes:[], outer:[], acc:[], stop:[], sbot:[], sshoe:[], sout:[]};
+  plan.items.map(byId).filter(Boolean).forEach(it => {
+    const c = it.cat === 'dress' ? 'top' : it.cat;
+    if (W[c]) W[c].push(it);
+  });
+  return W;
+}
+const rot = (arr, n) => arr.length ? arr.slice(n % arr.length).concat(arr.slice(0, n % arr.length)) : arr;
+const clash = (x, y) => x && y && !isNeutral(x.color) && !isNeutral(y.color);
+
+function mainOutfit(W, i, s, used, a){
+  if (!W.top.length) return null;
+  const tops = rot(W.top, i + s), bots = rot(W.bottom, i + s);
+  let best = null, fallback = null;
+  for (const t of tops){
+    const options = t.cat === 'dress' || !bots.length ? [null] : bots;
+    for (const b of options){
+      if (clash(t, b)) continue;
+      const key = t.id + '|' + (b ? b.id : '');
+      if (!fallback) fallback = {t, b, key};
+      if (!used.has(key)){ best = {t, b, key}; break; }
+    }
+    if (best) break;
+  }
+  const pick = best || fallback || {t: tops[0], b: bots[0] || null, key: tops[0].id};
+  const lead = [pick.t, pick.b].find(x => x && !isNeutral(x.color));
+  const shoes = rot(W.shoes, i + s).find(x => !clash(x, lead)) || W.shoes[0] || null;
+  const outer = a.weather !== 'calor' ? (rot(W.outer, i + s).find(x => !clash(x, lead)) || W.outer[0] || null) : null;
+  const acc = W.acc.length && (i + s) % 2 === 0 ? rot(W.acc, Math.floor((i + s) / 2))[0] : null;
+  return {key: pick.key, pieces: [outer, pick.t, pick.b, shoes, acc].filter(Boolean).map(x => x.id)};
+}
+function sportKit(W, j, s, a){
+  const pieces = [
+    a.weather !== 'calor' ? rot(W.sout, j + s)[0] : null,
+    rot(W.stop, j + s)[0], rot(W.sbot, j + s)[0], rot(W.sshoe, j + s)[0]
+  ].filter(Boolean).map(x => x.id);
+  return pieces.length ? {pieces} : null;
+}
+
+const TIPS = {
+  cas:['Remete solo la parte de delante de la camiseta: estiliza sin esfuerzo.','Dale un par de vueltas al bajo del vaquero si llevas zapatillas.','Si arriba vas ancho, abajo algo más recto, y al revés.'],
+  min:['Pocos colores y bien planchado: en este estilo el truco es el ajuste.','Combina tonos de la misma familia (beige, crema, camel) para un look caro.','Nada de logos grandes hoy: deja que hablen las formas.'],
+  str:['Juega con volúmenes: oversize arriba y zapatilla con presencia abajo.','Deja que asome un poco la camiseta por debajo de la sudadera.','Una gorra o una bandolera cruzada terminan el look.'],
+  ele:['Mete la parte de arriba por dentro y marca cintura con un cinturón.','Zapato limpio y prenda sin arrugas: es lo que más se nota.','Remanga un poco las mangas para que no quede tan rígido.'],
+  pre:['Punto sobre camisa con el cuello por fuera: preppy de manual.','Calcetín blanco visible con mocasín o zapatilla clásica.','Mezcla una prenda con estampado (rayas, cuadros) con el resto liso.'],
+  rom:['Suma un complemento dorado pequeño: aros o un collar fino.','Equilibra una prenda con volante con otra sencilla.','Las faldas midi quedan genial con bota o con bailarina.'],
+  roc:['Total black con una textura distinta (efecto piel, vaquero lavado).','Las botas son el centro del look: pantalón por dentro o por fuera, pero sin que arrugue.','Remanga la chaqueta y añade una cadena o cinturón.'],
+  ath:['Mezcla una prenda deportiva con otra de calle para que no parezca que vas al gimnasio.','Zapatilla blanca limpia: sube cualquier chándal.','Juega con conjuntos del mismo color de arriba a abajo.'],
+  sport:['Mete en la mochila una camiseta de recambio y desodorante.','Átate bien las zapatillas y lleva el pelo recogido si lo tienes largo.','Bebe agua antes de clase: lleva botella.'],
+  change:['Ropa de deporte en una bolsa aparte para que no se arrugue el resto.','Lleva una camiseta extra para cambiarte después de la clase.']
+};
+function tipFor(day, outfit, idx, a){
+  if (outfit){
+    const loud = outfit.pieces.map(byId).filter(x => x && !isNeutral(x.color) && x.cat !== 'acc' && x.cat !== 'shoes')[0];
+    if (loud && idx % 2 === 0) return 'El color lo pone tu <b>' + esc(loud.name.toLowerCase()) + '</b>. El resto en neutros para que destaque.';
+    const st = a.styles[idx % a.styles.length];
+    const list = TIPS[st] || TIPS.cas;
+    return list[(idx + (S.plan.seed % 7)) % list.length];
+  }
+  return TIPS.sport[idx % TIPS.sport.length];
+}
+
+function buildWeek(){
+  const a = S.answers, plan = S.plan, W = wardrobe(plan), sch = scheduleOf(a);
+  const out = {};
+  const used = new Set();
+  // primera pasada: sin cambios, evitando repetir la misma combinación
+  sch.show.forEach(d => {
+    const mi = sch.main.indexOf(d), si = sch.sport.indexOf(d);
+    const main = mi >= 0 ? mainOutfit(W, mi, 0, used, a) : null;
+    if (main) used.add(main.key);
+    out[d] = {main, kit: si >= 0 ? sportKit(W, si, 0, a) : null, mi, si};
+  });
+  // días con "otra combinación"
+  sch.show.forEach(d => {
+    const sh = plan.shifts[d] || 0;
+    if (!sh) return;
+    const o = out[d];
+    const others = new Set(sch.show.filter(x => x !== d && out[x].main).map(x => out[x].main.key));
+    if (o.mi >= 0) o.main = mainOutfit(W, o.mi, sh, others, a);
+    if (o.si >= 0) o.kit = sportKit(W, o.si, sh, a);
+  });
+  sch.show.forEach((d, n) => {
+    const o = out[d];
+    o.sport = sch.isSport(d);
+    o.tip = tipFor(d, o.main, n + (plan.shifts[d] || 0), a);
+    if (o.main && o.kit) o.tip2 = TIPS.change[n % TIPS.change.length];
+  });
+  return out;
+}
+
+// ---------- iconos de prendas ----------
+function iconKind(it){
+  const n = it.name.toLowerCase();
+  if (it.cat === 'dress') return 'dress';
+  if (it.cat === 'shoes' || it.cat === 'sshoe') return /bota|botin|botín|martens|1460/.test(n) ? 'boot' : 'shoe';
+  if (it.cat === 'acc'){
+    if (/gorra/.test(n)) return 'cap';
+    if (/gorro/.test(n)) return 'beanie';
+    if (/bolso|mochila|tote|bandolera/.test(n)) return 'bag';
+    if (/bufanda|pañuelo/.test(n)) return 'scarf';
+    return 'jewel';
+  }
+  if (it.cat === 'bottom' || it.cat === 'sbot'){
+    if (/falda/.test(n)) return 'skirt';
+    if (/bermuda|short|corto|biker/.test(n)) return 'shorts';
+    return 'pants';
+  }
+  if (it.cat === 'outer' || it.cat === 'sout'){
+    if (/abrigo|gabardina|parka/.test(n)) return 'coat';
+    if (/sudadera/.test(n)) return 'hoodie';
+    if (/chaleco/.test(n)) return 'vest';
+    return 'jacket';
+  }
+  if (/capucha/.test(n)) return 'hoodie';
+  if (/chaleco/.test(n)) return 'vest';
+  if (/jersey|sudadera|cárdigan|manga larga|henley|térmica|body/.test(n)) return 'sweater';
+  if (/camisa|blusa|polo/.test(n)) return 'shirt';
+  if (/tirantes|top|corsé/.test(n)) return 'tank';
+  return 'tee';
+}
+const SHAPES = {
+  tee:'<path d="M16 8 10 11 4 18l5 5 4-3v22h22V20l4 3 5-5-6-7-6-3c-2 3-14 3-16 0Z"/>',
+  tank:'<path d="M17 6v8c-3 4-4 8-4 12v17h22V26c0-4-1-8-4-12V6h-3c-1 5-7 5-8 0Z"/>',
+  shirt:'<path d="M17 7 10 10 5 30l5 1 4-12v24h20V19l4 12 5-1-5-20-7-3-7 7Z"/><path d="M24 14v29" fill="none"/>',
+  sweater:'<path d="M16 8 9 11 4 38l6 1 4-19v22h20V20l4 19 6-1-5-27-7-3c-2 3-14 3-16 0Z"/><path d="M14 39h20" fill="none"/>',
+  hoodie:'<path d="M16 9 9 12 4 38l6 1 4-19v22h20V20l4 19 6-1-5-26-7-3"/><path d="M16 9c0-8 16-8 16 0-2 4-14 4-16 0Z"/><path d="M19 30h10v6H19z" fill="none"/>',
+  jacket:'<path d="M17 6 9 9 4 40l7 1 3-19v21h9V12l1-2 1 2v31h9V22l3 19 7-1-5-31-8-3-7 5Z"/>',
+  coat:'<path d="M17 4 9 7 4 36l7 1 3-15v24h9V10l1-2 1 2v36h9V22l3 15 7-1-5-29-8-3-7 5Z"/>',
+  vest:'<path d="M16 6 12 12v31h11V12h2v31h11V12l-4-6-8 5Z"/>',
+  dress:'<path d="M18 5v7l-4 8-6 24h32l-6-24-4-8V5h-3c-1 4-5 4-6 0Z"/>',
+  pants:'<path d="M13 5h22l2 39H27l-3-28-3 28H11Z"/><path d="M13 10h22" fill="none"/>',
+  shorts:'<path d="M12 10h24l3 22H27l-3-12-3 12H9Z"/>',
+  skirt:'<path d="M16 8h16l8 32H8Z"/><path d="M16 13h16" fill="none"/>',
+  shoe:'<path d="M5 31v-9c5 0 9-4 12-8h7c2 6 8 9 16 10 4 1 4 6 3 8H5Z"/><path d="M5 31h38" fill="none"/>',
+  boot:'<path d="M13 6h12v20c6 1 13 2 15 6v6H11V26Z"/><path d="M11 34h29" fill="none"/>',
+  cap:'<path d="M8 29c0-12 8-18 16-18s14 6 14 15l8 4H8Z"/>',
+  beanie:'<path d="M10 31c0-13 6-19 14-19s14 6 14 19Z"/><path d="M9 30h30v6H9z"/>',
+  bag:'<path d="M17 18c0-9 14-9 14 0" fill="none"/><path d="M10 18h28l-2 24H12Z"/>',
+  scarf:'<path d="M14 8h20v6l-6 2 2 26h-8l0-24-8-4Z"/>',
+  jewel:'<circle cx="24" cy="24" r="11"/><path d="M20 4h8v9h-8zM20 35h8v9h-8z"/><circle cx="24" cy="24" r="6" fill="none"/>'
+};
+function icon(it){
+  const k = iconKind(it);
+  return '<svg viewBox="0 0 48 48" aria-hidden="true" fill="' + colorHex(it.color) + '" stroke="var(--ico-stroke)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">' + SHAPES[k] + '</svg>';
+}
+
+// ---------- render ----------
+const app = document.getElementById('app');
+let wiz = null; // borrador del cuestionario
+let confirmReset = false;
+
+function storeName(it){ return (STORES[it.store] || STORES.own).n; }
+function buyUrl(it){ const st = STORES[it.store]; return st && st.u ? st.u(it.q) : null; }
+
+function tagHTML(it, ctx){
+  const have = !!S.owned[it.id];
+  const url = buyUrl(it);
+  const cid = 'own-' + ctx + '-' + it.id;
+  const custom = !!it.custom;
+  return '<article class="tag' + (have ? ' have' : '') + '">' +
+    '<div class="tag-top"><div class="ico">' + icon(it) + '</div>' +
+    '<div class="tag-info"><span class="role">' + esc(CAT[it.cat]) + '</span>' +
+    '<h4 class="tag-name">' + esc(it.name) + '</h4>' +
+    '<span class="store">' + esc(storeName(it)) + (custom ? '' : ' · ' + esc(COLORS[it.color] ? COLORS[it.color][0] : '')) + '</span>' +
+    (custom ? '' : '<span class="price">' + euro(it.price) + '</span>') + '</div></div>' +
+    '<div class="tag-actions">' +
+    (have ? '<span class="havebadge">✓ En tu armario</span>' : (url ? '<a class="buy" href="' + esc(url) + '" target="_blank" rel="noopener">Comprar<span class="long"> en ' + esc(storeName(it)) + '</span> ↗</a>' : '')) +
+    (custom ? '' : '<label class="check" for="' + cid + '"><input type="checkbox" id="' + cid + '" data-own="' + esc(it.id) + '"' + (have ? ' checked' : '') + '> ' + (have ? 'La tengo' : 'La he comprado') + '</label>') +
+    '</div></article>';
+}
+
+function totals(){
+  const items = S.plan.items.map(byId).filter(x => x && !x.custom);
+  const pre = new Set(S.plan.preOwned || []);
+  const newItems = items.filter(x => !pre.has(x.id));
+  const plan = newItems.reduce((t, x) => t + x.price, 0);
+  const bought = newItems.filter(x => S.owned[x.id]).reduce((t, x) => t + x.price, 0);
+  const toBuy = items.filter(x => !S.owned[x.id]);
+  return {plan, bought, left: plan - bought, toBuy, count: items.length};
+}
+
+function render(){
+  if (!S.answers || wiz){ renderWizard(); return; }
+  if (!S.plan){ S.plan = generatePlan(S.answers, newSeed()); save(); }
+  const t = totals();
+  const tabs = [['semana','Semana'],['compras','Compras', t.toBuy.length],['armario','Armario', Object.keys(S.owned).length],['respuestas','Respuestas']];
+  let h = '<header class="top"><div class="brand"><h1>Percha</h1><span>tu estilista</span></div>' +
+    '<nav class="tabs" role="tablist">' + tabs.map(([k, n, c]) => '<button role="tab" data-tab="' + k + '" aria-selected="' + (S.tab === k) + '">' + n + (c ? '<span class="count">' + c + '</span>' : '') + '</button>').join('') + '</nav></header>';
+  const over = t.plan - S.answers.budget;
+  h += '<section class="summary" aria-label="Resumen del presupuesto">' +
+    '<div><div class="lab">Presupuesto</div><div class="val">' + euro(S.answers.budget) + '</div></div>' +
+    '<div><div class="lab">Coste del plan</div><div class="val ' + (over > 0.5 ? 'over' : 'ok') + '">' + euro(t.plan) + '</div></div>' +
+    '<div><div class="lab">Ya comprado</div><div class="val">' + euro(t.bought) + '</div></div>' +
+    '<div><div class="lab">Te falta comprar</div><div class="val">' + euro(t.left) + '</div></div>' +
+    '<div class="act"><button class="btn primary" data-action="regen">Nueva propuesta</button></div></section>';
+  if (over > 0.5) h += '<p class="muted" style="margin:6px 0 0;font-size:13px">Con este presupuesto no llega para lo mínimo de todos los días, así que te he puesto lo más barato. Te pasas ' + euro(over) + '.</p>';
+  if (S.tab === 'semana') h += renderWeek();
+  else if (S.tab === 'compras') h += renderShopping(t);
+  else if (S.tab === 'armario') h += renderCloset();
+  else h += renderAnswers();
+  h += '<p class="foot">Precios orientativos de la temporada otoño-invierno 2026 en las webs españolas de cada tienda. El botón de compra abre esa prenda en la tienda: el stock y los precios cambian cada semana, así que puede que veas el modelo de esta temporada con otro precio. Todo se guarda solo en este navegador.</p>';
+  app.innerHTML = h;
+}
+
+function renderWeek(){
+  const a = S.answers, wk = buildWeek();
+  const todayK = DAYS[(new Date().getDay() + 6) % 7].k;
+  let h = '<nav class="weekbar" aria-label="Días">' + DAYS.map(d => {
+    const o = wk[d.k];
+    const cls = [!o ? 'off' : '', o && o.sport ? 'sport' : '', d.k === todayK ? 'today' : ''].join(' ');
+    const lab = !o ? 'libre' : o.sport ? 'EF' : 'look';
+    return '<button class="' + cls + '" ' + (o ? 'data-jump="' + d.k + '"' : 'disabled') + ' aria-label="' + d.n + ': ' + lab + '"><b>' + d.s + '</b><small>' + lab + '</small></button>';
+  }).join('') + '</nav>';
+  DAYS.forEach(d => {
+    const o = wk[d.k];
+    if (!o) return;
+    const ids = (o.main ? o.main.pieces : []).concat(o.kit ? o.kit.pieces : []);
+    const cost = ids.map(byId).filter(x => x && !S.owned[x.id]).reduce((t, x) => t + x.price, 0);
+    h += '<section class="day" id="dia-' + d.k + '"><div class="day-head"><h3>' + d.n + '</h3>' +
+      (d.k === todayK ? '<span class="chip today">Hoy</span>' : '') +
+      (o.sport ? '<span class="chip sport">Deporte / EF</span>' : '') +
+      '<span class="spacer"></span><span class="day-total">' + (cost ? 'por comprar ' + euro(cost) : 'todo en tu armario') + '</span>' +
+      '<button class="btn small" data-reroll="' + d.k + '">Otra combinación</button></div>';
+    if (o.main){
+      h += '<div class="tags">' + o.main.pieces.map(byId).filter(Boolean).map(it => tagHTML(it, d.k)).join('') + '</div>';
+    }
+    if (o.kit){
+      if (o.main) h += '<div class="kit"><h4>Bolsa de deporte <span class="chip sport">para cambiarte</span></h4>';
+      h += '<div class="tags">' + o.kit.pieces.map(byId).filter(Boolean).map(it => tagHTML(it, d.k + 'k')).join('') + '</div>';
+      if (o.main) h += '</div>';
+    }
+    if (!o.main && !o.kit) h += '<div class="empty">No he encontrado prendas para este día. Prueba a subir el presupuesto o elegir otro estilo.</div>';
+    h += '<p class="tip"><b>Consejo:</b> ' + o.tip + (o.tip2 ? ' ' + esc(o.tip2) : '') + '</p></section>';
+  });
+  return h;
+}
+
+function sortCat(list){ return list.slice().sort((x, y) => CAT_ORDER.indexOf(x.cat) - CAT_ORDER.indexOf(y.cat)); }
+function rowHTML(it){
+  const have = !!S.owned[it.id], url = buyUrl(it), cid = 'own-row-' + it.id;
+  return '<div class="row"><div class="ico">' + icon(it) + '</div>' +
+    '<div style="min-width:0"><div class="role">' + esc(CAT[it.cat]) + '</div><div class="tag-name">' + esc(it.name) + '</div><div class="store">' + esc(storeName(it)) + '</div></div>' +
+    '<div class="price">' + (it.custom ? '' : euro(it.price)) + '</div>' +
+    '<div class="row-actions">' +
+    (it.custom ? '<button class="btn small ghost" data-remove="' + esc(it.id) + '">Quitar</button>' :
+      (have ? '<span class="havebadge">✓ La tienes</span>' : (url ? '<a class="buy" href="' + esc(url) + '" target="_blank" rel="noopener">Comprar ↗</a>' : '')) +
+      '<label class="check" for="' + cid + '"><input type="checkbox" id="' + cid + '" data-own="' + esc(it.id) + '"' + (have ? ' checked' : '') + '> ' + (have ? 'La tengo' : 'Comprada') + '</label>') +
+    '</div></div>';
+}
+function renderShopping(t){
+  const items = sortCat(S.plan.items.map(byId).filter(x => x && !x.custom));
+  const todo = items.filter(x => !S.owned[x.id]), done = items.filter(x => S.owned[x.id]);
+  let h = '<div class="section-title"><h2>Por comprar</h2><span class="mono muted">' + todo.length + ' prendas · ' + euro(todo.reduce((s, x) => s + x.price, 0)) + '</span></div>';
+  h += todo.length ? '<div class="rows">' + todo.map(rowHTML).join('') + '</div>' : '<div class="empty">Ya tienes todo lo de esta semana. Cuando quieras, pulsa «Nueva propuesta» y te monto otra con lo que ya tienes.</div>';
+  h += '<div class="section-title"><h2>Ya lo tienes</h2><span class="mono muted">' + done.length + ' prendas</span></div>';
+  h += done.length ? '<div class="rows">' + done.map(rowHTML).join('') + '</div>' : '<div class="empty">Cuando compres algo, marca «Comprada» y desaparecerá el enlace. Así sé que la tienes.</div>';
+  return h;
+}
+function renderCloset(){
+  const items = sortCat(allItems().filter(x => S.owned[x.id]));
+  let h = '<div class="section-title"><h2>Tu armario</h2><span class="mono muted">' + items.length + ' prendas</span></div>';
+  h += items.length ? '<div class="rows">' + items.map(rowHTML).join('') + '</div>' : '<div class="empty">Aún no has marcado nada. Marca lo que compres desde la semana o añade aquí lo que ya tienes en casa.</div>';
+  h += '<div class="section-title"><h2>Añadir algo que ya tengo</h2><span class="muted" style="font-size:13px">Lo usaré en tu próxima propuesta</span></div>' +
+    '<form class="addform" id="addform">' +
+    '<label for="add-name">Qué es<input id="add-name" required maxlength="60" placeholder="Ej: sudadera azul de mi hermano"></label>' +
+    '<label for="add-cat">Tipo<select id="add-cat">' + Object.keys(CAT).map(k => '<option value="' + k + '">' + CAT[k] + '</option>').join('') + '</select></label>' +
+    '<label for="add-color">Color<select id="add-color">' + Object.keys(COLORS).map(k => '<option value="' + k + '">' + COLORS[k][0] + '</option>').join('') + '</select></label>' +
+    '<button class="btn primary" type="submit">Añadir</button></form>';
+  return h;
+}
+function answerText(a){
+  const days = list => list.length ? DAYS.filter(d => list.includes(d.k)).map(d => d.n).join(', ') : '—';
+  return [
+    ['Ropa de', {m:'Mujer', h:'Hombre', x:'De todo'}[a.gender]],
+    ['Estilo', a.styles.map(s => STYLES[s].n).join(', ')],
+    ['Presupuesto', euro(a.budget)],
+    ['Días con outfit', days(a.days)],
+    ['Deporte / EF', a.sport ? days(a.sportDays) + (a.sportMode === 'change' ? ' (te cambias)' : ' (vas en ropa de deporte)') : 'No'],
+    ['Tiempo', {calor:'Calor', templado:'Entretiempo', frio:'Frío'}[a.weather]],
+    ['Colores favoritos', a.colors.length ? a.colors.map(c => COLOR_GROUPS.find(g => g[0] === c)[1]).join(', ') : 'Sin preferencia']
+  ];
+}
+function renderAnswers(){
+  let h = '<div class="section-title"><h2>Mis respuestas</h2><button class="btn" data-action="edit">Cambiar respuestas</button></div>';
+  h += '<dl class="answers">' + answerText(S.answers).map(([k, v]) => '<div><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>').join('') + '</dl>';
+  h += '<div class="section-title"><h2>Empezar de cero</h2></div>';
+  h += confirmReset
+    ? '<div class="confirm">Se borran respuestas, outfits y armario. ¿Seguro? <button class="btn small danger" data-action="reset-yes">Sí, borrar todo</button><button class="btn small" data-action="reset-no">Cancelar</button></div>'
+    : '<button class="btn danger" data-action="reset">Borrar todo</button>';
+  return h;
+}
+
+// ---------- cuestionario ----------
+function defaultWeather(){ const m = new Date().getMonth(); return [5,6,7,8].includes(m) ? 'calor' : [10,11,0,1,2].includes(m) ? 'frio' : 'templado'; }
+function newDraft(){
+  return S.answers ? JSON.parse(JSON.stringify(S.answers)) :
+    {gender:null, styles:[], budget:null, days:['lun','mar','mie','jue','vie'], sport:null, sportDays:[], sportMode:'all', weather:defaultWeather(), colors:[]};
+}
+const STEPS = [
+  {q:'¿Para quién es la ropa?', help:'Así te enseño los cortes que buscas. Lo unisex sale siempre.',
+   ok:w => !!w.gender, err:'Elige una opción.',
+   body:w => '<div class="opts">' + [['m','Mujer','Ropa de mujer y unisex'],['h','Hombre','Ropa de hombre y unisex'],['x','De todo','Enséñame todo el catálogo']].map(([k, n, d]) =>
+     '<button class="opt" data-set="gender" data-val="' + k + '" aria-pressed="' + (w.gender === k) + '"><b>' + n + '</b><span>' + d + '</span></button>').join('') + '</div>'},
+  {q:'¿Qué estilo te gusta?', help:'Elige hasta tres. Mezclarlos da looks con más personalidad.',
+   ok:w => w.styles.length > 0, err:'Elige al menos un estilo.',
+   body:w => '<div class="opts">' + Object.keys(STYLES).map(k =>
+     '<button class="opt" data-toggle="styles" data-val="' + k + '" data-max="3" aria-pressed="' + w.styles.includes(k) + '"><b>' + STYLES[k].n + '</b><span>' + STYLES[k].d + '</span></button>').join('') + '</div>'},
+  {q:'¿Cuánto quieres gastarte?', help:'Es el total para toda la semana. Lo que ya tengas en tu armario no cuenta.',
+   ok:w => w.budget >= 20, err:'Pon un presupuesto de 20 € o más.',
+   body:w => '<div class="opts">' + [[60,'Ajustado'],[120,'Normal'],[200,'Holgado'],[350,'Me doy un capricho'],[600,'Renovar el armario']].map(([v, n]) =>
+     '<button class="opt" data-set="budget" data-val="' + v + '" data-num="1" aria-pressed="' + (w.budget === v) + '"><b class="mono">' + euro(v) + '</b><span>' + n + '</span></button>').join('') + '</div>' +
+     '<div class="money"><label for="budget-in">Otra cantidad</label><span class="field"><input id="budget-in" type="number" inputmode="numeric" min="20" max="5000" step="5" value="' + (w.budget || '') + '" placeholder="150"><span class="mono">€</span></span></div>'},
+  {q:'¿Para qué días quieres outfit?', help:'Te los ordeno de lunes a domingo.',
+   ok:w => w.days.length > 0, err:'Elige al menos un día.',
+   body:w => dayPicker('days', w.days, '') + '<div class="presets"><button class="btn small" data-preset="week">Entre semana</button><button class="btn small" data-preset="all">Toda la semana</button><button class="btn small" data-preset="weekend">Solo finde</button></div>'},
+  {q:'¿Haces deporte o tienes educación física?', help:'Los días de deporte te preparo ropa deportiva.',
+   ok:w => w.sport === false || (w.sport === true && w.sportDays.length > 0), err:'Dime qué días haces deporte.',
+   body:w => '<div class="opts">' + [[true,'Sí','Tengo EF o voy a entrenar'],[false,'No','Solo ropa de diario']].map(([v, n, d]) =>
+     '<button class="opt" data-set="sport" data-val="' + v + '" data-bool="1" aria-pressed="' + (w.sport === v) + '"><b>' + n + '</b><span>' + d + '</span></button>').join('') + '</div>' +
+     (w.sport ? '<div class="sub"><h3>¿Qué días?</h3>' + dayPicker('sportDays', w.sportDays, ' sportsel') +
+       '</div><div class="sub"><h3>Esos días…</h3><div class="opts">' +
+       [['all','Voy en ropa de deporte todo el día','Te pongo un conjunto deportivo completo'],['change','Me cambio para la clase','Outfit normal y aparte la bolsa de deporte']].map(([k, n, d]) =>
+         '<button class="opt" data-set="sportMode" data-val="' + k + '" aria-pressed="' + (w.sportMode === k) + '"><b>' + n + '</b><span>' + d + '</span></button>').join('') + '</div></div>' : '')},
+  {q:'¿Qué tiempo hace donde vives?', help:'Para saber si hace falta abrigo. Lo he elegido según la fecha de hoy.',
+   ok:w => !!w.weather, err:'Elige una opción.',
+   body:w => '<div class="opts">' + [['calor','Calor','Manga corta, nada de abrigo'],['templado','Entretiempo','Una chaqueta ligera'],['frio','Frío','Abrigo y punto']].map(([k, n, d]) =>
+     '<button class="opt" data-set="weather" data-val="' + k + '" aria-pressed="' + (w.weather === k) + '"><b>' + n + '</b><span>' + d + '</span></button>').join('') + '</div>'},
+  {q:'¿Qué colores te gustan más?', help:'Opcional. Les daré prioridad, sin dejar de combinar.',
+   ok:() => true,
+   body:w => '<div class="swatches">' + COLOR_GROUPS.map(([k, n, hex]) =>
+     '<button class="sw" data-toggle="colors" data-val="' + k + '" aria-pressed="' + w.colors.includes(k) + '"><i style="background:' + hex + '"></i>' + n + '</button>').join('') + '</div>'}
+];
+function dayPicker(field, sel, extra){
+  return '<div class="dayopts">' + DAYS.map(d =>
+    '<button class="dayopt' + extra + '" data-toggle="' + field + '" data-val="' + d.k + '" aria-pressed="' + sel.includes(d.k) + '" aria-label="' + d.n + '"><b>' + d.s + '</b><span>' + d.n.slice(0, 3) + '</span></button>').join('') + '</div>';
+}
+let step = 0, wizErr = '';
+function renderWizard(){
+  if (!wiz) wiz = newDraft();
+  const st = STEPS[step], last = step === STEPS.length - 1;
+  let h = '<div class="wizard"><div class="wiz-intro"><h1>Percha</h1><p>Soy tu estilista. Te hago siete preguntas y te monto los outfits de la semana, con la tienda, el precio y dónde comprar cada prenda.</p></div>' +
+    '<div class="progress" aria-hidden="true">' + STEPS.map((_, i) => '<i class="' + (i <= step ? 'on' : '') + '"></i>').join('') + '</div>' +
+    '<section class="qcard"><div class="qstep">Pregunta ' + (step + 1) + ' de ' + STEPS.length + '</div><h2>' + st.q + '</h2><p class="qhelp">' + st.help + '</p>' + st.body(wiz) +
+    '<div class="qerr" role="alert">' + esc(wizErr) + '</div>' +
+    '<div class="qnav">' + (step > 0 ? '<button class="btn" data-action="back">Atrás</button>' : (S.answers ? '<button class="btn ghost" data-action="cancel">Cancelar</button>' : '<span></span>')) +
+    '<button class="btn primary" data-action="next">' + (last ? 'Crear mis outfits' : 'Siguiente') + '</button></div></section></div>';
+  app.innerHTML = h;
+}
+
+// ---------- eventos ----------
+let toastT;
+function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+function newSeed(){ return (Math.random() * 2 ** 31) | 0; }
+function rerender(focusId){ render(); if (focusId){ const el = document.getElementById(focusId); if (el) el.focus({preventScroll:true}); } }
+
+app.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (wiz){
+    if (b.dataset.set){
+      let v = b.dataset.val;
+      if (b.dataset.num) v = +v;
+      if (b.dataset.bool) v = v === 'true';
+      wiz[b.dataset.set] = v; wizErr = '';
+      if (b.dataset.set === 'sport' && v && !wiz.sportDays.length) wiz.sportDays = [];
+      renderWizard();
+      const again = app.querySelector('[data-set="' + b.dataset.set + '"][data-val="' + b.dataset.val + '"]'); if (again) again.focus();
+      return;
+    }
+    if (b.dataset.toggle){
+      const arr = wiz[b.dataset.toggle], v = b.dataset.val, i = arr.indexOf(v);
+      if (i >= 0) arr.splice(i, 1);
+      else {
+        const max = +b.dataset.max || 99;
+        if (arr.length >= max) arr.shift();
+        arr.push(v);
+      }
+      wizErr = ''; renderWizard();
+      const again = app.querySelector('[data-toggle="' + b.dataset.toggle + '"][data-val="' + v + '"]'); if (again) again.focus();
+      return;
+    }
+    if (b.dataset.preset){
+      wiz.days = {week:['lun','mar','mie','jue','vie'], all:DAYS.map(d => d.k), weekend:['sab','dom']}[b.dataset.preset];
+      wizErr = ''; renderWizard(); return;
+    }
+    const act = b.dataset.action;
+    if (act === 'back'){ step--; wizErr = ''; renderWizard(); return; }
+    if (act === 'cancel'){ wiz = null; step = 0; wizErr = ''; render(); return; }
+    if (act === 'next'){
+      if (step === 2){ const inp = document.getElementById('budget-in'); if (inp && inp.value) wiz.budget = Math.round(+inp.value); }
+      const st = STEPS[step];
+      if (!st.ok(wiz)){ wizErr = st.err; renderWizard(); return; }
+      wizErr = '';
+      if (step < STEPS.length - 1){ step++; renderWizard(); window.scrollTo(0, 0); return; }
+      if (!wiz.sport){ wiz.sportDays = []; }
+      S.answers = wiz; wiz = null; step = 0;
+      S.plan = generatePlan(S.answers, newSeed()); S.tab = 'semana'; save(); render(); window.scrollTo(0, 0);
+      toast('Listo: tus outfits de la semana');
+      return;
+    }
+    return;
+  }
+  if (b.dataset.tab){ S.tab = b.dataset.tab; confirmReset = false; save(); render(); return; }
+  if (b.dataset.jump){ const el = document.getElementById('dia-' + b.dataset.jump); if (el) el.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); return; }
+  if (b.dataset.reroll){
+    const d = b.dataset.reroll, before = JSON.stringify(buildWeek()[d]);
+    let tries = 0, now;
+    do { S.plan.shifts[d] = (S.plan.shifts[d] || 0) + 1; now = JSON.stringify(buildWeek()[d]); tries++; } while (now === before && tries < 8);
+    save(); render();
+    const again = app.querySelector('[data-reroll="' + d + '"]'); if (again) again.focus({preventScroll:true});
+    toast(now === before ? 'No hay más combinaciones con estas prendas' : 'Nueva combinación para el ' + DAYS.find(x => x.k === d).n.toLowerCase());
+    return;
+  }
+  if (b.dataset.remove){
+    const id = b.dataset.remove;
+    S.custom = S.custom.filter(x => x.id !== id); delete S.owned[id];
+    if (S.plan) S.plan.items = S.plan.items.filter(x => x !== id);
+    save(); render(); toast('Quitada de tu armario'); return;
+  }
+  const act = b.dataset.action;
+  if (act === 'regen'){ S.plan = generatePlan(S.answers, newSeed()); save(); render(); toast('Nueva propuesta, usando lo que ya tienes'); return; }
+  if (act === 'edit'){ wiz = newDraft(); step = 0; render(); window.scrollTo(0, 0); return; }
+  if (act === 'reset'){ confirmReset = true; render(); return; }
+  if (act === 'reset-no'){ confirmReset = false; render(); return; }
+  if (act === 'reset-yes'){ confirmReset = false; S = blank(); save(); wiz = null; step = 0; render(); return; }
+});
+
+app.addEventListener('change', e => {
+  const c = e.target.closest('input[data-own]');
+  if (!c) return;
+  const id = c.dataset.own, it = byId(id);
+  if (c.checked) S.owned[id] = true; else delete S.owned[id];
+  save(); rerender(c.id);
+  toast(c.checked ? 'Apuntado: ya tienes ' + it.name.toLowerCase() : 'Quitada de tu armario');
+});
+
+app.addEventListener('submit', e => {
+  if (e.target.id !== 'addform') return;
+  e.preventDefault();
+  const name = document.getElementById('add-name').value.trim();
+  if (!name) return;
+  const it = {id:'mia-' + Date.now().toString(36), name, cat:document.getElementById('add-cat').value, g:'u',
+    st:(S.answers && S.answers.styles) || ['cas'], color:document.getElementById('add-color').value, price:0, store:'own', season:'', q:name, custom:true};
+  S.custom.push(it); S.owned[it.id] = true; save(); render();
+  toast('Añadida. Pulsa «Nueva propuesta» para que la use');
+});
+
+app.addEventListener('keydown', e => {
+  if (wiz && e.key === 'Enter' && e.target.id === 'budget-in'){ e.preventDefault(); const n = app.querySelector('[data-action="next"]'); if (n) n.click(); }
+});
+
+render();
+})();
+</script>
+</body>
+</html>
