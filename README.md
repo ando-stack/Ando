@@ -9,6 +9,8 @@ pinned: false
 short_description: Saca los momentos graciosos y épicos de directos y vídeos
 ---
 
+> 🎯 **Nuevo en este repositorio:** [Cuota Justa](apuestas/README.md), web de análisis de partidos y apuestas con valor (LaLiga, Premier, Serie A, Bundesliga, Ligue 1, Champions, Europa y Conference League).
+
 # ✂️ AutoClips
 
 Programa **gratis** que saca automáticamente los **momentos graciosos y épicos** de un directo

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cuota Justa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div>
+        <h1>Cuota <span>Justa</span></h1>
+        <div class="meta" id="meta">Cargando datos…</div>
+      </div>
+      <div class="acciones">
+        <button class="btn" id="btnAjustes">⚙ Ajustes</button>
+      </div>
+    </div>
+    <nav class="comps" aria-label="Competiciones"></nav>
+  </header>
+
+  <main id="main"><div class="vacio">Cargando calendario y modelo…</div></main>
+
+  <footer class="pie">
+    Datos: calendario de fixturedownload.com · resultados, estadísticas y cuotas de football-data.co.uk.
+    Modelo propio: Poisson con xG y corrección Dixon-Coles para goles; binomial negativa para córners, tarjetas, faltas y tiros.
+    Ningún modelo garantiza ganancias. Solo mayores de 18 años. Juega con responsabilidad (jugarbien.es).
+  </footer>
+</div>
+
+<dialog id="ajustes">
+  <form id="formAjustes">
+    <h3>Ajustes</h3>
+    <div class="campo">
+      <label for="ajCasa">Cuotas con las que comparar</label>
+      <select id="ajCasa">
+        <option value="max">Mejor cuota del mercado (recomendado)</option>
+        <option value="avg">Media del mercado</option>
+        <option value="b365">Bet365</option>
+      </select>
+      <small>Las cuotas que escribas a mano siempre tienen prioridad.</small>
+    </div>
+    <div class="campo">
+      <label for="ajEdge">Ventaja mínima para recomendar (%)</label>
+      <input id="ajEdge" type="number" step="0.5" min="0" max="50">
+    </div>
+    <div class="campo">
+      <label for="ajPeso">Peso del modelo frente al mercado (%)</label>
+      <input id="ajPeso" type="number" step="5" min="0" max="100">
+      <small>100 = solo el modelo. Con 20 el modelo corrige al consenso de las casas; en la simulación de esta temporada es lo que mejor funciona.</small>
+    </div>
+    <div class="campo" style="grid-template-columns:1fr 1fr;column-gap:10px">
+      <label for="ajMin">Cuota mínima</label><label for="ajMax">Cuota máxima</label>
+      <input id="ajMin" type="number" step="0.05" min="1.01"><input id="ajMax" type="number" step="0.5" min="1.1">
+    </div>
+    <div class="campo">
+      <label for="ajKey">Clave de The Odds API (opcional)</label>
+      <input id="ajKey" type="text" autocomplete="off" placeholder="Pega aquí tu clave gratuita">
+      <small>Gratis en the-odds-api.com (500 peticiones al mes). Se guarda solo en este navegador.</small>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button type="button" class="btn" id="cerrarAjustes">Cancelar</button>
+      <button type="submit" class="btn prim">Guardar</button>
+    </div>
+  </form>
+</dialog>
+<script src="app.js"></script>
+</body>
+</html>
