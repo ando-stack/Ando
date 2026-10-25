@@ -1,6 +1,7 @@
 // Utilidades comunes de las funciones de servidor: entorno, Supabase, respuestas y autenticación.
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { normalizarUrlSupabase } from "../../../src/lib/urlSupabase";
 
 export class ErrorUsuario extends Error {
   constructor(
@@ -24,7 +25,7 @@ let admin: SupabaseClient | null = null;
 /** Cliente con service role: SOLO en el servidor. Siempre filtrar por user_id. */
 export function supabaseAdmin(): SupabaseClient {
   if (!admin) {
-    admin = createClient(entorno("SUPABASE_URL"), entorno("SUPABASE_SERVICE_ROLE_KEY"), {
+    admin = createClient(normalizarUrlSupabase(entorno("SUPABASE_URL")), entorno("SUPABASE_SERVICE_ROLE_KEY").trim().replace(/^["']|["']$/g, ""), {
       auth: { persistSession: false, autoRefreshToken: false },
     });
   }

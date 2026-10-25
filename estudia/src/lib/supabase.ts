@@ -1,8 +1,9 @@
 // Cliente de Supabase para el navegador: solo usa la clave pública "anon" (protegida por RLS).
 import { createClient } from "@supabase/supabase-js";
+import { normalizarUrlSupabase } from "./urlSupabase";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const url = normalizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL as string | undefined);
+const anon = String(import.meta.env.VITE_SUPABASE_ANON_KEY ?? "").trim().replace(/^["']|["']$/g, "");
 
 export const configuracionCompleta = Boolean(url && anon);
 

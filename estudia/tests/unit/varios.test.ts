@@ -145,3 +145,12 @@ describe("mejora de fotos", () => {
     expect(p1).toBeGreaterThan(200);
   });
 });
+
+import { normalizarUrlSupabase } from "../../src/lib/urlSupabase";
+describe("URL de Supabase mal pegada", () => {
+  it("se corrige sola", () => {
+    for (const u of ["https://abc123.supabase.co", "https://abc123.supabase.co/", " https://abc123.supabase.co/rest/v1/ ", '"https://abc123.supabase.co"', "abc123.supabase.co", "https://supabase.com/dashboard/project/abc123/settings/api"]) {
+      expect(normalizarUrlSupabase(u)).toBe("https://abc123.supabase.co");
+    }
+  });
+});
