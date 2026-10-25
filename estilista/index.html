@@ -119,6 +119,8 @@ a{color:var(--accent)}
 .buy:hover{filter:brightness(1.15)}
 .havebadge{display:flex;justify-content:center;align-items:center;gap:6px;background:var(--sport-soft);color:var(--sport);font-weight:700;font-size:13.5px;padding:8px 10px;border-radius:9px}
 .check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+.nope{border:0;background:none;padding:0;text-align:left;font-size:12.5px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.nope:hover{color:var(--warn)}
 .check input{width:17px;height:17px;accent-color:var(--sport);margin:0;flex:none}
 
 /* listas */
@@ -262,6 +264,21 @@ const CAT = {
   top:'Arriba', dress:'Vestido', bottom:'Abajo', outer:'Abrigo / chaqueta', shoes:'Calzado', acc:'Complemento',
   stop:'Deporte · arriba', sbot:'Deporte · abajo', sshoe:'Deporte · zapatillas', sout:'Deporte · sudadera'
 };
+const AVOID = [
+  ['shorts','Pantalón corto','Bermudas, shorts y pantalón corto de deporte', it => (it.cat === 'bottom' || it.cat === 'sbot') && /bermuda|short|corto|biker/i.test(it.name)],
+  ['mocasines','Mocasines y náuticos','Zapato de vestir sin cordones', it => /mocas|náutico/i.test(it.name)],
+  ['faldas','Faldas','', it => /falda/i.test(it.name)],
+  ['vestidos','Vestidos','', it => it.cat === 'dress'],
+  ['tacones','Tacones y plataformas','', it => /tacón|plataforma/i.test(it.name)],
+  ['botas','Botas','Botas y botines', it => /bota|botín|botines|martens/i.test(it.name)],
+  ['tirantes','Sin mangas','Tirantes, corsés y tops', it => /tirantes|corsé|^top /i.test(it.name)],
+  ['zapatos','Zapatos de vestir','Derby, bailarinas y merceditas', it => /derby|bailarinas|merceditas/i.test(it.name)],
+  ['complementos','Complementos','Gorras, bolsos, joyas…', it => it.cat === 'acc']
+];
+function allowed(it, a){
+  if (S.banned && S.banned[it.id]) return false;
+  return !(a.avoid || []).some(k => { const r = AVOID.find(x => x[0] === k); return r && r[3](it); });
+}
 const CAT_ORDER = ['outer','top','dress','bottom','shoes','acc','sout','stop','sbot','sshoe'];
 
 // Catálogo: nombre | categoría | público (m=mujer, h=hombre, u=unisex) | estilos | color | precio € | tienda | temporada (c=calor, t=entretiempo y frío, f=frío) | búsqueda
@@ -427,7 +444,7 @@ const CATALOG = RAW.trim().split('\n').map(line => {
 });
 
 // ---------- estado ----------
-function blank(){ return {v:1, answers:null, owned:{}, custom:[], plan:null, tab:'semana'}; }
+function blank(){ return {v:1, answers:null, owned:{}, custom:[], banned:{}, plan:null, tab:'semana'}; }
 function load(){
   try{
     const s = JSON.parse(localStorage.getItem(KEY));
@@ -476,15 +493,21 @@ function generatePlan(a, seed){
   const slots = [];
   const add = (cat, req) => slots.push({cat, req});
   if (nM){ add('top',1); add('bottom',1); add('shoes',1); if (w === 'frio') add('outer',1); }
-  if (nS){ add('stop',1); add('sbot',1); add('sshoe',1); }
+  if (nS){ add('stop',1); add('sbot',1); }
   if (nM){
+    // primero variedad: camisetas y pantalones intercalados
     const nTops = Math.min(nM, 5), nBot = nM <= 2 ? 1 : nM <= 4 ? 2 : 3;
     const dress = a.gender !== 'h' && nM >= 3;
-    for (let i = 1; i < nTops - (dress ? 1 : 0); i++) add('top',0);
+    const extraTops = nTops - 1 - (dress ? 1 : 0), extraBots = nBot - 1;
+    for (let i = 0; i < Math.max(extraTops, extraBots); i++){
+      if (i < extraTops) add('top',0);
+      if (i < extraBots) add('bottom',0);
+    }
     if (dress) add('dress',0);
-    for (let i = 1; i < nBot; i++) add('bottom',0);
     if (w === 'templado') add('outer',0);
   }
+  // si no llega para zapatillas de deporte, se usan las de diario
+  if (nS) add('sshoe', nM ? 0 : 1);
   if (nS && w !== 'calor') add('sout',0);
   if (nS >= 2) add('stop',0);
   if (nS >= 3) add('sbot',0);
@@ -515,6 +538,8 @@ function generatePlan(a, seed){
     if (a.colors.length && COLORS[it.color] && a.colors.includes(COLORS[it.color][3])) s += 1.6;
     s += Math.min(it.price / Math.max(cap, 1), 1) * 1.2;
     s += rng() * 1.8;
+    if (/básic/i.test(it.name) && MAIN_CATS.includes(it.cat)) s -= 1;
+    if (it.st.includes('ath') && !a.styles.includes('ath') && MAIN_CATS.includes(it.cat)) s -= 1.5;
     const same = picks.filter(p => p.cat === it.cat);
     if (same.some(p => p.color === it.color)) s -= 2.2;
     if (same.some(p => firstWord(p) === firstWord(it))) s -= 1.2;
@@ -528,25 +553,40 @@ function generatePlan(a, seed){
     return s;
   }
 
+  // precio mínimo de cada tipo de prenda, para reservar dinero y que haya variedad
+  const minPrice = {};
+  ordered.forEach(sl => {
+    if (minPrice[sl.cat] != null) return;
+    const ps = CATALOG.filter(it => it.cat === sl.cat && genderOk(it, a) && seasonOk(it, w) && allowed(it, a)).map(it => it.price);
+    minPrice[sl.cat] = ps.length ? Math.min(...ps) : 0;
+  });
   ordered.forEach((slot, k) => {
     const restW = ordered.slice(k).reduce((t, s) => t + WEIGHT[s.cat], 0);
+    const reserve = slot.req ? ordered.slice(k + 1).filter(s => s.req).reduce((t, s) => t + minPrice[s.cat], 0) : 0;
+    const limit = Math.max(remaining - reserve, 0);
     const cap = remaining * WEIGHT[slot.cat] / restW;
-    const cands = CATALOG.filter(it => it.cat === slot.cat && genderOk(it, a) && seasonOk(it, w) && !picked.has(it.id));
+    const cands = CATALOG.filter(it => it.cat === slot.cat && genderOk(it, a) && seasonOk(it, w) && allowed(it, a) && !picked.has(it.id));
     if (!cands.length) return;
     const scored = cands.map(it => ({it, s: score(it, cap)}));
-    const pool = scored.filter(x => x.it.price <= Math.min(cap * 1.5, remaining));
+    const pool = scored.filter(x => x.it.price <= Math.min(cap * 1.5, limit));
     let choice = null;
     if (pool.length) choice = pool.reduce((b, x) => x.s > b.s ? x : b);
-    else if (slot.req){
+    else if (slot.req || ['top','bottom','dress'].includes(slot.cat)){
       // no llega: lo más barato, y entre precios parecidos el que más pega con tu estilo
       const minP = Math.min(...scored.map(x => x.it.price));
       const cheap = scored.filter(x => x.it.price <= minP * 1.2 + 2);
       choice = cheap.reduce((b, x) => x.s > b.s ? x : b);
     }
-    if (!choice) return;
+    if (!choice || (!slot.req && choice.it.price > remaining)) return;
     picks.push(choice.it); picked.add(choice.it.id); remaining -= choice.it.price;
   });
 
+  // días de deporte sin zapatillas: si no hay unas de diario que valgan, las más baratas de deporte
+  const sneaker = x => (x.cat === 'sshoe') || (x.cat === 'shoes' && iconKind(x) === 'shoe' && !/derby|bailarinas|merceditas|mocas|náutico|sandalias|plataforma/i.test(x.name));
+  if (nS && !picks.some(sneaker)){
+    const c = CATALOG.filter(it => it.cat === 'sshoe' && genderOk(it, a) && allowed(it, a)).sort((x, y) => x.price - y.price)[0];
+    if (c) picks.push(c);
+  }
   return {seed, items: picks.map(p => p.id), preOwned: picks.filter(p => S.owned[p.id]).map(p => p.id), shifts: {}, created: Date.now()};
 }
 
@@ -586,7 +626,8 @@ function mainOutfit(W, i, s, used, a){
 function sportKit(W, j, s, a){
   const pieces = [
     a.weather !== 'calor' ? rot(W.sout, j + s)[0] : null,
-    rot(W.stop, j + s)[0], rot(W.sbot, j + s)[0], rot(W.sshoe, j + s)[0]
+    rot(W.stop, j + s)[0], rot(W.sbot, j + s)[0],
+    rot(W.sshoe, j + s)[0] || W.shoes.find(x => iconKind(x) === 'shoe' && !/derby|bailarinas|merceditas|mocas|náutico|sandalias|plataforma/i.test(x.name))
   ].filter(Boolean).map(x => x.id);
   return pieces.length ? {pieces} : null;
 }
@@ -721,6 +762,7 @@ function tagHTML(it, ctx){
     '<div class="tag-actions">' +
     (have ? '<span class="havebadge">✓ En tu armario</span>' : (url ? '<a class="buy" href="' + esc(url) + '" target="_blank" rel="noopener">Comprar<span class="long"> en ' + esc(storeName(it)) + '</span> ↗</a>' : '')) +
     (custom ? '' : '<label class="check" for="' + cid + '"><input type="checkbox" id="' + cid + '" data-own="' + esc(it.id) + '"' + (have ? ' checked' : '') + '> ' + (have ? 'La tengo' : 'La he comprado') + '</label>') +
+    (have || custom ? '' : '<button class="nope" data-ban="' + esc(it.id) + '">No me lo pondría</button>') +
     '</div></article>';
 }
 
@@ -832,6 +874,7 @@ function answerText(a){
     ['Días con outfit', days(a.days)],
     ['Deporte / EF', a.sport ? days(a.sportDays) + (a.sportMode === 'change' ? ' (te cambias)' : ' (vas en ropa de deporte)') : 'No'],
     ['Tiempo', {calor:'Calor', templado:'Entretiempo', frio:'Frío'}[a.weather]],
+    ['No te pones', (a.avoid || []).length ? a.avoid.map(k => AVOID.find(x => x[0] === k)[1]).join(', ') : 'Nada que evitar'],
     ['Colores favoritos', a.colors.length ? a.colors.map(c => COLOR_GROUPS.find(g => g[0] === c)[1]).join(', ') : 'Sin preferencia']
   ];
 }
@@ -848,8 +891,10 @@ function renderAnswers(){
 // ---------- cuestionario ----------
 function defaultWeather(){ const m = new Date().getMonth(); return [5,6,7,8].includes(m) ? 'calor' : [10,11,0,1,2].includes(m) ? 'frio' : 'templado'; }
 function newDraft(){
-  return S.answers ? JSON.parse(JSON.stringify(S.answers)) :
-    {gender:null, styles:[], budget:null, days:['lun','mar','mie','jue','vie'], sport:null, sportDays:[], sportMode:'all', weather:defaultWeather(), colors:[]};
+  const d = S.answers ? JSON.parse(JSON.stringify(S.answers)) :
+    {gender:null, styles:[], budget:null, days:['lun','mar','mie','jue','vie'], sport:null, sportDays:[], sportMode:'all', weather:defaultWeather(), colors:[], avoid:[]};
+  if (!d.avoid) d.avoid = [];
+  return d;
 }
 const STEPS = [
   {q:'¿Para quién es la ropa?', help:'Así te enseño los cortes que buscas. Lo unisex sale siempre.',
@@ -880,6 +925,10 @@ const STEPS = [
    ok:w => !!w.weather, err:'Elige una opción.',
    body:w => '<div class="opts">' + [['calor','Calor','Manga corta, nada de abrigo'],['templado','Entretiempo','Una chaqueta ligera'],['frio','Frío','Abrigo y punto']].map(([k, n, d]) =>
      '<button class="opt" data-set="weather" data-val="' + k + '" aria-pressed="' + (w.weather === k) + '"><b>' + n + '</b><span>' + d + '</span></button>').join('') + '</div>'},
+  {q:'¿Hay algo que no te pondrías?', help:'Marca todo lo que no quieras ver. Nunca te lo pondré, tampoco para deporte.',
+   ok:() => true,
+   body:w => '<div class="opts">' + AVOID.map(([k, n, d]) =>
+     '<button class="opt" data-toggle="avoid" data-val="' + k + '" aria-pressed="' + w.avoid.includes(k) + '"><b>' + n + '</b><span>' + (d || '&nbsp;') + '</span></button>').join('') + '</div>'},
   {q:'¿Qué colores te gustan más?', help:'Opcional. Les daré prioridad, sin dejar de combinar.',
    ok:() => true,
    body:w => '<div class="swatches">' + COLOR_GROUPS.map(([k, n, hex]) =>
@@ -893,7 +942,7 @@ let step = 0, wizErr = '';
 function renderWizard(){
   if (!wiz) wiz = newDraft();
   const st = STEPS[step], last = step === STEPS.length - 1;
-  let h = '<div class="wizard"><div class="wiz-intro"><h1>Percha</h1><p>Soy tu estilista. Te hago siete preguntas y te monto los outfits de la semana, con la tienda, el precio y dónde comprar cada prenda.</p></div>' +
+  let h = '<div class="wizard"><div class="wiz-intro"><h1>Percha</h1><p>Soy tu estilista. Te hago ocho preguntas y te monto los outfits de la semana, con la tienda, el precio y dónde comprar cada prenda.</p></div>' +
     '<div class="progress" aria-hidden="true">' + STEPS.map((_, i) => '<i class="' + (i <= step ? 'on' : '') + '"></i>').join('') + '</div>' +
     '<section class="qcard"><div class="qstep">Pregunta ' + (step + 1) + ' de ' + STEPS.length + '</div><h2>' + st.q + '</h2><p class="qhelp">' + st.help + '</p>' + st.body(wiz) +
     '<div class="qerr" role="alert">' + esc(wizErr) + '</div>' +
@@ -964,6 +1013,18 @@ app.addEventListener('click', e => {
     save(); render();
     const again = app.querySelector('[data-reroll="' + d + '"]'); if (again) again.focus({preventScroll:true});
     toast(now === before ? 'No hay más combinaciones con estas prendas' : 'Nueva combinación para el ' + DAYS.find(x => x.k === d).n.toLowerCase());
+    return;
+  }
+  if (b.dataset.ban){
+    const id = b.dataset.ban, old = byId(id), a = S.answers;
+    S.banned = S.banned || {}; S.banned[id] = true;
+    const inPlan = new Set(S.plan.items);
+    const cands = CATALOG.filter(x => x.cat === old.cat && !inPlan.has(x.id) && genderOk(x, a) && seasonOk(x, a.weather) && allowed(x, a));
+    const fit = x => x.st.filter(t => a.styles.includes(t)).length * 2 - Math.abs(x.price - old.price) / 15;
+    const best = cands.sort((x, y) => fit(y) - fit(x))[0];
+    S.plan.items = S.plan.items.map(x => x === id ? (best ? best.id : null) : x).filter(Boolean);
+    save(); render();
+    toast(best ? 'Cambiado por: ' + best.name.toLowerCase() : 'Quitado. No hay otra prenda parecida');
     return;
   }
   if (b.dataset.remove){
