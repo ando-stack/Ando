@@ -224,3 +224,9 @@ footer.pie { margin-top: 36px; color: var(--ink-3); font-size: 12px; border-top:
 @media (prefers-reduced-motion: no-preference) {
   .partido, .btn { transition: border-color .15s ease; }
 }
+
+table.m.ou td { white-space: normal; }
+table.m.ou td:first-child { min-width: 170px; }
+table.m tr.clic { cursor: pointer; }
+table.m tr.clic:hover td { background: var(--panel-2); }
+table.m.ou th, table.m.ou td { text-align: left; }

@@ -6,10 +6,10 @@
 // ---------------------------------------------------------------------------
 // Ajustes (se guardan en este navegador)
 // ---------------------------------------------------------------------------
-const AJUSTES_DEF = { casa: "max", minEdge: 4, pesoModelo: 20, cuotaMin: 1.3, cuotaMax: 6, oddsKey: "" };
+const AJUSTES_DEF = { casa: "max", minEdge: 100, pesoModelo: 100, probMin: 25, cuotaMin: 1.01, cuotaMax: 50, cuotaMinOU: 1.15, oddsKey: "" };
 const guardado = (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } };
 const guardar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin almacenamiento */ } };
-let AJ = { ...AJUSTES_DEF, ...guardado("cj_ajustes", {}) };
+let AJ = { ...AJUSTES_DEF, ...guardado("cj_ajustes2", {}) };
 let MANUAL = guardado("cj_manual", {});        // cuotas que escribe el usuario: {partido: {clave: cuota}}
 let VIVO = guardado("cj_vivo", {});            // cuotas de The Odds API: {partido: {t, cuotas:{clave:{avg,max,n}}}}
 
@@ -17,7 +17,7 @@ let D = null;                                  // datos.json
 const EST = { vista: "picks", comp: null, jornada: null, partido: null };
 
 const CASAS = { b365: "Bet365", avg: "Media del mercado", max: "Mejor cuota del mercado" };
-const GRUPOS = ["Resultado", "Goles", "Hándicap asiático", "Córners", "Tarjetas", "Faltas", "Tiros a puerta", "Resultado exacto"];
+const GRUPOS = ["Resultado", "Goles", "Hándicap asiático", "Córners", "Tarjetas", "Faltas", "Tiros a puerta", "Tiros", "Resultado exacto"];
 
 // ---------------------------------------------------------------------------
 // Utilidades
@@ -84,8 +84,16 @@ const DIM = {
 function asiatico(conj, dim, s, lin) {
   const partes = Math.abs(Math.round(lin * 4)) % 2 === 1 ? [lin - 0.25, lin + 0.25] : [lin, lin];
   let w = 0, hw = 0, pu = 0, hl = 0, l = 0;
-  for (const [a, b, p] of conj) {
-    const x = s * DIM[dim](a, b);
+  // distribución marginal de la dimensión (se calcula una vez por conjunta)
+  const cache = (conj._m = conj._m || {});
+  let marg = cache[dim];
+  if (!marg) {
+    const acc = new Map();
+    for (const [a, b, p] of conj) { const v = DIM[dim](a, b); acc.set(v, (acc.get(v) || 0) + p); }
+    marg = cache[dim] = [...acc];
+  }
+  for (const [v, p] of marg) {
+    const x = s * v;
     const r = partes.map((h) => (x + h > 1e-9 ? 1 : x + h < -1e-9 ? -1 : 0));
     const t = r[0] + r[1];
     if (t === 2) w += p; else if (t === 1) hw += p; else if (t === 0) pu += p; else if (t === -1) hl += p; else l += p;
@@ -107,7 +115,8 @@ function liquidar(m, partido) {      // resultado real de un mercado: 1 gana, 0.
 function valoresReales(p) {
   const v = {};
   if (p.res) v.g = p.res;
-  if (p.real) for (const k of ["c", "f", "t", "tp"]) if (p.real[k]) v[k] = p.real[k];
+  if (p.real) for (const k of ["c", "f", "t", "tp", "s", "g1"]) if (p.real[k]) v[k] = p.real[k];
+  if (v.g && v.g1) v.g2 = [v.g[0] - v.g1[0], v.g[1] - v.g1[1]];
   return v;
 }
 
@@ -119,10 +128,16 @@ function lineasAlrededor(media, ancho, paso = 1) {
   for (let x = c - ancho; x <= c + ancho + 1e-9; x += paso) if (x > 0) out.push(+x.toFixed(1));
   return out;
 }
-function mercados(p) {
+const CALIBRA = { g: 0.95, g1: 0.96, g2: 0.94, c: 0.97, c1: 0.97, t: 1, f: 0.98, tp: 0.88, s: 0.9 };
+function mercados(p, ligero = false) {
   const L = nombre(p.l), V = nombre(p.v), M = p.modelo, out = [];
   const add = (grupo, sub, sel, clave, stat, dim, s, lin, conj, extra = {}) => {
-    const o = asiatico(conj, dim, s, lin);
+    let o = asiatico(conj, dim, s, lin);
+    if (extra.fam && !o.hw && !o.hl) {
+      // Calibración: en los partidos jugados el modelo se pasaba algo de confianza en los más/menos
+      const f = CALIBRA[stat] ?? 0.95, w = 0.5 + (o.w - 0.5) * f;
+      o = { w, hw: 0, pu: o.pu, hl: 0, l: Math.max(0, 1 - w - o.pu) };
+    }
     out.push({ grupo, sub, sel, clave, stat, dim, s, lin, o, ...extra });
   };
   const G = conjuntaGoles(M.g[0], M.g[1], D.rho);
@@ -135,16 +150,26 @@ function mercados(p) {
   add("Resultado", "Doble oportunidad", `Empate o ${V} (X2)`, "dc:X2", "g", "d", -1, 0.5, G);
   add("Resultado", "Empate no válido", `${L} (DNB)`, "dnb:1", "g", "d", 1, 0, G);
   add("Resultado", "Empate no válido", `${V} (DNB)`, "dnb:2", "g", "d", -1, 0, G);
-  // Goles
-  for (const x of [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]) {
-    add("Goles", "Total de goles", `Más de ${x}`, `g:o:${x}`, "g", "t", 1, -x, G);
-    add("Goles", "Total de goles", `Menos de ${x}`, `g:u:${x}`, "g", "t", -1, x, G);
-  }
+  // Goles (más/menos)
+  const ou = (grupo, sub, fam, pre, stat, dim, conj, lineas, extra = {}, quien = "") => {
+    for (const x of lineas) {
+      add(grupo, sub, `${quien}Más de ${x}`, `${pre}:o:${x}`, stat, dim, 1, -x, conj, { fam, ...extra });
+      add(grupo, sub, `${quien}Menos de ${x}`, `${pre}:u:${x}`, stat, dim, -1, x, conj, { fam, ...extra });
+    }
+  };
+  const rango = (a, b) => { const r = []; for (let x = a; x <= b + 1e-9; x++) r.push(x); return r; };
+  ou("Goles", "Total de goles", "Goles del partido", "g", "g", "t", G, ligero ? [2.5] : rango(0.5, 6.5));
+  if (!ligero) {
   add("Goles", "Ambos marcan", "Sí", "btts:si", "g", "min", 1, -0.5, G);
   add("Goles", "Ambos marcan", "No", "btts:no", "g", "min", -1, 0.5, G);
-  for (const [pre, dim, n] of [["gl", "l", L], ["gv", "v", V]]) for (const x of [0.5, 1.5, 2.5, 3.5]) {
-    add("Goles", `Goles de ${n}`, `${n}: más de ${x}`, `${pre}:o:${x}`, "g", dim, 1, -x, G);
-    add("Goles", `Goles de ${n}`, `${n}: menos de ${x}`, `${pre}:u:${x}`, "g", dim, -1, x, G);
+  ou("Goles", `Goles de ${L}`, `Goles de ${L}`, "gl", "g", "l", G, rango(0.5, 4.5), {}, `${L}: `);
+  ou("Goles", `Goles de ${V}`, `Goles de ${V}`, "gv", "g", "v", G, rango(0.5, 4.5), {}, `${V}: `);
+  // Por partes: la 1ª parte suele llevar ~45% de los goles
+  const G1 = conjuntaGoles(M.g[0] * 0.45, M.g[1] * 0.45, 0), G2 = conjuntaGoles(M.g[0] * 0.55, M.g[1] * 0.55, 0);
+  ou("Goles", "Goles en la 1ª parte", "Goles 1ª parte", "g1", "g1", "t", G1, rango(0.5, 3.5));
+  ou("Goles", "Goles en la 2ª parte", "Goles 2ª parte", "g2", "g2", "t", G2, rango(0.5, 4.5));
+  ou("Goles", `Goles de ${L} en la 1ª parte`, `Goles de ${L} 1ª parte`, "g1l", "g1", "l", G1, rango(0.5, 2.5), {}, `${L}: `);
+  ou("Goles", `Goles de ${V} en la 1ª parte`, `Goles de ${V} 1ª parte`, "g1v", "g1", "v", G1, rango(0.5, 2.5), {}, `${V}: `);
   }
   // Hándicap asiático
   const lineasAH = new Set([-2.5, -2, -1.5, -1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5]);
@@ -154,35 +179,34 @@ function mercados(p) {
     add("Hándicap asiático", `Línea ${lineaH(x)} / ${lineaH(-x)}`, `${L} ${lineaH(x)}`, `ah:1:${linea(x)}`, "g", "d", 1, x, G);
     add("Hándicap asiático", `Línea ${lineaH(x)} / ${lineaH(-x)}`, `${V} ${lineaH(-x)}`, `ah:2:${linea(-x)}`, "g", "d", -1, -x, G);
   }
+  if (ligero) return out;
   // Resultado exacto (los 8 más probables)
   G.slice().sort((a, b) => b[2] - a[2]).slice(0, 8).forEach(([i, j, pr]) => {
     out.push({ grupo: "Resultado exacto", sub: "Marcador", sel: `${L} ${i}-${j} ${V}`, clave: `cs:${i}-${j}`, stat: "g",
       exacto: [i, j], o: { w: pr, hw: 0, pu: 0, hl: 0, l: 1 - pr } });
   });
-  // Estadísticas
+  // Estadísticas (más/menos por partido y por equipo)
   const STATS = [
-    ["c", "Córners", "córners", 3, [2.5, 3.5, 4.5, 5.5, 6.5, 7.5]],
-    ["t", "Tarjetas", "tarjetas", 2, [0.5, 1.5, 2.5, 3.5]],
-    ["f", "Faltas", "faltas", 4, null],
-    ["tp", "Tiros a puerta", "tiros a puerta", 3, null],
+    ["c", "Córners", "córners"], ["t", "Tarjetas", "tarjetas"], ["f", "Faltas", "faltas"],
+    ["tp", "Tiros a puerta", "tiros a puerta"], ["s", "Tiros", "tiros totales"],
   ];
-  for (const [st, grupo, txt, ancho, lineasEq] of STATS) {
+  const sd = (m, k) => Math.sqrt(m + (k && k < 300 ? (m * m) / k : 0));
+  const lineasDe = (m, k) => { const r = []; const a = Math.max(0.5, Math.floor(m - 2.6 * sd(m, k)) + 0.5); for (let x = a; x <= m + 2.6 * sd(m, k) + 0.5; x++) r.push(x); return r; };
+  const totalNB = (m, k) => binNeg(m, k, Math.ceil(m + 6 * sd(m, k) + 6)).map((pr, n) => [n, 0, pr]);
+  for (const [st, grupo, txt] of STATS) {
     if (!M[st]) continue;
-    const k = D.dispersion?.[st]?.ke ?? 300;
-    const C = conjuntaStat(M[st][0], M[st][1], k);
+    const ke = D.dispersion?.[st]?.ke ?? 300, kt = D.dispersion?.[st]?.k ?? 300;
+    const C = conjuntaStat(M[st][0], M[st][1], ke);
     const extra = M.aprox?.includes(st) ? { aprox: true } : {};
-    const totales = new Set(lineasAlrededor(M[st][0] + M[st][1], ancho));
-    for (const kk of Object.keys(cuotasDe(p))) { const m = kk.match(new RegExp(`^${st}:[ou]:([\\d.]+)$`)); if (m) totales.add(+m[1]); }
-    for (const x of [...totales].sort((a, b) => a - b)) {
-      add(grupo, `Total de ${txt}`, `Más de ${x}`, `${st}:o:${x}`, st, "t", 1, -x, C, extra);
-      add(grupo, `Total de ${txt}`, `Menos de ${x}`, `${st}:u:${x}`, st, "t", -1, x, C, extra);
-    }
-    for (const [suf, dim, n, media] of [["l", "l", L, M[st][0]], ["v", "v", V, M[st][1]]]) {
-      const ls = lineasEq ? lineasEq.filter((x) => Math.abs(x - media) < 3) : lineasAlrededor(media, 2);
-      for (const x of ls) {
-        add(grupo, `${grupo} de ${n}`, `${n}: más de ${x}`, `${st}${suf}:o:${x}`, st, dim, 1, -x, C, extra);
-        add(grupo, `${grupo} de ${n}`, `${n}: menos de ${x}`, `${st}${suf}:u:${x}`, st, dim, -1, x, C, extra);
-      }
+    const mt = M[st][0] + M[st][1];
+    const tot = new Set(lineasDe(mt, kt));
+    for (const kk of Object.keys(cuotasDe(p))) { const m = kk.match(new RegExp(`^${st}:[ou]:([\\d.]+)$`)); if (m) tot.add(+m[1]); }
+    ou(grupo, `Total de ${txt}`, `${grupo} del partido`, st, st, "t", totalNB(mt, kt), [...tot].sort((a, b) => a - b), extra);
+    ou(grupo, `${grupo} de ${L}`, `${grupo} de ${L}`, `${st}l`, st, "l", C, lineasDe(M[st][0], ke), extra, `${L}: `);
+    ou(grupo, `${grupo} de ${V}`, `${grupo} de ${V}`, `${st}v`, st, "v", C, lineasDe(M[st][1], ke), extra, `${V}: `);
+    if (st === "c") {
+      const m1 = mt * 0.46;
+      ou(grupo, "Córners en la 1ª parte", "Córners 1ª parte", "c1", "c1", "t", totalNB(m1, kt), lineasDe(m1, kt), { ...extra, aprox: true });
     }
     if (st === "c" || st === "t") {
       add(grupo, `Quién tiene más ${txt}`, `${L}`, `${st}w:1`, st, "d", 1, -0.5, C, extra);
@@ -244,8 +268,16 @@ function probMercado(clave, cuotas) {
 // ---------------------------------------------------------------------------
 // Evaluación y mejor pick
 // ---------------------------------------------------------------------------
+let VERSION = 0;
+const MEMO = new Map();
 function evaluar(p, opciones = {}) {
-  const ms = mercados(p), cuotas = opciones.cuotas || cuotasDe(p), w = (opciones.peso ?? AJ.pesoModelo) / 100;
+  if (opciones.cuotas || opciones.peso != null) return evaluarSinMemo(p, opciones);
+  const k = p.id + "|" + VERSION + "|" + AJ.casa;
+  if (!MEMO.has(k)) MEMO.set(k, evaluarSinMemo(p, opciones));
+  return MEMO.get(k);
+}
+function evaluarSinMemo(p, opciones = {}) {
+  const ms = mercados(p, !!opciones.ligero), cuotas = opciones.cuotas || cuotasDe(p), w = (opciones.peso ?? AJ.pesoModelo) / 100;
   for (const m of ms) {
     m.pModelo = probEf(m.o);
     m.justa = cuotaJusta(m.o);
@@ -271,13 +303,33 @@ function evaluar(p, opciones = {}) {
     m.kelly = m.ev / (cu.c - 1);
   }
   const fiab = p.modelo.fiab ?? 1;
+  // Error de cuota: la ventaja tiene que llegar al mínimo de Ajustes (por defecto +100%:
+  // la casa paga al menos el doble de nuestra cuota justa)
   const candidatos = ms.filter((m) => m.cuota && m.ev != null && !m.exacto &&
-    m.cuota >= AJ.cuotaMin && m.cuota <= AJ.cuotaMax && m.pNuestra >= 0.2 && m.ev * 100 >= AJ.minEdge &&
-    !(m.pMercado != null && Math.abs(m.pModeloEq - m.pMercado) > 0.22));
-  for (const m of candidatos) m.puntos = m.kelly * (0.5 + 0.5 * fiab) * (m.aprox ? 0.6 : 1);
+    m.cuota >= AJ.cuotaMin && m.cuota <= AJ.cuotaMax && m.pNuestra * 100 >= AJ.probMin && m.ev * 100 >= AJ.minEdge);
+  for (const m of candidatos) {
+    m.puntos = m.kelly * (0.5 + 0.5 * fiab) * (m.aprox ? 0.6 : 1);
+    m.choque = m.pMercado != null && Math.abs(m.pModeloEq - m.pMercado) > 0.2;
+  }
   candidatos.sort((a, b) => b.puntos - a.puntos);
-  return { ms, pick: candidatos[0] || null, cuotas, fiab };
+  return { ms, pick: candidatos[0] || null, cuotas, fiab, ou: mejoresOU(ms, fiab) };
 }
+/** Mejor más/menos de cada mercado: el más probable cuya cuota justa llega a la mínima de Ajustes. */
+function mejoresOU(ms, fiab) {
+  const fams = new Map();
+  for (const m of ms) {
+    if (!m.fam || !isFinite(m.justa) || m.justa < AJ.cuotaMinOU) continue;
+    const act = fams.get(m.fam);
+    if (!act || m.pModelo > act.pModelo + 1e-9) fams.set(m.fam, m);
+  }
+  const out = [...fams.values()];
+  for (const m of out) {
+    m.errorSi = m.justa * (1 + AJ.minEdge / 100);          // cuota a partir de la cual es error de cuota
+    m.puntosOU = m.pModelo * (0.5 + 0.5 * fiab) * (m.aprox ? 0.8 : 1);
+  }
+  return out;
+}
+const etiqueta = (m) => (m.fam && !m.sel.includes(":") ? `${m.sel} · ${m.fam}` : m.sel);
 function staked(m) { return Math.min(3, Math.max(0.25, 25 * m.kelly)); }  // 1/4 de Kelly, máx. 3% del bank
 
 // ---------------------------------------------------------------------------
@@ -307,10 +359,14 @@ function filaPartido(p, extraIzq = "") {
     const r = res ? liquidar(ev.pick, p) : null;
     const c = r == null ? "valor" : r > 0 ? "gano" : r < 0 ? "perdio" : "";
     const icono = r == null ? "💥" : r > 0 ? "✓" : r < 0 ? "✗" : "↺";
-    chip = `<span class="chip ${c}"><span>${icono}</span><span class="t"><b>${esc(ev.pick.sel)}</b> @${dec(ev.pick.cuota)} · ${signo(ev.pick.ev)}</span></span>`;
+    chip = `<span class="chip ${c}"><span>${icono}</span><span class="t"><b>${esc(etiqueta(ev.pick))}</b> @${dec(ev.pick.cuota)} · ${signo(ev.pick.ev, 0)}</span></span>`;
   } else {
-    const hay = Object.keys(ev.cuotas).length;
-    chip = `<span class="chip"><span class="t">${hay ? "Sin valor suficiente" : "Sin cuotas · mira cuotas justas"}</span></span>`;
+    const m = ev.ou.filter((x) => !x.aprox).sort((a, b) => b.puntosOU - a.puntosOU)[0];
+    if (m) {
+      const r = res ? liquidar(m, p) : null;
+      const c = r == null ? "" : r > 0 ? "gano" : r < 0 ? "perdio" : "";
+      chip = `<span class="chip ${c}"><span>${r == null ? "📊" : r > 0 ? "✓" : "✗"}</span><span class="t"><b>${esc(etiqueta(m))}</b> · ${pct(m.pModelo)} · justa ${dec(m.justa)}</span></span>`;
+    } else chip = `<span class="chip"><span class="t">Sin datos</span></span>`;
   }
   return `<button class="partido" data-id="${p.id}">
     ${extraIzq}
@@ -356,21 +412,48 @@ function vistaPicks() {
   const ahora = Date.now();
   const proximos = D.partidos.filter((p) => !p.res && new Date(p.fecha).getTime() > ahora);
   const lista = [];
-  for (const p of proximos) { const e = evaluar(p); if (e.pick) lista.push([p, e.pick]); }
+  const conCuotasL = proximos.filter((p) => Object.keys(cuotasDe(p)).length);
+  for (const p of conCuotasL) { const e = evaluar(p); if (e.pick) lista.push([p, e.pick]); }
   lista.sort((a, b) => b[1].puntos - a[1].puntos);
-  const conCuotas = proximos.filter((p) => Object.keys(cuotasDe(p)).length).length;
-  let html = `<div class="jornadas"><h2>Mejores picks</h2><span class="resumen">${conCuotas} próximos partidos con cuotas · ${lista.length} con valor ≥ ${AJ.minEdge}% · ${esc(CASAS[AJ.casa])}</span></div>`;
+  const conCuotas = conCuotasL.length;
+  let html = `<div class="jornadas"><h2>Errores de cuota</h2><span class="resumen">La casa paga al menos un ${AJ.minEdge}% más que nuestra cuota justa · ${conCuotas} próximos partidos con cuotas · ${esc(CASAS[AJ.casa])}</span></div>`;
   if (!lista.length) {
-    html += `<div class="vacio">Ahora mismo ningún partido con cuotas supera tu umbral de valor (${AJ.minEdge}%).<br>Entra en cualquier partido: verás la <b>cuota justa</b> de cada mercado y, si escribes la cuota de tu casa, te digo al instante si hay error de cuota.</div>`;
+    html += `<div class="vacio">Ahora mismo ninguna cuota disponible llega a +${AJ.minEdge}% sobre nuestra cuota justa.<br>Abajo tienes los over/under más probables: mira la columna <b>“Error si pagan ≥”</b> y compárala con tu casa. Si tu casa paga eso o más, es error de cuota.</div>`;
   } else {
     html += `<div class="ranking">` + lista.slice(0, 25).map(([p], i) => filaPartido(p, `<span class="pos">${i + 1}</span>`)).join("") + `</div>`;
   }
-  // Próximos sin cuotas
-  const siguientes = proximos.filter((p) => !Object.keys(cuotasDe(p)).length).slice(0, 12);
-  if (siguientes.length) {
-    html += `<div class="dia">Próximos partidos sin cuotas todavía (abre uno para ver sus cuotas justas)</div><div class="lista">${siguientes.map((p) => filaPartido(p)).join("")}</div>`;
+  // Over/under más probables de los próximos días
+  const limite = ahora + 4 * 86400e3;
+  const filas = [];
+  for (const p of proximos) {
+    if (new Date(p.fecha).getTime() > limite) continue;
+    for (const m of evaluar(p).ou) if (!m.aprox) filas.push([p, m]);
   }
+  filas.sort((a, b) => b[1].puntosOU - a[1].puntosOU);
+  html += `<div class="jornadas"><h2>Over/Under más probables</h2><span class="resumen">Próximos 4 días · el pick más seguro de cada mercado con cuota justa ≥ ${dec(AJ.cuotaMinOU)}</span></div>`;
+  html += filas.length ? tablaOU(filas.slice(0, 60), true) : `<div class="vacio">No hay partidos en los próximos 4 días.</div>`;
   return html;
+}
+
+/** Tabla de over/under: filas [partido, mercado]. */
+function tablaOU(filas, conPartido) {
+  let html = `<div class="panel tabla-wrap" style="padding:8px"><table class="m ou"><thead><tr>${conPartido ? "<th>Partido</th>" : ""}<th>Mercado</th><th>Pick</th><th>Prob.</th><th>Cuota justa</th><th>Error si pagan ≥</th><th>Cuota casa</th><th>Diferencia</th>${conPartido ? "" : "<th>Resultado</th>"}</tr></thead><tbody>`;
+  for (const [p, m] of filas) {
+    const r = p.res ? liquidar(m, p) : null;
+    const err = m.ev != null && m.ev * 100 >= AJ.minEdge;
+    html += `<tr class="${err ? "elegido" : ""} ${conPartido ? "clic" : ""}" ${conPartido ? `data-id="${p.id}"` : ""}>
+      ${conPartido ? `<td>${fCorto.format(new Date(p.fecha))} ${fHora.format(new Date(p.fecha))} · <b>${esc(nombre(p.l))} – ${esc(nombre(p.v))}</b></td>` : ""}
+      <td>${esc(m.fam)}${m.aprox ? " (aprox.)" : ""}</td>
+      <td><b>${esc(m.sel.replace(/^.*?: /, ""))}</b></td>
+      <td><span class="barrita"><i style="width:${100 * m.pModelo}%"></i></span>${pct(m.pModelo, 1)}</td>
+      <td>${dec(m.justa)}</td>
+      <td><b>${dec(m.errorSi)}</b></td>
+      <td>${m.cuota ? dec(m.cuota) : "—"}</td>
+      <td class="${err ? "v-pos" : "v-neg"}">${m.ev != null ? signo(m.ev, 0) : "—"}</td>
+      ${conPartido ? "" : `<td>${r == null ? "—" : r > 0 ? '<span class="v-pos">✓ Acertado</span>' : r < 0 ? '<span style="color:var(--bad)">✗ Fallado</span>' : "↺ Nulo"}</td>`}
+    </tr>`;
+  }
+  return html + `</tbody></table></div>`;
 }
 
 function vistaPartido() {
@@ -385,6 +468,8 @@ function vistaPartido() {
     <div class="xg"><span>Goles esperados (modelo): ${dec(M.g[0])} – ${dec(M.g[1])}</span>${p.real?.xg ? `<span>xG real: ${dec(p.real.xg[0])} – ${dec(p.real.xg[1])}</span>` : ""}<span>Fiabilidad de datos: ${pct(M.fiab)}</span></div>
   </section>`;
   html += `<div class="grid2">` + panelPick(p, E) + panelEsperados(p, eqL, eqV) + `</div>`;
+  html += `<div class="jornadas" style="margin-top:22px"><h2>Mejor over/under de cada mercado</h2><span class="resumen">El más probable con cuota justa ≥ ${dec(AJ.cuotaMinOU)} · error de cuota si tu casa paga ≥ ${AJ.minEdge}% más</span></div>`;
+  html += tablaOU(E.ou.map((m) => [p, m]), false);
   html += `<div class="mercados">` + tablasMercados(p, E) + `</div>`;
   html += panelVivo(p);
   return html;
@@ -395,20 +480,20 @@ function panelPick(p, E) {
   if (!m) {
     const hay = Object.keys(E.cuotas).length;
     return `<section class="panel pick sinpick">
-      <div class="eyebrow">Mejor pick</div>
-      <div class="sel">${hay ? "Ninguna cuota con valor" : p.res ? "Sin cuotas registradas" : "Aún sin cuotas"}</div>
-      <p class="nota">${hay ? `Ninguna cuota disponible supera tu umbral (${AJ.minEdge}% de ventaja). Las casas están bien ajustadas en este partido; no apostar también es una decisión ganadora.`
+      <div class="eyebrow">Error de cuota</div>
+      <div class="sel">${hay ? `Ninguna cuota llega a +${AJ.minEdge}%` : p.res ? "Sin cuotas registradas" : "Aún sin cuotas"}</div>
+      <p class="nota">${hay ? `Para ser error de cuota la casa tiene que pagar al menos un ${AJ.minEdge}% más que nuestra cuota justa. Mira abajo el mejor over/under de cada mercado y su cuota mínima de error.`
         : p.res ? `Las fuentes no guardaron cuotas de este partido, así que no se puede saber qué pick habría salido. Abajo ves lo que esperaba el modelo antes del partido.`
-        : `Este partido aún no tiene cuotas en las fuentes gratuitas. Abajo tienes la <b>cuota justa</b> de cada mercado: escribe la cuota de tu casa en la columna “Tu cuota” y el pick aparecerá aquí si encuentra valor.`}</p>
+        : `Este partido aún no tiene cuotas en las fuentes gratuitas. Abajo tienes el mejor over/under de cada mercado con su <b>cuota justa</b> y la cuota a partir de la cual sería error de cuota. Escribe la cuota de tu casa en la columna “Tu cuota” de los mercados y, si llega, aparecerá aquí.`}</p>
     </section>`;
   }
   const r = p.res ? liquidar(m, p) : null;
   const res = r == null ? "" : r > 0 ? `<span class="chip gano">✓ Acertado</span>` : r < 0 ? `<span class="chip perdio">✗ Fallado</span>` : `<span class="chip">↺ Nulo</span>`;
   const pModelo = m.pModeloEq, pCasa = m.pCasa;
-  const boom = m.ev >= 0.08 ? `<span class="boom">BOOM</span>` : "";
+  const boom = m.ev >= 1 ? `<span class="boom">BOOM</span>` : "";
   return `<section class="panel pick">
-    <div class="eyebrow">💥 Mejor pick ${boom} ${res}</div>
-    <div class="sel">${esc(m.sel)}</div>
+    <div class="eyebrow">💥 Error de cuota ${boom} ${res}</div>
+    <div class="sel">${esc(etiqueta(m))}</div>
     <div class="mercado">${esc(m.grupo)} · ${esc(m.sub)} · cuota <b>${dec(m.cuota)}</b> (${esc(m.fuente === "manual" ? "tu cuota" : m.fuente === "vivo" ? "The Odds API" : CASAS[AJ.casa])})</div>
     <div class="cifras">
       <div><small>Nuestra prob.</small><b>${pct(m.pNuestra, 1)}</b></div>
@@ -422,7 +507,7 @@ function panelPick(p, E) {
       ${m.pMercado != null ? `<div class="fila casa"><span>Mercado sin margen</span><span class="pista"><i style="width:${100 * m.pMercado}%"></i></span><b class="num">${pct(m.pMercado, 1)}</b></div>` : ""}
       <div class="fila casa"><span>Cuota ${dec(m.cuota)} implica</span><span class="pista"><i style="width:${100 * pCasa}%"></i></span><b class="num">${pct(pCasa, 1)}</b></div>
     </div>
-    <p class="nota">Cuota justa según nuestra estimación: <b>${dec(1 / m.pNuestra)}</b>. Mientras te paguen por encima, la apuesta tiene valor. Stake = ¼ de Kelly sobre tu bank (máx. 3%).${m.aprox ? " Ojo: estadística estimada con datos parciales." : ""}</p>
+    <p class="nota">Cuota justa según nuestra estimación: <b>${dec(1 / m.pNuestra)}</b>. Mientras te paguen por encima, la apuesta tiene valor. Stake = ¼ de Kelly sobre tu bank (máx. 3%).${m.aprox ? " Ojo: estadística estimada con datos parciales." : ""}${m.choque ? " <b>Aviso:</b> el modelo y el resto de casas discrepan mucho; antes de apostar comprueba lesiones y alineaciones, que el modelo no conoce." : ""}</p>
   </section>`;
 }
 
@@ -506,11 +591,11 @@ function enlazarPartido() {
       const v = parseFloat(inp.value.replace(",", "."));
       MANUAL[p.id] = MANUAL[p.id] || {};
       if (v > 1) MANUAL[p.id][inp.dataset.k] = v; else delete MANUAL[p.id][inp.dataset.k];
-      guardar("cj_manual", MANUAL);
+      guardar("cj_manual", MANUAL); VERSION++;
       const y = window.scrollY; render(); window.scrollTo({ top: y });
     });
   });
-  $("#borrarManual")?.addEventListener("click", () => { delete MANUAL[p.id]; guardar("cj_manual", MANUAL); render(); });
+  $("#borrarManual")?.addEventListener("click", () => { delete MANUAL[p.id]; guardar("cj_manual", MANUAL); VERSION++; render(); });
   $("#cargarVivo")?.addEventListener("click", () => (AJ.oddsKey ? cargarVivo(p) : abrirAjustes()));
 }
 
@@ -522,7 +607,7 @@ function backtest(casa) {
   const prev = AJ.casa; AJ.casa = casa;
   for (const p of D.partidos) {
     if (!p.res || !p.cierre || !p.cuotas) continue;
-    const E = evaluar(p, { cuotas: cuotasDatos(p) });
+    const E = evaluar(p, { cuotas: cuotasDatos(p), ligero: true });
     if (!E.pick) continue;
     const r = liquidar(E.pick, p);
     if (r == null) continue;
@@ -537,6 +622,27 @@ function backtest(casa) {
 function cuotasDatos(p) {   // solo cuotas de los datos (sin manuales ni en vivo) para que la simulación sea limpia
   const guardaM = MANUAL, guardaV = VIVO; MANUAL = {}; VIVO = {};
   const c = cuotasDe(p); MANUAL = guardaM; VIVO = guardaV; return c;
+}
+const CATEG = {
+  g: "Goles del partido", gl: "Goles del local", gv: "Goles del visitante", g1: "Goles 1ª parte", g2: "Goles 2ª parte",
+  g1l: "Goles del local 1ª parte", g1v: "Goles del visitante 1ª parte", c: "Córners del partido", cl: "Córners del local",
+  cv: "Córners del visitante", t: "Tarjetas del partido", tl: "Tarjetas del local", tv: "Tarjetas del visitante",
+  f: "Faltas del partido", fl: "Faltas del local", fv: "Faltas del visitante", tp: "Tiros a puerta del partido",
+  tpl: "Tiros a puerta del local", tpv: "Tiros a puerta del visitante", s: "Tiros del partido", sl: "Tiros del local", sv: "Tiros del visitante",
+};
+function aciertoOU() {
+  const por = {};
+  for (const p of D.partidos) {
+    if (!p.res) continue;
+    for (const m of evaluar(p).ou) {
+      const r = liquidar(m, p);
+      if (r == null || r === 0) continue;
+      const k = m.clave.split(":")[0];
+      const a = (por[k] = por[k] || { n: 0, ok: 0, esp: 0, justa: 0 });
+      a.n++; a.ok += r > 0 ? 1 : 0; a.esp += m.pModelo; a.justa += m.justa;
+    }
+  }
+  return Object.entries(por).filter(([k]) => CATEG[k]);
 }
 function vistaRendimiento() {
   const filas = backtest(AJ.casa);
@@ -561,6 +667,15 @@ function vistaRendimiento() {
   html += `<section class="panel" style="margin-top:14px"><h3>Según dónde apuestes</h3><div class="tabla-wrap"><table class="m"><thead><tr><th>Cuotas</th><th>Picks</th><th>Beneficio</th><th>ROI</th></tr></thead><tbody>
     ${comparar.map(([c, nn, gg]) => `<tr><td>${esc(CASAS[c])}</td><td>${nn}</td><td>${gg >= 0 ? "+" : ""}${gg.toFixed(1)} u</td><td class="${gg >= 0 ? "v-pos" : ""}">${nn ? signo(gg / nn) : "—"}</td></tr>`).join("")}
   </tbody></table></div></section>`;
+  const ou = aciertoOU();
+  if (ou.length) {
+    const tn = ou.reduce((a, [, v]) => a + v.n, 0), tok = ou.reduce((a, [, v]) => a + v.ok, 0), tesp = ou.reduce((a, [, v]) => a + v.esp, 0);
+    html += `<section class="panel" style="margin-top:14px"><h3>Mejor over/under de cada mercado <small>partidos jugados · ${tn} picks · acierto ${pct(tok / tn, 1)} (el modelo esperaba ${pct(tesp / tn, 1)})</small></h3>
+    <div class="tabla-wrap"><table class="m"><thead><tr><th>Mercado</th><th>Picks</th><th>Acierto real</th><th>Esperado por el modelo</th><th>Cuota justa media</th></tr></thead><tbody>
+    ${ou.map(([k, v]) => `<tr><td>${esc(CATEG[k])}</td><td>${v.n}</td><td class="${v.ok / v.n >= v.esp / v.n - 0.03 ? "v-pos" : ""}">${pct(v.ok / v.n, 1)}</td><td>${pct(v.esp / v.n, 1)}</td><td>${dec(v.justa / v.n)}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="aviso">Si el acierto real está cerca del esperado, las probabilidades del modelo son fiables en ese mercado. Así puedes fiarte de la cuota justa para detectar errores de cuota.</p></section>`;
+  }
   html += `<section class="texto"><p><b>Cómo leer esto.</b> Cada partido jugado se ha predicho solo con datos anteriores a su fecha, y el pick se compara con las cuotas de cierre, que son las más difíciles de batir. Solo cuentan los mercados con cuotas históricas (1X2, más/menos 2,5 y hándicap asiático); córners, faltas y tarjetas no tienen cuotas gratuitas para comprobarlos.</p>
   <p>La conclusión práctica: el valor aparece sobre todo cuando comparas casas y apuestas en la que mejor paga. Con una sola casa, el margen se come buena parte de la ventaja. Es una muestra de pocas jornadas: tómala como orientación, no como garantía.</p></section>`;
   return html;
@@ -643,7 +758,7 @@ async function cargarVivo(p) {
     const cuotas = {};
     for (const [k, a] of Object.entries(acum)) cuotas[k] = { avg: +(a.s / a.n).toFixed(3), max: a.max, n: a.n };
     VIVO[p.id] = { t: Date.now(), cuotas };
-    guardar("cj_vivo", VIVO);
+    guardar("cj_vivo", VIVO); VERSION++;
     const quedan = r2.headers.get("x-requests-remaining");
     render();
     const e2 = $("#estadoVivo"); if (e2) e2.textContent += quedan ? ` · te quedan ${quedan} créditos este mes` : "";
@@ -658,15 +773,16 @@ async function cargarVivo(p) {
 function abrirAjustes() {
   const d = $("#ajustes");
   $("#ajCasa").value = AJ.casa; $("#ajEdge").value = AJ.minEdge; $("#ajPeso").value = AJ.pesoModelo;
-  $("#ajMin").value = AJ.cuotaMin; $("#ajMax").value = AJ.cuotaMax; $("#ajKey").value = AJ.oddsKey;
+  $("#ajProb").value = AJ.probMin; $("#ajOU").value = AJ.cuotaMinOU; $("#ajMin").value = AJ.cuotaMin; $("#ajMax").value = AJ.cuotaMax; $("#ajKey").value = AJ.oddsKey;
   d.showModal();
 }
 function guardarAjustes(e) {
   e.preventDefault();
   const n = (id, def) => { const v = parseFloat($(id).value); return isFinite(v) ? v : def; };
-  AJ = { casa: $("#ajCasa").value, minEdge: n("#ajEdge", 4), pesoModelo: Math.min(100, Math.max(0, n("#ajPeso", 20))),
-    cuotaMin: n("#ajMin", 1.3), cuotaMax: n("#ajMax", 6), oddsKey: $("#ajKey").value.trim() };
-  guardar("cj_ajustes", AJ);
+  AJ = { casa: $("#ajCasa").value, minEdge: n("#ajEdge", 100), pesoModelo: Math.min(100, Math.max(0, n("#ajPeso", 100))),
+    probMin: n("#ajProb", 25), cuotaMinOU: n("#ajOU", 1.15),
+    cuotaMin: n("#ajMin", 1.01), cuotaMax: n("#ajMax", 50), oddsKey: $("#ajKey").value.trim() };
+  guardar("cj_ajustes2", AJ); VERSION++;
   $("#ajustes").close();
   render();
 }
@@ -696,7 +812,7 @@ async function iniciar() {
     render();
   });
   $("#main").addEventListener("click", (e) => {
-    const f = e.target.closest(".partido");
+    const f = e.target.closest(".partido, tr.clic");
     if (f) { const p = D.partidos.find((x) => x.id === f.dataset.id); EST.partido = p.id; EST.comp = p.comp; EST.jornada = p.j; EST.vista = "partido"; render(); return; }
     const fl = e.target.closest("[data-j]");
     if (fl) { const c = comp(EST.comp), i = c.jornadas.indexOf(EST.jornada) + +fl.dataset.j; if (c.jornadas[i] != null) { EST.jornada = c.jornadas[i]; render(); } }

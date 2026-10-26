@@ -52,13 +52,19 @@ GitHub solo ejecuta las tareas programadas desde la rama principal, así que hay
   existe. Las pruebas con esta temporada muestran que el modelo solo es algo menos preciso que el mercado de
   cierre; mezclado, sirve para detectar casas que se desvían. Para mercados sin consenso (por ejemplo, una
   cuota de córners que escribes tú) se usa el modelo puro.
-- El pick elegido es la apuesta con mayor criterio de Kelly entre las que superan la ventaja mínima (4%),
-  con cuota entre 1,30 y 6 y sin una diferencia exagerada con el mercado (que suele indicar lesiones o
-  rotaciones que el modelo no conoce). Todo esto se cambia en Ajustes.
+- **Error de cuota**: solo cuando la casa paga al menos un **100% más** que nuestra cuota justa (por defecto se
+  compara el modelo puro con la cuota). Se cambia en Ajustes.
+- **Mejor over/under de cada mercado** (goles del partido, por equipo, 1ª y 2ª parte, córners, córners 1ª parte,
+  tarjetas, faltas, tiros a puerta y tiros, del partido y de cada equipo): la línea más probable cuya cuota
+  justa sea al menos 1,15, con la cuota a partir de la cual sería error de cuota. Sale aunque no haya cuotas.
+- Las probabilidades de más/menos están calibradas con los partidos jugados: el mejor over/under de cada
+  mercado acertó el 82,5% de las veces y el modelo esperaba el 82,4% (calibración ajustada con esos mismos
+  partidos).
 
 ## Importante
 
-Ningún modelo garantiza ganancias. En la simulación de esta temporada el resultado frente a las cuotas de
-cierre está entre −9% y +3% según los ajustes: la muestra es pequeña y no demuestra una ventaja. Donde más
+Ningún modelo garantiza ganancias. En la simulación de esta temporada, cuanto mayor era la diferencia entre el
+modelo y la cuota, peor salía la apuesta: con +100% solo hubo 4 casos y se perdieron los 4. Diferencias tan
+grandes suelen significar que el mercado sabe algo (lesiones, alineaciones) que el modelo no sabe. Donde más
 valor aparece es comparando casas y apostando en la que mejor paga. El modelo tampoco sabe de lesiones,
 alineaciones ni motivación. Solo mayores de 18 años; juega con responsabilidad.

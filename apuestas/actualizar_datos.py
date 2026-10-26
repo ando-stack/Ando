@@ -201,7 +201,7 @@ class Partido:
             setattr(self, k, kw.get(k))
 
 
-STATS = {"c": ("HC", "AC"), "f": ("HF", "AF"), "tp": ("HST", "AST")}
+STATS = {"c": ("HC", "AC"), "f": ("HF", "AF"), "tp": ("HST", "AST"), "s": ("HS", "AS")}
 
 
 def cuotas_de_fila(r, cierre):
@@ -252,6 +252,9 @@ def cargar_fd():
                     va, vb = num(r.get(a)), num(r.get(b))
                     if va is not None and vb is not None:
                         stats[k] = (va, vb)
+                h1, a1 = num(r.get("HTHG")), num(r.get("HTAG"))
+                if h1 is not None and a1 is not None:
+                    stats["g1"] = (h1, a1)       # goles al descanso (solo para comprobar picks)
                 yl, yv, rl, rv = (num(r.get(c)) for c in ("HY", "AY", "HR", "AR"))
                 if None not in (yl, yv, rl, rv):
                     stats["t"] = (yl + rl, yv + rv)
@@ -552,7 +555,7 @@ def main():
     for corte in cortes:
         modelos[corte] = {
             "g": ajustar_goles(hist, prior, corte),
-            **{k: ajustar_stat(hist, k, corte, equipos_div) for k in ("c", "f", "t", "tp")},
+            **{k: ajustar_stat(hist, k, corte, equipos_div) for k in ("c", "f", "t", "tp", "s")},
         }
     final = modelos[cortes[-1]]
 
@@ -588,7 +591,7 @@ def main():
             est["gc"] = media(lambda p: p.gv if p.loc == t else p.gl)
             est["xgf"] = media(lambda p: (p.xl if p.loc == t else p.xv))
             est["xgc"] = media(lambda p: (p.xv if p.loc == t else p.xl))
-            for k, (fa, co) in {"c": ("cf", "cc"), "f": ("ff", "fr"), "t": ("tf", "tr"), "tp": ("tpf", "tpc")}.items():
+            for k, (fa, co) in {"c": ("cf", "cc"), "f": ("ff", "fr"), "t": ("tf", "tr"), "tp": ("tpf", "tpc"), "s": ("sf", "sc")}.items():
                 est[fa] = media(lambda p: (p.stats[k][0] if p.loc == t else p.stats[k][1]) if k in p.stats else None)
                 est[co] = media(lambda p: (p.stats[k][1] if p.loc == t else p.stats[k][0]) if k in p.stats else None)
             est["o25"] = media(lambda p: 1.0 if p.gl + p.gv > 2.5 else 0.0)
@@ -611,7 +614,7 @@ def main():
         mod = modelos[corte] if (jugado or f < HOY) else final
         lh, la = lambdas(mod["g"], m["loc"], m["vis"], prior)
         modelo = {"g": [round(lh, 3), round(la, 3)]}
-        for k in ("c", "f", "t", "tp"):
+        for k in ("c", "f", "t", "tp", "s"):
             v = medias_stat(mod[k], m["loc"], m["vis"], equipos_div)
             if v and m["loc"] in (mod[k] or {}).get("fav", {}) and m["vis"] in (mod[k] or {}).get("fav", {}):
                 modelo[k] = v
@@ -656,7 +659,7 @@ def main():
         salida.append(item)
 
     # Dispersión de cada estadística (del modelo final)
-    disp = {k: {"k": final[k]["k"], "ke": final[k]["ke"]} for k in ("c", "f", "t", "tp") if final[k]}
+    disp = {k: {"k": final[k]["k"], "ke": final[k]["ke"]} for k in ("c", "f", "t", "tp", "s") if final[k]}
 
     comps = []
     ahora = datetime.now(timezone.utc)
