@@ -1,0 +1,786 @@
+{
+  "batch": 1,
+  "shorts": [
+    {
+      "number": 1,
+      "slug": "rejected-google-for-750k",
+      "title": "He Could Have Bought Google for $750K 😳",
+      "description": "In 1999, Google was for sale for less than a million dollars. The CEO of Excite said no. This is the most expensive 'no' in internet history.",
+      "hashtags": [
+        "#google",
+        "#businessstory"
+      ],
+      "thumbnail": {
+        "top": "Google for",
+        "big": "$750K?",
+        "bottom": "He said NO",
+        "emoji": "🔍"
+      },
+      "sources": [
+        "Wikipedia: Excite (web portal) — 1999 offer to buy Google",
+        "Vinod Khosla interviews about the Excite–Google deal"
+      ],
+      "scenes": [
+        {
+          "text": "This man could have bought Google… and he said no.",
+          "emoji": "🔍",
+          "big": "Google?"
+        },
+        {
+          "text": "In 1999, Larry Page and Sergey Brin wanted to sell Google and go back to Stanford.",
+          "emoji": "🎓"
+        },
+        {
+          "text": "They offered it to George Bell, the CEO of Excite, one of the biggest search engines back then.",
+          "emoji": "🏢"
+        },
+        {
+          "text": "The price? Seven hundred and fifty thousand dollars.",
+          "emoji": "💰",
+          "big": "$750,000"
+        },
+        {
+          "text": "Bell thought it was too expensive. He turned it down.",
+          "emoji": "🙅‍♂️",
+          "big": "NO DEAL",
+          "tone": "loss"
+        },
+        {
+          "text": "Today, Google is worth over two trillion dollars.",
+          "emoji": "📈",
+          "big": "$2 TRILLION+",
+          "tone": "gain"
+        },
+        {
+          "text": "And Excite? Almost nobody remembers it. Would you have bought it?",
+          "emoji": "🤔"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "slug": "blockbuster-laughed-at-netflix",
+      "title": "Blockbuster Could Have Bought Netflix for $50M",
+      "description": "In 2000, Netflix offered itself to Blockbuster for $50 million. Blockbuster passed. Ten years later, Blockbuster was bankrupt.",
+      "hashtags": [
+        "#netflix",
+        "#blockbuster"
+      ],
+      "thumbnail": {
+        "top": "They laughed at",
+        "big": "NETFLIX",
+        "bottom": "Big mistake",
+        "emoji": "📼",
+        "tone": "loss"
+      },
+      "sources": [
+        "Marc Randolph, 'That Will Never Work' (2019)",
+        "Wikipedia: Blockbuster LLC — 2010 bankruptcy"
+      ],
+      "scenes": [
+        {
+          "text": "In the year 2000, Netflix was losing money, and its founders flew to Dallas with an offer.",
+          "emoji": "✈️"
+        },
+        {
+          "text": "They offered Netflix to Blockbuster, the king of video rentals, for fifty million dollars.",
+          "emoji": "📼",
+          "big": "$50 MILLION"
+        },
+        {
+          "text": "According to co-founder Marc Randolph, Blockbuster's executives could barely keep a straight face.",
+          "emoji": "😂"
+        },
+        {
+          "text": "They said no.",
+          "emoji": "🙅‍♂️",
+          "big": "NO",
+          "tone": "loss"
+        },
+        {
+          "text": "Ten years later, Blockbuster filed for bankruptcy.",
+          "emoji": "📉",
+          "big": "BANKRUPT",
+          "tone": "loss"
+        },
+        {
+          "text": "Netflix is now worth hundreds of billions. And only one Blockbuster store is left, in Oregon.",
+          "emoji": "🍿",
+          "tone": "gain",
+          "big": "$100B+"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "slug": "sold-10-percent-of-apple-for-800",
+      "title": "He Sold 10% of Apple for $800",
+      "description": "Apple had three founders. The third one, Ronald Wayne, sold his 10% stake just 12 days after signing.",
+      "hashtags": [
+        "#apple",
+        "#stevejobs"
+      ],
+      "thumbnail": {
+        "top": "He sold Apple for",
+        "big": "$800",
+        "bottom": "After 12 days",
+        "emoji": "🍎",
+        "tone": "loss"
+      },
+      "sources": [
+        "Wikipedia: Ronald Wayne",
+        "Apple partnership agreement, April 1976"
+      ],
+      "scenes": [
+        {
+          "text": "Apple wasn't founded by two people. It was founded by three.",
+          "emoji": "🍎",
+          "big": "3 FOUNDERS"
+        },
+        {
+          "text": "In 1976, Steve Jobs, Steve Wozniak and Ronald Wayne started Apple. Wayne got ten percent.",
+          "emoji": "📝",
+          "big": "10%"
+        },
+        {
+          "text": "But he was scared of the company's debts.",
+          "emoji": "😰"
+        },
+        {
+          "text": "So just twelve days later, he sold his share for eight hundred dollars.",
+          "emoji": "💵",
+          "big": "$800",
+          "tone": "loss"
+        },
+        {
+          "text": "That ten percent would be worth billions today.",
+          "emoji": "💎",
+          "big": "BILLIONS",
+          "tone": "gain"
+        },
+        {
+          "text": "Wayne says he has no regrets. Do you believe him?",
+          "emoji": "🤔"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "slug": "billion-dollar-bitcoin-pizza",
+      "title": "He Paid 10,000 Bitcoin for 2 Pizzas 🍕",
+      "description": "On May 22, 2010, Laszlo Hanyecz bought two pizzas with 10,000 bitcoin. At bitcoin's peak, that was over a billion dollars.",
+      "hashtags": [
+        "#bitcoin",
+        "#crypto"
+      ],
+      "thumbnail": {
+        "top": "2 pizzas =",
+        "big": "$1 BILLION",
+        "bottom": "Worst trade ever?",
+        "emoji": "🍕"
+      },
+      "sources": [
+        "Wikipedia: Bitcoin Pizza Day",
+        "BitcoinTalk forum post by Laszlo Hanyecz, May 2010"
+      ],
+      "scenes": [
+        {
+          "text": "These are the most expensive pizzas in history.",
+          "emoji": "🍕",
+          "big": "2 PIZZAS"
+        },
+        {
+          "text": "On May twenty second, 2010, a programmer named Laszlo Hanyecz wanted to see if bitcoin could actually buy something.",
+          "emoji": "💻"
+        },
+        {
+          "text": "He offered ten thousand bitcoin to anyone who would bring him two pizzas. Someone said yes.",
+          "emoji": "🪙",
+          "big": "10,000 BTC"
+        },
+        {
+          "text": "Back then, that was about forty dollars.",
+          "emoji": "💵",
+          "big": "$40"
+        },
+        {
+          "text": "At bitcoin's peak, those coins were worth more than one billion dollars.",
+          "emoji": "🚀",
+          "big": "$1 BILLION+",
+          "tone": "gain"
+        },
+        {
+          "text": "Today, May twenty second is Bitcoin Pizza Day. Would you have eaten them?",
+          "emoji": "🤔"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "slug": "kodak-invented-digital-camera",
+      "title": "Kodak Invented the Digital Camera… and It Killed Them",
+      "description": "In 1975, a Kodak engineer built the first digital camera. Kodak didn't go all in. In 2012, it filed for bankruptcy.",
+      "hashtags": [
+        "#kodak",
+        "#innovation"
+      ],
+      "thumbnail": {
+        "top": "They invented",
+        "big": "THEIR OWN DEATH",
+        "bottom": "Kodak 1975",
+        "emoji": "📷",
+        "tone": "loss"
+      },
+      "sources": [
+        "Wikipedia: Steven Sasson",
+        "Wikipedia: Eastman Kodak — Chapter 11, January 2012"
+      ],
+      "scenes": [
+        {
+          "text": "Kodak invented the digital camera. And that's what destroyed it.",
+          "emoji": "📷"
+        },
+        {
+          "text": "In 1975, a Kodak engineer named Steve Sasson built the very first digital camera.",
+          "emoji": "🔧",
+          "big": "1975"
+        },
+        {
+          "text": "But Kodak was making a fortune selling film.",
+          "emoji": "🎞️",
+          "big": "FILM = $$$"
+        },
+        {
+          "text": "Digital cameras threatened that business, so Kodak never fully bet on them.",
+          "emoji": "🙈"
+        },
+        {
+          "text": "Other companies did.",
+          "emoji": "📸"
+        },
+        {
+          "text": "In 2012, Kodak filed for bankruptcy.",
+          "emoji": "📉",
+          "big": "BANKRUPT",
+          "tone": "loss"
+        },
+        {
+          "text": "Sometimes a company's biggest enemy is its own success.",
+          "emoji": "💡"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "slug": "nokia-from-king-to-zero",
+      "title": "Nokia Had It All… and Lost It in 6 Years",
+      "description": "In 2007, Nokia sold almost half of the world's phones. Then the iPhone arrived.",
+      "hashtags": [
+        "#nokia",
+        "#iphone"
+      ],
+      "thumbnail": {
+        "top": "The king that",
+        "big": "LOST IT ALL",
+        "bottom": "Nokia",
+        "emoji": "📱",
+        "tone": "loss"
+      },
+      "sources": [
+        "Wikipedia: Nokia — market share 2007",
+        "Microsoft press release, Sept 2013: acquisition of Nokia Devices & Services"
+      ],
+      "scenes": [
+        {
+          "text": "In 2007, almost half of all phones sold in the world were Nokias.",
+          "emoji": "📱",
+          "big": "#1 IN THE WORLD",
+          "tone": "gain"
+        },
+        {
+          "text": "They were indestructible. Everyone had one.",
+          "emoji": "🧱"
+        },
+        {
+          "text": "That same year, the iPhone came out. A touchscreen with no keys? Many thought it was a fad.",
+          "emoji": "🤳"
+        },
+        {
+          "text": "They were wrong.",
+          "emoji": "❌",
+          "big": "WRONG",
+          "tone": "loss"
+        },
+        {
+          "text": "In 2013, Nokia sold its phone business to Microsoft for about five point four billion euros, a fraction of its old value.",
+          "emoji": "💸",
+          "big": "€5.4 BILLION"
+        },
+        {
+          "text": "Did you have a Nokia?",
+          "emoji": "🤔"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "slug": "lamborghini-born-from-insult",
+      "title": "Lamborghini Exists Because Ferrari Insulted Him 🐂",
+      "description": "A tractor maker complained to Enzo Ferrari. The answer he got made him start his own supercar brand.",
+      "hashtags": [
+        "#lamborghini",
+        "#ferrari"
+      ],
+      "thumbnail": {
+        "top": "Ferrari insulted",
+        "big": "A FARMER",
+        "bottom": "Big mistake",
+        "emoji": "🐂"
+      },
+      "sources": [
+        "Wikipedia: Ferruccio Lamborghini",
+        "Ferruccio Lamborghini interviews (story as he told it)"
+      ],
+      "scenes": [
+        {
+          "text": "Lamborghini exists because Enzo Ferrari insulted a tractor maker.",
+          "emoji": "🚜"
+        },
+        {
+          "text": "Ferruccio Lamborghini got rich building tractors, and he owned several Ferraris.",
+          "emoji": "🏎️"
+        },
+        {
+          "text": "As the story goes, he complained to Enzo Ferrari about a clutch problem.",
+          "emoji": "🔧"
+        },
+        {
+          "text": "And Ferrari basically told him: stick to your tractors.",
+          "emoji": "😤",
+          "big": "STICK TO TRACTORS",
+          "tone": "loss"
+        },
+        {
+          "text": "Lamborghini took it personally. In 1963, he started his own supercar company to beat Ferrari.",
+          "emoji": "🐂",
+          "big": "1963",
+          "tone": "gain"
+        },
+        {
+          "text": "Never underestimate an angry man with money.",
+          "emoji": "💰"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "slug": "zara-founder-started-delivering-shirts",
+      "title": "The Founder of Zara Started as a Delivery Boy",
+      "description": "Amancio Ortega left school at 14. Today his company, Inditex, sells clothes almost everywhere on Earth.",
+      "hashtags": [
+        "#zara",
+        "#entrepreneur"
+      ],
+      "thumbnail": {
+        "top": "Delivery boy to",
+        "big": "BILLIONAIRE",
+        "bottom": "Zara",
+        "emoji": "👕",
+        "tone": "gain"
+      },
+      "sources": [
+        "Wikipedia: Amancio Ortega",
+        "Wikipedia: Zara — first store in A Coruña, 1975"
+      ],
+      "scenes": [
+        {
+          "text": "One of the richest men in the world started out delivering shirts.",
+          "emoji": "👕"
+        },
+        {
+          "text": "Amancio Ortega left school at fourteen and went to work at a shirt shop in Spain.",
+          "emoji": "🧵",
+          "big": "AGE 14"
+        },
+        {
+          "text": "Later, with his family, he started making bathrobes.",
+          "emoji": "🥻"
+        },
+        {
+          "text": "In 1975, he opened a small store in A Coruña. He called it Zara.",
+          "emoji": "🏬",
+          "big": "ZARA",
+          "tone": "gain"
+        },
+        {
+          "text": "His idea was simple: copy trends fast and have new clothes in stores every few weeks.",
+          "emoji": "⚡"
+        },
+        {
+          "text": "Today his company, Inditex, is one of the biggest fashion empires on the planet.",
+          "emoji": "🌍",
+          "big": "EMPIRE",
+          "tone": "gain"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "slug": "colonel-sanders-started-at-62",
+      "title": "He Started KFC at 62 🍗",
+      "description": "Colonel Sanders spent his life switching jobs. At 62, he started franchising his chicken recipe.",
+      "hashtags": [
+        "#kfc",
+        "#motivation"
+      ],
+      "thumbnail": {
+        "top": "He was broke at",
+        "big": "62",
+        "bottom": "Then came KFC",
+        "emoji": "🍗",
+        "tone": "gain"
+      },
+      "sources": [
+        "Wikipedia: Colonel Sanders",
+        "Wikipedia: KFC — first franchise 1952, sold 1964"
+      ],
+      "scenes": [
+        {
+          "text": "If you think it's too late to start, listen to this.",
+          "emoji": "⏳"
+        },
+        {
+          "text": "Harland Sanders spent his life switching jobs. Railroad worker, salesman, gas station operator.",
+          "emoji": "🔄"
+        },
+        {
+          "text": "In 1952, at sixty two, he started selling his fried chicken recipe to other restaurants.",
+          "emoji": "🍗",
+          "big": "AGE 62"
+        },
+        {
+          "text": "A few years later, a new highway took the traffic away from his own restaurant.",
+          "emoji": "🛣️",
+          "big": "NO CUSTOMERS",
+          "tone": "loss"
+        },
+        {
+          "text": "So he went all in, driving from restaurant to restaurant to sell his recipe. He heard no, again and again.",
+          "emoji": "🚗",
+          "big": "NO. NO. NO.",
+          "tone": "loss"
+        },
+        {
+          "text": "Today, KFC is in more than one hundred forty countries.",
+          "emoji": "🌍",
+          "big": "140+ COUNTRIES",
+          "tone": "gain"
+        },
+        {
+          "text": "It's never too late.",
+          "emoji": "💪"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "slug": "nintendo-started-in-1889",
+      "title": "Nintendo Started in 1889 Selling Playing Cards 🃏",
+      "description": "Before Mario, Nintendo sold playing cards and even tried running a taxi company.",
+      "hashtags": [
+        "#nintendo",
+        "#gaming"
+      ],
+      "thumbnail": {
+        "top": "Nintendo was born in",
+        "big": "1889",
+        "bottom": "Not a typo",
+        "emoji": "🃏"
+      },
+      "sources": [
+        "Wikipedia: History of Nintendo",
+        "Wikipedia: Hanafuda"
+      ],
+      "scenes": [
+        {
+          "text": "Nintendo is older than you think. Much older.",
+          "emoji": "🎮"
+        },
+        {
+          "text": "It was founded in 1889, in Kyoto, Japan.",
+          "emoji": "⛩️",
+          "big": "1889"
+        },
+        {
+          "text": "But it didn't make video games. It made playing cards called hanafuda.",
+          "emoji": "🃏"
+        },
+        {
+          "text": "In the sixties, it tried anything to survive. A taxi company. Even instant rice.",
+          "emoji": "🚕",
+          "big": "TAXIS?!"
+        },
+        {
+          "text": "Almost all of it failed.",
+          "emoji": "📉",
+          "tone": "loss"
+        },
+        {
+          "text": "Then it bet on toys, and later on video games. Today it's one of the biggest names in entertainment.",
+          "emoji": "🍄",
+          "big": "LEGEND",
+          "tone": "gain"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "slug": "samsung-started-selling-dried-fish",
+      "title": "Samsung Started Out Selling Dried Fish 🐟",
+      "description": "Samsung was founded in 1938 as a small trading company in Daegu, Korea.",
+      "hashtags": [
+        "#samsung",
+        "#techhistory"
+      ],
+      "thumbnail": {
+        "top": "Samsung used to sell",
+        "big": "FISH",
+        "bottom": "Seriously",
+        "emoji": "🐟"
+      },
+      "sources": [
+        "Wikipedia: Samsung — founded 1938 by Lee Byung-chul",
+        "Samsung corporate history"
+      ],
+      "scenes": [
+        {
+          "text": "Your Samsung phone comes from a shop that sold dried fish.",
+          "emoji": "🐟"
+        },
+        {
+          "text": "In 1938, Lee Byung-chul founded Samsung in Daegu, Korea.",
+          "emoji": "🇰🇷",
+          "big": "1938"
+        },
+        {
+          "text": "It was a tiny trading company selling dried fish, vegetables and noodles.",
+          "emoji": "🍜"
+        },
+        {
+          "text": "Then it moved into sugar, textiles, insurance…",
+          "emoji": "🏭"
+        },
+        {
+          "text": "And at the end of the sixties, it got into electronics.",
+          "emoji": "📺"
+        },
+        {
+          "text": "Today, Samsung is one of the biggest makers of phones and chips on Earth. Is there a Samsung near you right now?",
+          "emoji": "📱",
+          "big": "GIANT",
+          "tone": "gain"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "slug": "facebook-rejected-whatsapp-founder",
+      "title": "Facebook Rejected Him… Then Paid $19 Billion for His App",
+      "description": "In 2009, Facebook didn't hire Brian Acton. Five years later, it bought WhatsApp for $19 billion.",
+      "hashtags": [
+        "#whatsapp",
+        "#facebook"
+      ],
+      "thumbnail": {
+        "top": "Rejected. Then paid",
+        "big": "$19 BILLION",
+        "bottom": "WhatsApp",
+        "emoji": "💬",
+        "tone": "gain"
+      },
+      "sources": [
+        "Brian Acton's tweet, August 2009",
+        "Wikipedia: WhatsApp — acquired by Facebook in 2014"
+      ],
+      "scenes": [
+        {
+          "text": "In 2009, Facebook turned this man down for a job.",
+          "emoji": "📧",
+          "big": "REJECTED",
+          "tone": "loss"
+        },
+        {
+          "text": "His name was Brian Acton. He tweeted that it was a great opportunity, and he was moving on.",
+          "emoji": "🐦"
+        },
+        {
+          "text": "That same year, he joined his friend Jan Koum on a small messaging app called WhatsApp.",
+          "emoji": "💬"
+        },
+        {
+          "text": "Five years later, Facebook bought it for nineteen billion dollars.",
+          "emoji": "💰",
+          "big": "$19 BILLION",
+          "tone": "gain"
+        },
+        {
+          "text": "The most expensive rejection in history.",
+          "emoji": "😅"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "slug": "yahoo-rejected-44-billion",
+      "title": "Yahoo Said No to $44.6 Billion",
+      "description": "In 2008, Microsoft offered $44.6 billion for Yahoo. Nine years later, Yahoo's core business sold for about a tenth of that.",
+      "hashtags": [
+        "#yahoo",
+        "#microsoft"
+      ],
+      "thumbnail": {
+        "top": "From $44.6B to",
+        "big": "$4.5B",
+        "bottom": "Ouch",
+        "emoji": "📉",
+        "tone": "loss"
+      },
+      "sources": [
+        "Wikipedia: Microsoft's proposed acquisition of Yahoo! (2008)",
+        "Verizon–Yahoo deal closed June 2017"
+      ],
+      "scenes": [
+        {
+          "text": "In 2008, Microsoft tried to buy Yahoo for forty four point six billion dollars.",
+          "emoji": "💼",
+          "big": "$44.6 BILLION"
+        },
+        {
+          "text": "Yahoo said no. They believed they were worth more.",
+          "emoji": "🙅‍♂️",
+          "big": "NO",
+          "tone": "loss"
+        },
+        {
+          "text": "Nine years later, Yahoo sold its core business to Verizon…",
+          "emoji": "📞"
+        },
+        {
+          "text": "for about four and a half billion.",
+          "emoji": "📉",
+          "big": "$4.5 BILLION",
+          "tone": "loss"
+        },
+        {
+          "text": "Roughly ten times less.",
+          "emoji": "😬",
+          "big": "÷10"
+        },
+        {
+          "text": "Sometimes the best offer is the one in front of you.",
+          "emoji": "🤝"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "slug": "instagram-13-employees-1-billion",
+      "title": "13 Employees. $1 Billion. Instagram",
+      "description": "In 2012, Facebook bought Instagram for $1 billion. It had 13 employees and almost no revenue.",
+      "hashtags": [
+        "#instagram",
+        "#startup"
+      ],
+      "thumbnail": {
+        "top": "13 employees =",
+        "big": "$1 BILLION",
+        "bottom": "Instagram",
+        "emoji": "📸",
+        "tone": "gain"
+      },
+      "sources": [
+        "Wikipedia: Instagram — acquired by Facebook, April 2012"
+      ],
+      "scenes": [
+        {
+          "text": "In 2012, a company with just thirteen employees sold for one billion dollars.",
+          "emoji": "👥",
+          "big": "13 PEOPLE"
+        },
+        {
+          "text": "It was Instagram. It was less than two years old and had barely made any money.",
+          "emoji": "📸"
+        },
+        {
+          "text": "Mark Zuckerberg bought it anyway.",
+          "emoji": "💰",
+          "big": "$1 BILLION",
+          "tone": "gain"
+        },
+        {
+          "text": "People called it insane.",
+          "emoji": "🤯"
+        },
+        {
+          "text": "Today Instagram has over two billion users and makes billions every year.",
+          "emoji": "🌍",
+          "big": "2 BILLION USERS",
+          "tone": "gain"
+        },
+        {
+          "text": "It wasn't insane. It was one of the best deals ever made.",
+          "emoji": "🏆"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "slug": "play-doh-was-wallpaper-cleaner",
+      "title": "Play-Doh Was Originally a Wallpaper Cleaner 🤯",
+      "description": "A cleaning product about to disappear became one of the most famous toys ever.",
+      "hashtags": [
+        "#playdoh",
+        "#funfacts"
+      ],
+      "thumbnail": {
+        "top": "Play-Doh was a",
+        "big": "CLEANER",
+        "bottom": "Wait what?",
+        "emoji": "🧽"
+      },
+      "sources": [
+        "Wikipedia: Play-Doh — Kutol Products, Kay Zufall"
+      ],
+      "scenes": [
+        {
+          "text": "The modeling clay you played with as a kid was a cleaning product.",
+          "emoji": "🧽"
+        },
+        {
+          "text": "In the 1930s, a company called Kutol sold a putty to clean soot off wallpaper.",
+          "emoji": "🏠"
+        },
+        {
+          "text": "But home heating changed, people stopped buying it, and the company was about to go under.",
+          "emoji": "📉",
+          "tone": "loss",
+          "big": "ALMOST BROKE"
+        },
+        {
+          "text": "Then a teacher noticed kids could use it to make shapes.",
+          "emoji": "👩‍🏫"
+        },
+        {
+          "text": "They removed the detergent, added colors, and Play-Doh was born.",
+          "emoji": "🎨",
+          "big": "PLAY-DOH",
+          "tone": "gain"
+        },
+        {
+          "text": "Billions of cans have been sold since.",
+          "emoji": "🏆"
+        }
+      ]
+    }
+  ]
+}

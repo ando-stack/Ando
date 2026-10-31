@@ -122,3 +122,7 @@ Opciones: `-n` número de clips · `-d` segundos o `auto` · `-e todo|graciosos|
 - Los trabajos se guardan en `trabajos/` y se borran solos a las 24 h.
 
 Respeta los derechos de autor y las normas de cada plataforma al publicar clips de contenido ajeno.
+
+---
+
+> 🏭 En [`shorts-factory/`](shorts-factory/) está la fábrica de YouTube Shorts en inglés (Remotion + voces de Google).

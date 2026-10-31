@@ -1,0 +1,25 @@
+{
+  "channel": {
+    "name": "Money Untold",
+    "handle": "@MoneyUntold"
+  },
+  "voice": {
+    "cloud": {
+      "languageCode": "en-US",
+      "name": "en-US-Neural2-J",
+      "speakingRate": 1.12,
+      "pitch": -1.0
+    },
+    "translate": {
+      "lang": "en",
+      "tld": "com",
+      "playbackRate": 1.2
+    }
+  },
+  "video": {
+    "fps": 30,
+    "gapFrames": 5,
+    "endFrames": 20
+  },
+  "defaultHashtags": ["#shorts", "#money", "#business"]
+}
