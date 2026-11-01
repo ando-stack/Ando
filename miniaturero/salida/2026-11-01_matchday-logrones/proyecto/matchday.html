@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Match Day — Amorebieta vs UD Logroñés</title>
+<style>
+  /* ====== AJUSTES RÁPIDOS ====== */
+  :root {
+    --rojo: #d6001c;
+    --rojo-osc: #7a0010;
+    --blanco: #ffffff;
+    --fondo: #14060a;
+    --jugador-alto: 74%;   /* tamaño del jugador respecto al alto del póster */
+  }
+  @font-face { font-family: "Anton"; src: url("fonts/Anton-Regular.ttf"); }
+  @font-face { font-family: "Bebas"; src: url("fonts/BebasNeue-Regular.ttf"); }
+  @font-face { font-family: "Montserrat"; src: url("fonts/Montserrat-Variable.ttf"); font-weight: 100 900; }
+
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: var(--fondo); }
+  .poster { position: relative; width: 100%; height: 100%; overflow: hidden;
+    background: radial-gradient(ellipse at 30% 55%, #3a0a12 0%, var(--fondo) 65%); font-family: "Anton", sans-serif; }
+
+  /* franjas rojiblancas en diagonal (eco de la referencia, con colores del Logroñés) */
+  .franjas { position: absolute; left: -28%; top: -15%; width: 70%; height: 140%; transform: rotate(14deg);
+    background: repeating-linear-gradient(90deg, var(--rojo) 0 70px, var(--blanco) 70px 120px);
+    opacity: .92;
+    -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent 100%); mask-image: linear-gradient(90deg, #000 40%, transparent 100%); }
+  /* mancha roja con borde rasgado a la derecha */
+  .mancha { position: absolute; right: -6%; top: 30%; width: 70%; height: 46%; background: var(--rojo); opacity: .9;
+    clip-path: polygon(8% 6%, 22% 0, 38% 5%, 55% 1%, 72% 6%, 100% 0, 100% 100%, 80% 95%, 63% 100%, 44% 94%, 26% 99%, 10% 93%, 0 98%, 4% 70%, 0 45%, 5% 22%); }
+  .mancha::after { content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(100deg, rgba(0,0,0,.18) 0 3px, transparent 3px 11px); }
+
+  /* texto repetido de fondo */
+  .eco { position: absolute; left: -20%; top: 18%; width: 160%; transform: rotate(-14deg); color: rgba(255,255,255,.06);
+    font-size: 64px; line-height: 1.15; letter-spacing: 4px; white-space: nowrap; }
+
+  .vineta { position: absolute; inset: 0; box-shadow: inset 0 0 220px rgba(0,0,0,.85); pointer-events: none; }
+
+  /* jugador (silueta provisional: sustituir por img/jugador.png recortado) */
+  .jugador { position: absolute; bottom: 0; left: -4%; height: var(--jugador-alto);
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 24px rgba(214,0,28,.9)); }
+
+  .titulo { position: absolute; right: 5%; top: 4%; text-align: right; color: var(--blanco);
+    font-size: 210px; line-height: .86; letter-spacing: 2px;
+    text-shadow: 6px 6px 0 var(--rojo), 12px 12px 0 rgba(0,0,0,.6); }
+  .titulo span { display: block; }
+  .titulo .hueco { color: transparent; -webkit-text-stroke: 4px var(--blanco); text-shadow: 6px 6px 0 var(--rojo); }
+
+  .equipos { position: absolute; right: 5%; top: 44%; text-align: right; color: var(--blanco); }
+  .equipos .eq { font-size: 74px; line-height: 1; text-shadow: 0 4px 0 rgba(0,0,0,.5); }
+  .equipos .vs { font-family: "Bebas"; font-size: 54px; color: var(--fondo); background: var(--blanco);
+    display: inline-block; padding: 2px 16px 0; margin: 10px 0; transform: skew(-10deg); }
+  .equipos .nuestro { color: var(--blanco); background: var(--fondo); display: inline-block; padding: 4px 16px 0; border-left: 10px solid var(--rojo); }
+
+  .pie { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 5% 34px; text-align: right;
+    background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.7) 70%, transparent 100%); color: var(--blanco); }
+  .pie .copa { font-size: 96px; line-height: 1; letter-spacing: 2px; }
+  .pie .copa b { color: var(--rojo); font-weight: normal; text-shadow: 0 0 1px #fff; }
+  .pie .datos { font-family: "Montserrat"; font-weight: 800; font-size: 34px; letter-spacing: 1px; margin-top: 8px; }
+  .pie .datos i { font-style: normal; color: var(--rojo); padding: 0 10px; }
+  .pie .campo { font-family: "Montserrat"; font-weight: 600; font-size: 28px; letter-spacing: 3px; opacity: .85; margin-top: 4px; text-transform: uppercase; }
+
+  /* formato vertical 9:16: más aire */
+  @media (min-aspect-ratio: 0/1) and (max-aspect-ratio: 10/16) {
+    .titulo { top: 6%; font-size: 240px; }
+    .equipos { top: 40%; }
+    .jugador { height: 70%; }
+    .pie { padding-bottom: 120px; }   /* margen para la interfaz de stories */
+    .mancha { top: 34%; height: 36%; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="franjas"></div>
+  <div class="mancha"></div>
+  <div class="eco">COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·<br>COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·<br>COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·</div>
+
+  <!-- SILUETA PROVISIONAL. Para poner al jugador: <img class="jugador" src="img/jugador.png"> -->
+  <svg class="jugador" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="rayas" width="56" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(4)">
+        <rect width="30" height="10" fill="#b00018"/><rect x="30" width="26" height="10" fill="#e8e8e8"/>
+      </pattern>
+      <linearGradient id="sombra" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#000" stop-opacity=".25"/><stop offset=".55" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity=".85"/>
+      </linearGradient>
+      <linearGradient id="piel" x1="0" x2="1"><stop offset="0" stop-color="#2a1316"/><stop offset="1" stop-color="#0d0507"/></linearGradient>
+    </defs>
+    <!-- cabeza y cuello -->
+    <path d="M200 40 C 245 40 268 78 266 122 C 265 150 258 172 246 190 C 236 206 220 214 200 214 C 180 214 164 206 154 190 C 142 172 135 150 134 122 C 132 78 155 40 200 40 Z" fill="url(#piel)"/>
+    <path d="M140 92 C 140 50 175 30 205 32 C 240 34 264 56 262 96 C 250 70 225 62 200 64 C 175 62 152 72 140 92 Z" fill="#050203"/>
+    <path d="M170 200 L 230 200 L 236 262 L 164 262 Z" fill="url(#piel)"/>
+    <!-- torso con camiseta rojiblanca -->
+    <path id="torso" d="M20 560 C 22 420 52 330 120 296 C 145 284 160 270 166 252 L 200 280 L 234 252 C 240 270 255 284 280 296 C 348 330 378 420 380 560 Z" fill="url(#rayas)"/>
+    <path d="M20 560 C 22 420 52 330 120 296 C 145 284 160 270 166 252 L 200 280 L 234 252 C 240 270 255 284 280 296 C 348 330 378 420 380 560 Z" fill="url(#sombra)"/>
+    <!-- cuello de la camiseta -->
+    <path d="M164 250 L 200 286 L 236 250 L 244 258 L 200 302 L 156 258 Z" fill="#f2f2f2"/>
+  </svg>
+
+  <div class="vineta"></div>
+
+  <div class="titulo"><span>MATCH</span><span class="hueco">DAY</span></div>
+
+  <div class="equipos">
+    <div class="eq">SD AMOREBIETA</div>
+    <div class="vs">VS</div><br>
+    <div class="eq nuestro">UD LOGROÑÉS</div>
+  </div>
+
+  <div class="pie">
+    <div class="copa"><b>COPA</b> DEL REY</div>
+    <div class="datos">MIÉ 4 NOV<i>|</i>20:00 H</div>
+    <div class="campo">Campo Municipal de Urritxe</div>
+  </div>
+</div>
+</body>
+</html>
