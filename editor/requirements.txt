@@ -6,7 +6,7 @@
 #   - NVIDIA (CUDA): índice https://download.pytorch.org/whl/cu126
 #   - Apple Silicon (MPS) y Windows/Linux sin GPU: índice CPU / PyPI
 torch==2.14.1
-torchvision==0.29.2
+torchvision==0.29.1
 
 transformers==5.22.1; python_version >= "3.11"
 transformers==5.20.2; python_version < "3.11"
