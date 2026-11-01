@@ -22,6 +22,7 @@ Significa: escribir el **siguiente lote de 15 guiones** y **renderizar sus 15 v�
 4. Comprueba que cada carpeta `outputs/NNN-slug/` tiene `video.mp4`, `info.txt` y `extras/` (`thumbnail.png`, `script.txt`),
    que ningún vídeo pasa de 60 s, y mira un par de fotogramas.
 5. Haz commit y push de `lotes/` y `outputs/` a la rama de trabajo.
-6. El usuario quiere los vídeos en su ordenador, no en GitHub: crea en el scratchpad un ZIP
-   `MoneyUntold-lote-NNN.zip` con la carpeta `MoneyUntold/shorts/` (solo las carpetas de ese lote)
-   y envíaselo con `SendUserFile`. Si hay una carpeta de su ordenador conectada (Remote Control), cópialos allí.
+6. El usuario quiere **todos** los vídeos juntos en una sola carpeta de su ordenador, no en GitHub:
+   crea en el scratchpad `MoneyUntold-todos.zip` con `MoneyUntold/shorts/` (las carpetas de **todos** los Shorts,
+   no solo las del lote nuevo) y `MoneyUntold/canal/` (banner y foto de perfil), y envíaselo con `SendUserFile`.
+   Si hay una carpeta de su ordenador conectada (Remote Control), cópialos allí en vez de mandar el ZIP.
