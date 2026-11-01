@@ -1,0 +1,21 @@
+#056 — The $75,000 Deal That Made Bill Gates Rich
+
+NARRATION
+The deal that made Bill Gates rich used software he didn't write.
+In 1980, IBM needed an operating system for its first personal computer.
+Microsoft didn't have one. So it bought one from a small Seattle company for about seventy five thousand dollars.
+They adapted it and licensed it to IBM. But here's the genius part: Microsoft kept the rights.
+When other companies copied the IBM PC, they all needed that operating system. And Microsoft sold it to all of them.
+That's how Microsoft took over the PC world. Read the contract.
+
+ON-SCREEN
+1. 💾
+2. 🖥️
+3. 💵 $75,000
+4. 🧠 KEPT THE RIGHTS
+5. 💰
+6. 📜
+
+SOURCES / FACT CHECK
+Wikipedia: 86-DOS — bought from Seattle Computer Products
+Wikipedia: MS-DOS — IBM PC licensing
