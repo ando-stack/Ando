@@ -1,0 +1,260 @@
+{
+  "batch": 3,
+  "shorts": [
+    {
+      "number": 31,
+      "slug": "bezos-parents-invested-245k",
+      "title": "His Parents Bet $245,000 on Amazon",
+      "description": "In 1995, Jeff Bezos told his parents there was a 70% chance they'd lose their money. They invested anyway.",
+      "hashtags": ["#amazon", "#jeffbezos"],
+      "thumbnail": { "top": "His parents bet", "big": "$245K", "bottom": "On Amazon", "emoji": "📦", "tone": "gain" },
+      "sources": ["Wikipedia: Jeff Bezos — early Amazon funding", "Bezos interviews about the 70% risk warning"],
+      "scenes": [
+        { "text": "In 1995, Jeff Bezos asked his parents for money for a tiny online bookstore.", "emoji": "📚" },
+        { "text": "He warned them: there's about a seventy percent chance you lose all of it.", "emoji": "⚠️", "big": "70% RISK", "tone": "loss" },
+        { "text": "They invested anyway. Around two hundred and forty five thousand dollars.", "emoji": "💵", "big": "$245,000" },
+        { "text": "That bookstore was Amazon.", "emoji": "📦", "big": "AMAZON" },
+        { "text": "That bet turned into billions of dollars for the Bezos family.", "emoji": "🚀", "big": "BILLIONS", "tone": "gain" },
+        { "text": "Would you have bet on your kid?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 32,
+      "slug": "mark-cuban-sold-to-yahoo-5-7-billion",
+      "title": "He Sold an Internet Radio Site for $5.7 Billion",
+      "description": "In 1999, Yahoo bought Mark Cuban's Broadcast.com for $5.7 billion in stock. Then the bubble popped.",
+      "hashtags": ["#markcuban", "#dotcom"],
+      "thumbnail": { "top": "Internet radio sold for", "big": "$5.7B", "bottom": "Perfect timing", "emoji": "📻", "tone": "gain" },
+      "sources": ["Wikipedia: Broadcast.com — acquired by Yahoo, 1999", "Wikipedia: Mark Cuban"],
+      "scenes": [
+        { "text": "Mark Cuban sold a website for five point seven billion dollars. At the perfect moment.", "emoji": "📻", "big": "$5.7 BILLION", "tone": "gain" },
+        { "text": "His company, Broadcast.com, streamed radio and sports over the internet. In the nineties, that was magic.", "emoji": "🎧" },
+        { "text": "In 1999, at the peak of the dot com craze, Yahoo bought it, paying in stock.", "emoji": "🫧", "big": "1999" },
+        { "text": "Cuban protected his shares so a crash couldn't wipe him out.", "emoji": "🛡️" },
+        { "text": "Months later, the bubble burst, and Yahoo eventually shut Broadcast.com down.", "emoji": "📉", "tone": "loss", "big": "SHUT DOWN" },
+        { "text": "Cuban walked away a billionaire. Timing is everything.", "emoji": "⏱️" }
+      ]
+    },
+    {
+      "number": 33,
+      "slug": "spanx-5000-dollars-to-billionaire",
+      "title": "From $5,000 to Billionaire: Spanx",
+      "description": "Sara Blakely cut the feet off her pantyhose and built a billion-dollar company with her savings.",
+      "hashtags": ["#spanx", "#entrepreneur"],
+      "thumbnail": { "top": "She started with", "big": "$5,000", "bottom": "Became a billionaire", "emoji": "✂️", "tone": "gain" },
+      "sources": ["Wikipedia: Sara Blakely", "Forbes, March 2012: youngest self-made female billionaire"],
+      "scenes": [
+        { "text": "She cut the feet off her pantyhose, and became a billionaire.", "emoji": "✂️" },
+        { "text": "Sara Blakely was selling fax machines door to door.", "emoji": "📠" },
+        { "text": "She wanted something smooth to wear under white pants, so she grabbed scissors and made it herself.", "emoji": "👖" },
+        { "text": "With five thousand dollars of savings, she started Spanx in 2000.", "emoji": "💵", "big": "$5,000" },
+        { "text": "Factories laughed at her idea. One finally said yes.", "emoji": "🏭" },
+        { "text": "In 2012, Forbes called her the youngest self-made female billionaire in the world.", "emoji": "👑", "big": "BILLIONAIRE", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 34,
+      "slug": "paypal-sale-funded-tesla-spacex",
+      "title": "The Sale That Paid for Tesla and SpaceX",
+      "description": "In 2002, eBay bought PayPal for $1.5 billion. Elon Musk put almost all of his share into two risky companies.",
+      "hashtags": ["#elonmusk", "#paypal"],
+      "thumbnail": { "top": "He bet it all on", "big": "ROCKETS", "bottom": "And cars", "emoji": "🚀" },
+      "sources": ["Wikipedia: PayPal — acquired by eBay, 2002", "Wikipedia: Elon Musk — early investments in SpaceX and Tesla"],
+      "scenes": [
+        { "text": "In 2002, eBay bought PayPal for one and a half billion dollars.", "emoji": "💳", "big": "$1.5 BILLION" },
+        { "text": "One of its biggest shareholders, Elon Musk, got around one hundred and eighty million.", "emoji": "💰", "big": "$180 MILLION", "tone": "gain" },
+        { "text": "Most people would retire. He didn't.", "emoji": "🏖️" },
+        { "text": "He put almost all of it into two companies everyone thought would fail: a rocket company and an electric car company.", "emoji": "🚀", "big": "ALL IN" },
+        { "text": "In 2008, both were close to running out of money.", "emoji": "😰", "tone": "loss", "big": "ALMOST BROKE" },
+        { "text": "Both survived. SpaceX and Tesla made him one of the richest people on Earth. Would you have risked it all?", "emoji": "🌍", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 35,
+      "slug": "enron-most-innovative-was-a-fraud",
+      "title": "America's 'Most Innovative Company' Was a Fraud",
+      "description": "Fortune named Enron America's most innovative company six years in a row. Then it collapsed.",
+      "hashtags": ["#enron", "#fraud"],
+      "thumbnail": { "top": "Most innovative company", "big": "FRAUD", "bottom": "Enron", "emoji": "🏢", "tone": "loss" },
+      "sources": ["Wikipedia: Enron scandal", "Fortune 'Most Innovative' ranking, 1996–2001"],
+      "scenes": [
+        { "text": "For six years in a row, Fortune called Enron America's most innovative company.", "emoji": "🏆", "big": "6 YEARS IN A ROW", "tone": "gain" },
+        { "text": "It was one of the biggest energy companies in the United States.", "emoji": "⚡" },
+        { "text": "But a lot of its profits weren't real. Debts were hidden in side companies with clever accounting.", "emoji": "🙈" },
+        { "text": "In 2001, the truth came out. The stock went from around ninety dollars to under one dollar.", "emoji": "📉", "big": "$90 → $1", "tone": "loss" },
+        { "text": "Enron went bankrupt. Thousands lost their jobs and retirement savings.", "emoji": "💔", "big": "BANKRUPT", "tone": "loss" },
+        { "text": "The most innovative thing about it was the accounting.", "emoji": "🧾" }
+      ]
+    },
+    {
+      "number": 36,
+      "slug": "google-was-called-backrub",
+      "title": "Google Used to Be Called BackRub",
+      "description": "Before it was Google, Larry Page and Sergey Brin's search engine had a very different name.",
+      "hashtags": ["#google", "#funfacts"],
+      "thumbnail": { "top": "Google's first name", "big": "BACKRUB", "bottom": "Not a joke", "emoji": "💆" },
+      "sources": ["Wikipedia: History of Google — BackRub", "Wikipedia: Googol"],
+      "scenes": [
+        { "text": "Google's first name was… BackRub.", "emoji": "💆", "big": "BACKRUB" },
+        { "text": "In 1996, Larry Page and Sergey Brin built a search engine at Stanford that ranked pages by their backlinks.", "emoji": "🔗" },
+        { "text": "Back links. BackRub. That was the name.", "emoji": "😅" },
+        { "text": "Then they wanted something bigger. They chose googol, the number one followed by one hundred zeros.", "emoji": "🔢", "big": "1 + 100 ZEROS" },
+        { "text": "As the story goes, it was misspelled, and Google stuck.", "emoji": "✍️", "big": "GOOGLE" },
+        { "text": "Would you search on BackRub?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 37,
+      "slug": "twitter-was-a-side-project",
+      "title": "Twitter Was a Side Project of a Dying Startup",
+      "description": "Twitter came out of Odeo, a podcast company crushed when Apple added podcasts to iTunes.",
+      "hashtags": ["#twitter", "#startup"],
+      "thumbnail": { "top": "Twitter was a", "big": "SIDE PROJECT", "bottom": "Then $44 billion", "emoji": "🐦", "tone": "gain" },
+      "sources": ["Wikipedia: Odeo", "Wikipedia: Twitter — history; acquisition by Elon Musk, 2022"],
+      "scenes": [
+        { "text": "Twitter was born because Apple killed a startup.", "emoji": "🐦" },
+        { "text": "In 2005, a company called Odeo was building a podcast platform.", "emoji": "🎙️" },
+        { "text": "Then Apple put podcasts right inside iTunes. Odeo was finished.", "emoji": "🍏", "big": "GAME OVER", "tone": "loss" },
+        { "text": "So the team looked for a new idea. One of them proposed short status updates by text message.", "emoji": "💬" },
+        { "text": "In 2006, it became Twitter.", "emoji": "🐣", "big": "2006" },
+        { "text": "In 2022, Elon Musk bought it for forty four billion dollars. One failure can start something huge.", "emoji": "💰", "big": "$44 BILLION", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 38,
+      "slug": "slack-came-from-failed-game",
+      "title": "Slack Came From a Failed Video Game",
+      "description": "A game called Glitch flopped. The chat tool its team built for themselves sold for $27.7 billion.",
+      "hashtags": ["#slack", "#startup"],
+      "thumbnail": { "top": "A failed game became", "big": "$27.7B", "bottom": "Slack", "emoji": "🎮", "tone": "gain" },
+      "sources": ["Wikipedia: Glitch (video game)", "Wikipedia: Slack Technologies — acquired by Salesforce, 2021"],
+      "scenes": [
+        { "text": "Slack exists because a video game failed.", "emoji": "🎮" },
+        { "text": "Stewart Butterfield's company was building an online game called Glitch.", "emoji": "👾" },
+        { "text": "Not enough people played it. In 2012, they shut it down.", "emoji": "📉", "big": "GAME OVER", "tone": "loss" },
+        { "text": "But while making it, the team had built their own internal chat tool.", "emoji": "💬" },
+        { "text": "They turned that tool into a product and called it Slack.", "emoji": "🚀", "big": "SLACK" },
+        { "text": "In 2021, Salesforce bought it for twenty seven point seven billion dollars. Look at what you build along the way.", "emoji": "💰", "big": "$27.7 BILLION", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 39,
+      "slug": "youtube-started-as-dating-site",
+      "title": "YouTube Started as a Dating Site 😳",
+      "description": "YouTube's first idea was video dating. A year and a half later, Google bought it for $1.65 billion.",
+      "hashtags": ["#youtube", "#funfacts"],
+      "thumbnail": { "top": "YouTube was a", "big": "DATING SITE", "bottom": "Seriously", "emoji": "💘" },
+      "sources": ["Jawed Karim, talk at SXSW 2016, on the dating-site origin", "Wikipedia: YouTube — acquired by Google, 2006"],
+      "scenes": [
+        { "text": "The site you're watching right now started as a dating website.", "emoji": "💘" },
+        { "text": "In early 2005, YouTube's founders had an idea: people upload videos about themselves to find a date.", "emoji": "📹" },
+        { "text": "Nobody uploaded dating videos.", "emoji": "🦗", "big": "ZERO DATES", "tone": "loss" },
+        { "text": "So they opened it up to any video at all.", "emoji": "🔓" },
+        { "text": "Around a year and a half later, Google bought YouTube for one point six five billion dollars.", "emoji": "💰", "big": "$1.65 BILLION", "tone": "gain" },
+        { "text": "Today, billions of people use it. Sometimes the first idea is just the door.", "emoji": "🚪" }
+      ]
+    },
+    {
+      "number": 40,
+      "slug": "new-coke-disaster",
+      "title": "Coca-Cola Changed Its Recipe… and People Revolted",
+      "description": "In 1985, Coca-Cola launched New Coke. 79 days later, the old recipe was back.",
+      "hashtags": ["#cocacola", "#marketingfail"],
+      "thumbnail": { "top": "Coke changed the recipe", "big": "79 DAYS", "bottom": "Then panic", "emoji": "🥤", "tone": "loss" },
+      "sources": ["Wikipedia: New Coke"],
+      "scenes": [
+        { "text": "In 1985, Coca-Cola changed its secret recipe.", "emoji": "🥤", "big": "NEW COKE" },
+        { "text": "Pepsi was winning taste tests, so Coke made a sweeter formula. In blind tests, people liked it.", "emoji": "🧪" },
+        { "text": "But when it hit stores, people were furious. They wanted the original back.", "emoji": "😡", "big": "OUTRAGE", "tone": "loss" },
+        { "text": "The company got a flood of angry calls and letters. Some fans stockpiled the old Coke.", "emoji": "📞" },
+        { "text": "After just seventy nine days, the original returned as Coca-Cola Classic.", "emoji": "🔙", "big": "79 DAYS" },
+        { "text": "Sales went up. Some still wonder if it was all a genius plan. What do you think?", "emoji": "🤔", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 41,
+      "slug": "wrigley-gum-was-a-free-gift",
+      "title": "Wrigley's Gum Started as a Free Gift 🍬",
+      "description": "William Wrigley Jr. gave away gum to sell baking powder. Customers wanted the gum.",
+      "hashtags": ["#wrigley", "#marketing"],
+      "thumbnail": { "top": "The gum was", "big": "FREE", "bottom": "Then an empire", "emoji": "🍬" },
+      "sources": ["Wikipedia: William Wrigley Jr.", "Wikipedia: Wrigley Company — history"],
+      "scenes": [
+        { "text": "Wrigley's gum started as a free gift.", "emoji": "🎁" },
+        { "text": "In 1891, William Wrigley Junior moved to Chicago to sell soap.", "emoji": "🧼" },
+        { "text": "To sell more, he gave away free baking powder with each order.", "emoji": "🧁" },
+        { "text": "The baking powder was more popular than the soap. So he sold that, and gave away free chewing gum.", "emoji": "🔄" },
+        { "text": "Then people wanted the gum more than the baking powder.", "emoji": "🍬", "big": "THE GUM!", "tone": "gain" },
+        { "text": "So he sold gum, and Wrigley became one of the biggest gum companies in the world. Watch what customers actually want.", "emoji": "👀" }
+      ]
+    },
+    {
+      "number": 42,
+      "slug": "toyota-started-making-looms",
+      "title": "Toyota Started by Making Weaving Looms",
+      "description": "Before cars, the Toyoda family built automatic looms. Selling a loom patent helped fund the car business.",
+      "hashtags": ["#toyota", "#cars"],
+      "thumbnail": { "top": "Toyota started with", "big": "LOOMS", "bottom": "Not cars", "emoji": "🧶" },
+      "sources": ["Wikipedia: Sakichi Toyoda", "Wikipedia: Toyota Industries — history"],
+      "scenes": [
+        { "text": "Toyota didn't start with cars. It started with weaving machines.", "emoji": "🧶" },
+        { "text": "Sakichi Toyoda was an inventor who built automatic looms in Japan.", "emoji": "🇯🇵" },
+        { "text": "His best loom stopped by itself when a thread broke. It was a huge deal.", "emoji": "⚙️", "big": "GENIUS" },
+        { "text": "In 1929, the rights to that loom were sold to a British company.", "emoji": "🇬🇧", "big": "PATENT SOLD" },
+        { "text": "His son Kiichiro used that money to help start building cars.", "emoji": "🚗", "big": "CARS", "tone": "gain" },
+        { "text": "Today, Toyota is one of the biggest car makers in the world. All thanks to a loom.", "emoji": "🌍", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 43,
+      "slug": "nike-logo-cost-35-dollars",
+      "title": "The Nike Logo Cost $35 ✔️",
+      "description": "In 1971, a student designed the Nike swoosh for $35. Phil Knight wasn't even sure he liked it.",
+      "hashtags": ["#nike", "#design"],
+      "thumbnail": { "top": "The Nike logo cost", "big": "$35", "bottom": "Really", "emoji": "✔️" },
+      "sources": ["Wikipedia: Swoosh", "Wikipedia: Carolyn Davidson"],
+      "scenes": [
+        { "text": "One of the most famous logos on Earth cost thirty five dollars.", "emoji": "✔️", "big": "$35" },
+        { "text": "In 1971, Phil Knight needed a logo for his new shoe brand.", "emoji": "👟" },
+        { "text": "He asked Carolyn Davidson, a design student, to make one.", "emoji": "✏️" },
+        { "text": "She drew the swoosh. Knight said: I don't love it, but it will grow on me.", "emoji": "🤷‍♂️" },
+        { "text": "Years later, Nike gave her a gold ring with the swoosh and shares in the company.", "emoji": "💍", "big": "THANK YOU GIFT", "tone": "gain" },
+        { "text": "Today that swoosh is worth billions. Would you take thirty five dollars for it?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 44,
+      "slug": "pepsi-went-bankrupt-twice",
+      "title": "Pepsi Went Bankrupt Twice",
+      "description": "Before it became a giant, Pepsi went bankrupt twice and was nearly sold to its biggest rival.",
+      "hashtags": ["#pepsi", "#cocacola"],
+      "thumbnail": { "top": "Pepsi went bankrupt", "big": "TWICE", "bottom": "Then this", "emoji": "🥤", "tone": "loss" },
+      "sources": ["Wikipedia: Pepsi — history, bankruptcies 1923 and 1931", "Wikipedia: Charles Guth"],
+      "scenes": [
+        { "text": "Pepsi went bankrupt. Twice.", "emoji": "🥤", "big": "BANKRUPT x2", "tone": "loss" },
+        { "text": "The first time was in 1923, after sugar prices went crazy.", "emoji": "🍬", "big": "1923" },
+        { "text": "It was sold, and in 1931 it went bankrupt again.", "emoji": "📉", "big": "1931", "tone": "loss" },
+        { "text": "Then Charles Guth, the boss of a candy store chain, bought it. As the story goes, Pepsi was even offered to Coca-Cola. Coke said no.", "emoji": "🙅‍♂️" },
+        { "text": "Pepsi survived by selling bigger bottles for the same price: twice as much for a nickel.", "emoji": "🪙", "big": "2x FOR 5¢", "tone": "gain" },
+        { "text": "Today, it's one of the biggest food and drink companies in the world.", "emoji": "🌍", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 45,
+      "slug": "dominos-traded-for-a-beetle",
+      "title": "He Traded Half of Domino's for a Used Car 🚗",
+      "description": "Tom Monaghan's brother swapped his half of a small pizzeria for a Volkswagen Beetle.",
+      "hashtags": ["#dominos", "#pizza"],
+      "thumbnail": { "top": "Half of Domino's for", "big": "A CAR", "bottom": "Worst trade?", "emoji": "🍕", "tone": "loss" },
+      "sources": ["Wikipedia: Tom Monaghan", "Wikipedia: Domino's — history"],
+      "scenes": [
+        { "text": "This man traded half of Domino's for a used car.", "emoji": "🚗" },
+        { "text": "In 1960, brothers Tom and James Monaghan bought a small pizzeria in Michigan.", "emoji": "🍕", "big": "1960" },
+        { "text": "Pretty soon, James wanted out.", "emoji": "🚪" },
+        { "text": "So he gave Tom his half of the business… in exchange for a Volkswagen Beetle.", "emoji": "🐞", "big": "A VW BEETLE", "tone": "loss" },
+        { "text": "Tom kept going, renamed it Domino's, and built it into a giant.", "emoji": "📈" },
+        { "text": "In 1998, he sold most of it for about one billion dollars. Would you have kept the car?", "emoji": "💰", "big": "$1 BILLION", "tone": "gain" }
+      ]
+    }
+  ]
+}
