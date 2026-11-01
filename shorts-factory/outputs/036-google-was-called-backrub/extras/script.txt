@@ -1,0 +1,21 @@
+#036 — Google Used to Be Called BackRub
+
+NARRATION
+Google's first name was… BackRub.
+In 1996, Larry Page and Sergey Brin built a search engine at Stanford that ranked pages by their backlinks.
+Back links. BackRub. That was the name.
+Then they wanted something bigger. They chose googol, the number one followed by one hundred zeros.
+As the story goes, it was misspelled, and Google stuck.
+Would you search on BackRub?
+
+ON-SCREEN
+1. 💆 BACKRUB
+2. 🔗
+3. 😅
+4. 🔢 1 + 100 ZEROS
+5. ✍️ GOOGLE
+6. 🤔
+
+SOURCES / FACT CHECK
+Wikipedia: History of Google — BackRub
+Wikipedia: Googol

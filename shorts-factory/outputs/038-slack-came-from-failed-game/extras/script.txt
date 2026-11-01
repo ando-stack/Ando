@@ -1,0 +1,21 @@
+#038 — Slack Came From a Failed Video Game
+
+NARRATION
+Slack exists because a video game failed.
+Stewart Butterfield's company was building an online game called Glitch.
+Not enough people played it. In 2012, they shut it down.
+But while making it, the team had built their own internal chat tool.
+They turned that tool into a product and called it Slack.
+In 2021, Salesforce bought it for twenty seven point seven billion dollars. Look at what you build along the way.
+
+ON-SCREEN
+1. 🎮
+2. 👾
+3. 📉 GAME OVER
+4. 💬
+5. 🚀 SLACK
+6. 💰 $27.7 BILLION
+
+SOURCES / FACT CHECK
+Wikipedia: Glitch (video game)
+Wikipedia: Slack Technologies — acquired by Salesforce, 2021
