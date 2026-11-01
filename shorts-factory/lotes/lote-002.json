@@ -1,0 +1,260 @@
+{
+  "batch": 2,
+  "shorts": [
+    {
+      "number": 16,
+      "slug": "warren-buffett-200-billion-revenge",
+      "title": "Warren Buffett's $200 Billion Revenge Mistake",
+      "description": "The greatest investor alive bought a dying textile company out of spite. He later called it a $200 billion mistake.",
+      "hashtags": ["#warrenbuffett", "#investing"],
+      "thumbnail": { "top": "Buffett's worst trade:", "big": "$200 BILLION", "bottom": "Out of revenge", "emoji": "😤", "tone": "loss" },
+      "sources": ["Warren Buffett, CNBC interview, October 2010", "Wikipedia: Berkshire Hathaway — history"],
+      "scenes": [
+        { "text": "The greatest investor in the world made a two hundred billion dollar mistake… out of pride.", "emoji": "😤", "big": "$200 BILLION", "tone": "loss" },
+        { "text": "In the early sixties, Warren Buffett was buying shares of a textile company called Berkshire Hathaway.", "emoji": "🧵" },
+        { "text": "The boss promised to buy his shares back at one price, then offered a little less.", "emoji": "📝", "big": "1/8 OF A DOLLAR" },
+        { "text": "Buffett was so angry, he bought control of the whole company and fired him.", "emoji": "🔥", "big": "YOU'RE FIRED" },
+        { "text": "But it was a dying textile business. Buffett later said that revenge cost him around two hundred billion dollars.", "emoji": "📉", "tone": "loss" },
+        { "text": "Lesson: never invest angry.", "emoji": "🧠" }
+      ]
+    },
+    {
+      "number": 17,
+      "slug": "ratner-destroyed-company-with-one-joke",
+      "title": "He Lost £500 Million With One Joke",
+      "description": "In 1991, Gerald Ratner called his own products 'crap' in a speech. His company never recovered.",
+      "hashtags": ["#marketing", "#businessfail"],
+      "thumbnail": { "top": "One joke cost him", "big": "£500M", "bottom": "Doing a Ratner", "emoji": "🎤", "tone": "loss" },
+      "sources": ["Wikipedia: Gerald Ratner — Institute of Directors speech, April 1991"],
+      "scenes": [
+        { "text": "This man destroyed his own company with one joke.", "emoji": "🎤" },
+        { "text": "In 1991, Gerald Ratner ran the biggest jewelry chain in Britain.", "emoji": "💍", "big": "#1 IN THE UK", "tone": "gain" },
+        { "text": "In a speech, he joked that some of his products were total crap.", "emoji": "💩", "big": "\"TOTAL CRAP\"" },
+        { "text": "His customers heard it. And they stopped buying.", "emoji": "🚶‍♂️" },
+        { "text": "About five hundred million pounds was wiped off the company's value, and Ratner was soon out.", "emoji": "📉", "big": "-£500 MILLION", "tone": "loss" },
+        { "text": "In Britain, it's still called doing a Ratner. Careful what you say.", "emoji": "🤐" }
+      ]
+    },
+    {
+      "number": 18,
+      "slug": "decca-rejected-the-beatles",
+      "title": "The Record Label That Rejected The Beatles 🎸",
+      "description": "On January 1, 1962, Decca Records auditioned The Beatles and said no.",
+      "hashtags": ["#thebeatles", "#musichistory"],
+      "thumbnail": { "top": "They told The Beatles", "big": "NO FUTURE", "bottom": "Decca, 1962", "emoji": "🎸", "tone": "loss" },
+      "sources": ["Wikipedia: Decca audition (1 January 1962)", "Brian Epstein, 'A Cellarful of Noise' (1964)"],
+      "scenes": [
+        { "text": "On New Year's Day, 1962, an unknown band auditioned for Decca Records.", "emoji": "🎙️", "big": "JAN 1, 1962" },
+        { "text": "They recorded fifteen songs in about an hour.", "emoji": "🎸", "big": "15 SONGS" },
+        { "text": "Decca said no. As the story goes, they were told guitar groups were on their way out.", "emoji": "🙅‍♂️", "big": "REJECTED", "tone": "loss" },
+        { "text": "That band was The Beatles.", "emoji": "🪲", "big": "THE BEATLES" },
+        { "text": "Months later, they signed with another label and became the best-selling band in history.", "emoji": "🏆", "tone": "gain", "big": "#1 EVER" },
+        { "text": "How many opportunities do we turn down without knowing it?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 19,
+      "slug": "michael-jordan-almost-signed-with-adidas",
+      "title": "Michael Jordan Almost Signed With Adidas 👟",
+      "description": "In 1984, Michael Jordan didn't even want to meet Nike. His mother convinced him to go.",
+      "hashtags": ["#michaeljordan", "#nike"],
+      "thumbnail": { "top": "He didn't want", "big": "NIKE", "bottom": "Mom said go", "emoji": "👟" },
+      "sources": ["Wikipedia: Air Jordan — 1984 Nike deal", "Nike annual reports — Jordan Brand revenue"],
+      "scenes": [
+        { "text": "Michael Jordan didn't want to sign with Nike. He wanted Adidas.", "emoji": "👟", "big": "ADIDAS?" },
+        { "text": "In 1984, Nike was mostly a running brand, not a basketball one.", "emoji": "🏃" },
+        { "text": "Jordan didn't even want to go to the meeting. His mother convinced him.", "emoji": "👩", "big": "THANKS, MOM" },
+        { "text": "Nike offered something almost no one got: his own shoe, and a cut of every pair sold.", "emoji": "💰", "big": "HIS OWN SHOE", "tone": "gain" },
+        { "text": "That shoe was the Air Jordan. Today the Jordan brand brings in billions of dollars a year.", "emoji": "🏀", "big": "BILLIONS / YEAR", "tone": "gain" },
+        { "text": "And Jordan still gets paid on every pair. Would you have taken the meeting?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 20,
+      "slug": "tulip-mania-flower-worth-a-house",
+      "title": "When One Flower Cost as Much as a House 🌷",
+      "description": "Tulip mania in 1637 Holland is often called the first speculative bubble in history.",
+      "hashtags": ["#history", "#economics"],
+      "thumbnail": { "top": "1 flower =", "big": "1 HOUSE", "bottom": "Holland, 1637", "emoji": "🌷" },
+      "sources": ["Wikipedia: Tulip mania", "Anne Goldgar, 'Tulipmania' (2007) — on how big the crash really was"],
+      "scenes": [
+        { "text": "In the sixteen hundreds, in Holland, a single tulip bulb could cost as much as a house.", "emoji": "🌷", "big": "1 FLOWER = 1 HOUSE" },
+        { "text": "Tulips were the ultimate luxury. Everyone wanted them.", "emoji": "👑" },
+        { "text": "People started buying bulbs just to sell them for more a few days later.", "emoji": "🔁", "big": "BUY. SELL. REPEAT." },
+        { "text": "According to accounts from the time, the rarest bulbs reached thousands of guilders.", "emoji": "💰" },
+        { "text": "Then, in February 1637, buyers simply stopped showing up. Prices collapsed.", "emoji": "📉", "big": "CRASH", "tone": "loss" },
+        { "text": "It's often called the first bubble in history. Sound familiar?", "emoji": "🫧" }
+      ]
+    },
+    {
+      "number": 21,
+      "slug": "dyson-5127-prototypes",
+      "title": "He Failed 5,126 Times Before Getting Rich",
+      "description": "James Dyson built 5,127 prototypes of his bagless vacuum cleaner.",
+      "hashtags": ["#dyson", "#motivation"],
+      "thumbnail": { "top": "He failed", "big": "5,126 TIMES", "bottom": "Then this", "emoji": "🌀", "tone": "gain" },
+      "sources": ["Wikipedia: James Dyson", "Dyson company history — 5,127 prototypes"],
+      "scenes": [
+        { "text": "This man failed five thousand one hundred and twenty six times.", "emoji": "❌", "big": "5,126 FAILS", "tone": "loss" },
+        { "text": "James Dyson was annoyed that his vacuum lost power as the bag filled up.", "emoji": "😠" },
+        { "text": "So he tried to build a vacuum with no bag at all.", "emoji": "🌀" },
+        { "text": "For about five years, he built prototype after prototype. He went deep into debt.", "emoji": "🔧", "big": "5 YEARS" },
+        { "text": "Prototype number five thousand one hundred and twenty seven worked.", "emoji": "✅", "big": "#5,127", "tone": "gain" },
+        { "text": "Today Dyson is a global brand. How many times would you have tried?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 22,
+      "slug": "ikea-founded-at-17",
+      "title": "IKEA Was Started by a 17-Year-Old",
+      "description": "Ingvar Kamprad founded IKEA in 1943. Do you know what the name means?",
+      "hashtags": ["#ikea", "#funfacts"],
+      "thumbnail": { "top": "IKEA's founder was", "big": "17", "bottom": "Name explained", "emoji": "🪑" },
+      "sources": ["Wikipedia: Ingvar Kamprad", "Wikipedia: IKEA — name origin and flat-pack furniture"],
+      "scenes": [
+        { "text": "IKEA was started by a seventeen year old.", "emoji": "🧒", "big": "AGE 17" },
+        { "text": "As a kid in Sweden, Ingvar Kamprad sold matches to his neighbors from his bike.", "emoji": "🚲" },
+        { "text": "In 1943, he started his own company. The name is made of his initials, his family farm, and his village.", "emoji": "🔤", "big": "I·K·E·A" },
+        { "text": "Ingvar Kamprad, Elmtaryd, Agunnaryd.", "emoji": "🇸🇪" },
+        { "text": "First he sold pens and wallets. Then furniture.", "emoji": "🖊️" },
+        { "text": "And the big idea came when an employee took the legs off a table to fit it in a car. Flat-pack furniture was born.", "emoji": "📦", "big": "FLAT-PACK", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 23,
+      "slug": "red-bull-is-from-thailand",
+      "title": "Red Bull Is Actually From Thailand 🐂",
+      "description": "A toothpaste marketer tried a Thai energy drink on a business trip. The rest is history.",
+      "hashtags": ["#redbull", "#marketing"],
+      "thumbnail": { "top": "Red Bull is from", "big": "THAILAND", "bottom": "Not Austria", "emoji": "🐂" },
+      "sources": ["Wikipedia: Red Bull — Dietrich Mateschitz and Chaleo Yoovidhya", "Wikipedia: Krating Daeng"],
+      "scenes": [
+        { "text": "Red Bull wasn't invented in Austria.", "emoji": "🐂" },
+        { "text": "Dietrich Mateschitz was selling toothpaste. On a trip to Thailand, he tried a drink truck drivers used to stay awake.", "emoji": "🚚" },
+        { "text": "It was called Krating Daeng. In Thai, that means red bull.", "emoji": "🇹🇭", "big": "RED BULL" },
+        { "text": "He partnered with its creator, Chaleo Yoovidhya, and changed the recipe for western tastes.", "emoji": "🤝" },
+        { "text": "In 1987, Red Bull launched in Austria, with almost no normal ads. Just extreme sports and wild events.", "emoji": "🪂", "big": "1987" },
+        { "text": "Today it sells billions of cans every year.", "emoji": "🥫", "big": "BILLIONS OF CANS", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 24,
+      "slug": "lego-started-with-wooden-ducks",
+      "title": "LEGO Started With Wooden Ducks 🦆",
+      "description": "A carpenter, a fire, and a bet on plastic: the story of LEGO.",
+      "hashtags": ["#lego", "#funfacts"],
+      "thumbnail": { "top": "LEGO started with", "big": "DUCKS", "bottom": "Wooden ones", "emoji": "🦆" },
+      "sources": ["Wikipedia: The Lego Group — history", "Wikipedia: Ole Kirk Christiansen"],
+      "scenes": [
+        { "text": "LEGO started with wooden ducks.", "emoji": "🦆" },
+        { "text": "In 1932, a Danish carpenter named Ole Kirk Christiansen was struggling to find work.", "emoji": "🪚", "big": "1932" },
+        { "text": "So he made wooden toys. The name comes from the Danish leg godt, which means play well.", "emoji": "🇩🇰", "big": "PLAY WELL" },
+        { "text": "In 1942, a fire burned his factory down. He rebuilt it.", "emoji": "🔥", "tone": "loss", "big": "FIRE" },
+        { "text": "Then he bet on plastic bricks, when almost nobody believed in plastic toys.", "emoji": "🧱" },
+        { "text": "Today, LEGO is one of the biggest toy companies on Earth.", "emoji": "🏆", "big": "TOY GIANT", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 25,
+      "slug": "myspace-580-million-to-35-million",
+      "title": "MySpace Went From $580M to $35M",
+      "description": "In 2005, MySpace was the biggest social network on Earth. Six years later, it sold for pocket change.",
+      "hashtags": ["#myspace", "#socialmedia"],
+      "thumbnail": { "top": "$580 million to", "big": "$35M", "bottom": "MySpace", "emoji": "💻", "tone": "loss" },
+      "sources": ["Wikipedia: Myspace — News Corp acquisition 2005, sale to Specific Media 2011"],
+      "scenes": [
+        { "text": "In 2005, MySpace was the biggest social network in the world.", "emoji": "💻", "big": "#1", "tone": "gain" },
+        { "text": "Rupert Murdoch's News Corp bought it for five hundred and eighty million dollars.", "emoji": "💰", "big": "$580 MILLION" },
+        { "text": "Then Facebook showed up. Cleaner, faster, simpler.", "emoji": "📘" },
+        { "text": "Users left by the millions.", "emoji": "🚶‍♂️" },
+        { "text": "In 2011, MySpace sold for about thirty five million.", "emoji": "📉", "big": "$35 MILLION", "tone": "loss" },
+        { "text": "It lost over ninety percent of its value in six years. On the internet, nobody is untouchable.", "emoji": "⚠️" }
+      ]
+    },
+    {
+      "number": 26,
+      "slug": "quibi-burned-1-75-billion",
+      "title": "$1.75 Billion App Dead in 6 Months",
+      "description": "Quibi raised $1.75 billion and shut down the same year it launched.",
+      "hashtags": ["#quibi", "#startupfail"],
+      "thumbnail": { "top": "$1.75 billion app", "big": "6 MONTHS", "bottom": "Then dead", "emoji": "🔥", "tone": "loss" },
+      "sources": ["Wikipedia: Quibi — launch April 2020, shutdown announced October 2020"],
+      "scenes": [
+        { "text": "This company raised one point seven five billion dollars and died in about six months.", "emoji": "🔥", "big": "$1.75 BILLION" },
+        { "text": "It was called Quibi. Hollywood-quality shows in ten minute episodes, made only for your phone.", "emoji": "📱" },
+        { "text": "It had stars, famous directors, and a huge budget.", "emoji": "🎬" },
+        { "text": "It launched in April 2020, right when everyone was stuck at home, with no commute to fill.", "emoji": "🏠" },
+        { "text": "And you couldn't even share clips on social media.", "emoji": "🚫" },
+        { "text": "In October, it announced it was shutting down. Money can't buy success.", "emoji": "📉", "big": "SHUT DOWN", "tone": "loss" }
+      ]
+    },
+    {
+      "number": 27,
+      "slug": "theranos-9-billion-lie",
+      "title": "She Fooled Everyone With One Drop of Blood 🩸",
+      "description": "Theranos was once worth $9 billion. Its founder ended up in prison.",
+      "hashtags": ["#theranos", "#fraud"],
+      "thumbnail": { "top": "A $9 billion", "big": "LIE", "bottom": "Theranos", "emoji": "🩸", "tone": "loss" },
+      "sources": ["Wikipedia: Theranos", "Wikipedia: Elizabeth Holmes — convicted January 2022, sentenced November 2022"],
+      "scenes": [
+        { "text": "She convinced the world she had a revolutionary invention. It didn't work.", "emoji": "🩸" },
+        { "text": "Elizabeth Holmes dropped out of Stanford and started Theranos at nineteen.", "emoji": "🎓", "big": "AGE 19" },
+        { "text": "She promised hundreds of medical tests from a single drop of blood.", "emoji": "💉" },
+        { "text": "Famous investors poured in money. At its peak, the company was valued at nine billion dollars.", "emoji": "💰", "big": "$9 BILLION", "tone": "gain" },
+        { "text": "But the machines didn't do what she claimed.", "emoji": "❌" },
+        { "text": "In 2022, she was convicted of fraud and sentenced to more than eleven years in prison.", "emoji": "⚖️", "big": "11+ YEARS", "tone": "loss" }
+      ]
+    },
+    {
+      "number": 28,
+      "slug": "airbnb-survived-selling-cereal",
+      "title": "Airbnb Survived by Selling Cereal 🥣",
+      "description": "In 2008, Airbnb's founders were broke. Election-themed cereal boxes kept them alive.",
+      "hashtags": ["#airbnb", "#startup"],
+      "thumbnail": { "top": "Airbnb was saved by", "big": "CEREAL", "bottom": "Seriously", "emoji": "🥣", "tone": "gain" },
+      "sources": ["Wikipedia: Airbnb — history", "Paul Graham / Y Combinator accounts of the 2008 cereal boxes"],
+      "scenes": [
+        { "text": "Airbnb was saved by boxes of cereal.", "emoji": "🥣" },
+        { "text": "In 2008, its founders were in debt, and almost nobody was using their website.", "emoji": "💸", "tone": "loss", "big": "BROKE" },
+        { "text": "It was election year in America. So they designed cereal boxes for the candidates: Obama O's and Cap'n McCain's.", "emoji": "🗳️" },
+        { "text": "They sold them as collector's items.", "emoji": "📦" },
+        { "text": "They made about thirty thousand dollars. Just enough to keep going.", "emoji": "💵", "big": "$30,000", "tone": "gain" },
+        { "text": "Today Airbnb is worth tens of billions. Sometimes, to survive, you have to get creative.", "emoji": "🏠" }
+      ]
+    },
+    {
+      "number": 29,
+      "slug": "mansa-musa-crashed-gold",
+      "title": "He Was So Rich He Crashed the Price of Gold 👑",
+      "description": "Mansa Musa, king of Mali, is often called the richest person in history.",
+      "hashtags": ["#history", "#mansamusa"],
+      "thumbnail": { "top": "So rich he crashed", "big": "GOLD", "bottom": "Mansa Musa", "emoji": "👑" },
+      "sources": ["Wikipedia: Mansa Musa — 1324 pilgrimage", "Al-Umari's account of Musa's visit to Cairo"],
+      "scenes": [
+        { "text": "The richest person in history wasn't Elon Musk.", "emoji": "👑", "big": "NOT MUSK" },
+        { "text": "Many historians say it was Mansa Musa, king of the Mali Empire, in the fourteenth century.", "emoji": "🌍" },
+        { "text": "In 1324, he traveled to Mecca with a huge caravan carrying gold.", "emoji": "🐪", "big": "1324" },
+        { "text": "When he passed through Cairo, he spent and gave away so much gold…", "emoji": "🪙" },
+        { "text": "that gold lost value in the city for years.", "emoji": "📉", "big": "GOLD CRASHED", "tone": "loss" },
+        { "text": "He was so rich, nobody can really calculate his fortune.", "emoji": "💰" }
+      ]
+    },
+    {
+      "number": 30,
+      "slug": "steve-jobs-fired-from-apple",
+      "title": "Apple Fired Steve Jobs… Then Paid $429M to Get Him Back",
+      "description": "In 1985, Steve Jobs was pushed out of his own company. In 1997, Apple bought his new one.",
+      "hashtags": ["#stevejobs", "#apple"],
+      "thumbnail": { "top": "Fired from his own company", "big": "THEN $429M", "bottom": "Steve Jobs", "emoji": "🍏", "tone": "gain" },
+      "sources": ["Wikipedia: Steve Jobs — 1985 departure from Apple", "Wikipedia: NeXT — acquired by Apple for $429 million"],
+      "scenes": [
+        { "text": "Steve Jobs was pushed out of the company he started.", "emoji": "🍏", "big": "FIRED", "tone": "loss" },
+        { "text": "In 1985, after a power struggle with Apple's CEO, the board sided against him. He left.", "emoji": "🚪" },
+        { "text": "He started a new computer company called NeXT, and bought a small animation studio called Pixar.", "emoji": "🎬" },
+        { "text": "Meanwhile, Apple was in serious trouble.", "emoji": "📉", "tone": "loss" },
+        { "text": "So Apple bought NeXT for four hundred and twenty nine million dollars, and Jobs came back.", "emoji": "💰", "big": "$429 MILLION", "tone": "gain" },
+        { "text": "Then came the iPod, the iPhone, and one of the most valuable companies on Earth. Getting fired can be the start.", "emoji": "📱" }
+      ]
+    }
+  ]
+}
