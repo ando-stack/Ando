@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import { Cloud, Info, Trash2, Upload } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { importarImagen } from '../acciones';
+import { anadirSuperposicion, importarImagen } from '../acciones';
 import { api, type ResumenProyecto, type Trabajo } from '../api';
 import { cargarImagen } from '../canvas/componer';
 import { renderizar } from '../canvas/refs';
@@ -537,7 +537,6 @@ export function PanelEfectos() {
   }, []);
   const nombre = (u: string) => decodeURIComponent(u.split('/').pop()!.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' '));
   const modo = (u: string): ImageLayer['blendMode'] => (/(grano|semitono|halftone|textura|papel)/i.test(u) ? 'overlay' : 'screen');
-  const { anadirSuperposicion } = useAcciones();
   return (
     <div className="space-y-3 p-3 text-xs">
       <p className="text-tenue">Recursos propios con licencia libre (CC0). Se añaden a tamaño completo con un modo de fusión adecuado; ajusta la opacidad en el panel de capas.</p>
@@ -558,7 +557,4 @@ export function PanelEfectos() {
   );
 }
 
-function useAcciones() {
-  return { anadirSuperposicion: (u: string, n: string, m: ImageLayer['blendMode']) => import('../acciones').then((a) => a.anadirSuperposicion(u, n, m)) };
-}
 

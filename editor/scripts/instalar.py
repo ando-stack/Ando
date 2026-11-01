@@ -82,14 +82,20 @@ def comprobar_requisitos() -> dict:
 def crear_entorno() -> None:
     titulo("Entorno virtual")
     if PY_VENV.exists():
-        print("  .venv ya existe")
-        return
+        ok = subprocess.run([str(PY_VENV), "-m", "pip", "--version"], capture_output=True).returncode == 0
+        if ok:
+            print("  .venv ya existe")
+            return
+        print("  .venv está incompleto (quizá se interrumpió la instalación): se vuelve a crear")
+        shutil.rmtree(VENV, ignore_errors=True)
+    print("  Creando .venv… (puede tardar 1-3 minutos sin mostrar nada; no lo interrumpas)", flush=True)
     venv.EnvBuilder(with_pip=True).create(VENV)
     print("  creado .venv")
 
 
 def instalar_dependencias(gpu: str, forzar_cpu: bool) -> None:
     titulo("Dependencias de Python (versiones fijadas)")
+    print("  Descarga varios cientos de MB (con GPU NVIDIA, ~2,5 GB): puede tardar 5-15 minutos.", flush=True)
     ejecutar([str(PY_VENV), "-m", "pip", "install", "--upgrade", "pip"])
     reqs = (RAIZ / "requirements.txt").read_text("utf-8").splitlines()
     torch = [r for r in reqs if r.startswith(("torch==", "torchvision=="))]
