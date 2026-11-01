@@ -1,0 +1,260 @@
+{
+  "batch": 4,
+  "shorts": [
+    {
+      "number": 46,
+      "slug": "walt-disney-went-bankrupt",
+      "title": "Walt Disney Went Bankrupt Before Mickey Mouse",
+      "description": "Walt Disney's first studio went bankrupt. He moved to Hollywood with almost nothing.",
+      "hashtags": ["#disney", "#motivation"],
+      "thumbnail": { "top": "Walt Disney went", "big": "BANKRUPT", "bottom": "Then Mickey", "emoji": "🐭", "tone": "loss" },
+      "sources": ["Wikipedia: Laugh-O-Gram Studio — bankruptcy 1923", "Wikipedia: Walt Disney — early career"],
+      "scenes": [
+        { "text": "Before Mickey Mouse, Walt Disney went bankrupt.", "emoji": "🐭", "big": "BANKRUPT", "tone": "loss" },
+        { "text": "As the story goes, an early boss told him he lacked imagination.", "emoji": "📰" },
+        { "text": "In Kansas City, he started his first animation studio, Laugh-O-Gram. In 1923, it went bankrupt.", "emoji": "🎞️", "big": "1923" },
+        { "text": "He moved to Hollywood with very little money and a suitcase.", "emoji": "🧳" },
+        { "text": "In 1928, he released a cartoon with a new character: Mickey Mouse.", "emoji": "🎬", "big": "MICKEY", "tone": "gain" },
+        { "text": "Today, Disney is one of the biggest entertainment companies on Earth. Failure isn't the end.", "emoji": "🏰", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 47,
+      "slug": "starbucks-bought-for-3-8-million",
+      "title": "He Bought Starbucks for $3.8 Million",
+      "description": "Howard Schultz left Starbucks, started his own coffee shops, then bought Starbucks for $3.8 million.",
+      "hashtags": ["#starbucks", "#entrepreneur"],
+      "thumbnail": { "top": "He bought Starbucks for", "big": "$3.8M", "bottom": "Best deal ever?", "emoji": "☕", "tone": "gain" },
+      "sources": ["Wikipedia: Howard Schultz", "Wikipedia: Starbucks — 1987 acquisition by Il Giornale"],
+      "scenes": [
+        { "text": "Starbucks used to sell coffee beans, not coffee drinks.", "emoji": "☕" },
+        { "text": "In 1983, an employee named Howard Schultz visited Italy and fell in love with espresso bars.", "emoji": "🇮🇹" },
+        { "text": "He wanted Starbucks to sell espresso drinks. The owners weren't interested.", "emoji": "🙅‍♂️" },
+        { "text": "So he left and opened his own coffee shops.", "emoji": "🏪" },
+        { "text": "In 1987, he bought Starbucks itself for about three point eight million dollars.", "emoji": "💰", "big": "$3.8 MILLION", "tone": "gain" },
+        { "text": "Today there are tens of thousands of Starbucks around the world.", "emoji": "🌍", "big": "40,000+ STORES", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 48,
+      "slug": "ray-kroc-mcdonalds-at-52",
+      "title": "A Milkshake Machine Salesman Took Over McDonald's",
+      "description": "Ray Kroc was 52 and selling milkshake mixers when he met the McDonald brothers.",
+      "hashtags": ["#mcdonalds", "#business"],
+      "thumbnail": { "top": "A salesman took over", "big": "McDONALD'S", "bottom": "At 52", "emoji": "🍔" },
+      "sources": ["Wikipedia: Ray Kroc", "Wikipedia: McDonald's — 1961 buyout of the McDonald brothers"],
+      "scenes": [
+        { "text": "McDonald's wasn't founded by the man who made it famous.", "emoji": "🍔" },
+        { "text": "In 1954, Ray Kroc was fifty two and selling milkshake machines.", "emoji": "🥤", "big": "AGE 52" },
+        { "text": "One restaurant in California ordered eight of them. He had to see why.", "emoji": "🤔", "big": "8 MACHINES" },
+        { "text": "It was run by the McDonald brothers, with a super fast kitchen system.", "emoji": "⚡" },
+        { "text": "Kroc started franchising it. In 1961, he bought the brothers out for two point seven million dollars.", "emoji": "💰", "big": "$2.7 MILLION" },
+        { "text": "Today McDonald's is one of the biggest restaurant chains on the planet. The brothers' name stayed. They didn't.", "emoji": "🌍", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 49,
+      "slug": "monopoly-was-invented-by-a-woman",
+      "title": "Monopoly's Real Inventor Got $500",
+      "description": "Monopoly was based on a game by Lizzie Magie, created to show the dangers of monopolies.",
+      "hashtags": ["#monopoly", "#history"],
+      "thumbnail": { "top": "Monopoly's inventor got", "big": "$500", "bottom": "Someone else got rich", "emoji": "🎲", "tone": "loss" },
+      "sources": ["Wikipedia: The Landlord's Game", "Wikipedia: Lizzie Magie"],
+      "scenes": [
+        { "text": "The real inventor of Monopoly got just five hundred dollars.", "emoji": "🎲", "big": "$500", "tone": "loss" },
+        { "text": "In 1904, Lizzie Magie patented a board game called The Landlord's Game.", "emoji": "📜", "big": "1904" },
+        { "text": "Its goal was to show how monopolies make landlords rich and everyone else poor.", "emoji": "🏠" },
+        { "text": "Decades later, a man named Charles Darrow sold a version of it to Parker Brothers as Monopoly.", "emoji": "🎩" },
+        { "text": "Darrow became a millionaire. Parker Brothers bought Magie's patent for five hundred dollars.", "emoji": "💰", "big": "MILLIONAIRE", "tone": "gain" },
+        { "text": "A game about unfair wealth… with an unfair ending.", "emoji": "😬" }
+      ]
+    },
+    {
+      "number": 50,
+      "slug": "milton-hershey-failed-before-chocolate",
+      "title": "Hershey Failed Again and Again Before Chocolate 🍫",
+      "description": "Milton Hershey's first candy businesses failed. Caramel saved him, then chocolate made him famous.",
+      "hashtags": ["#hershey", "#motivation"],
+      "thumbnail": { "top": "Hershey failed", "big": "AGAIN", "bottom": "And again", "emoji": "🍫", "tone": "loss" },
+      "sources": ["Wikipedia: Milton S. Hershey", "Wikipedia: Lancaster Caramel Company — sold 1900"],
+      "scenes": [
+        { "text": "The man behind Hershey's chocolate failed again and again.", "emoji": "🍫" },
+        { "text": "Milton Hershey started a candy business in Philadelphia. It failed.", "emoji": "📉", "tone": "loss", "big": "FAILED" },
+        { "text": "He tried again in New York. It failed too.", "emoji": "📉", "tone": "loss", "big": "FAILED AGAIN" },
+        { "text": "Back home in Pennsylvania, he started making caramels. This time, it worked.", "emoji": "🍬" },
+        { "text": "In 1900, he sold the caramel company for one million dollars and went all in on chocolate.", "emoji": "💰", "big": "$1 MILLION", "tone": "gain" },
+        { "text": "He built a whole town around his chocolate factory. Hershey, Pennsylvania.", "emoji": "🏘️", "big": "HIS OWN TOWN", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 51,
+      "slug": "harry-potter-rejected-12-times",
+      "title": "Harry Potter Was Rejected 12 Times 📚",
+      "description": "J.K. Rowling's first book was turned down by twelve publishers. An eight-year-old helped change that.",
+      "hashtags": ["#harrypotter", "#motivation"],
+      "thumbnail": { "top": "Harry Potter was rejected", "big": "12 TIMES", "bottom": "Then 500M copies", "emoji": "📚", "tone": "gain" },
+      "sources": ["Wikipedia: Harry Potter and the Philosopher's Stone — publication history", "Wikipedia: J. K. Rowling"],
+      "scenes": [
+        { "text": "Harry Potter was rejected by twelve publishers.", "emoji": "📚", "big": "12 REJECTIONS", "tone": "loss" },
+        { "text": "J. K. Rowling was a single mother with very little money when she finished the first book.", "emoji": "✍️" },
+        { "text": "Publisher after publisher said no.", "emoji": "🙅‍♂️" },
+        { "text": "Then a small publisher, Bloomsbury, gave the first chapter to the boss's eight year old daughter. She wanted more.", "emoji": "👧", "big": "AGE 8" },
+        { "text": "They published it in 1997, with a small advance.", "emoji": "📖", "big": "1997" },
+        { "text": "The series has sold over five hundred million copies. Twelve people said no. One kid said yes.", "emoji": "⚡", "big": "500M+ COPIES", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 52,
+      "slug": "groupon-rejected-google-6-billion",
+      "title": "Groupon Said No to $6 Billion From Google",
+      "description": "In 2010, Google offered around $6 billion for Groupon. Groupon said no.",
+      "hashtags": ["#groupon", "#google"],
+      "thumbnail": { "top": "They said no to", "big": "$6 BILLION", "bottom": "Big mistake", "emoji": "🏷️", "tone": "loss" },
+      "sources": ["Wikipedia: Groupon — rejected Google offer, 2010; IPO 2011"],
+      "scenes": [
+        { "text": "In 2010, Google offered about six billion dollars for a coupon website.", "emoji": "🏷️", "big": "$6 BILLION" },
+        { "text": "It was Groupon, one of the fastest growing companies in history.", "emoji": "🚀" },
+        { "text": "Groupon said no. They thought they'd be worth even more alone.", "emoji": "🙅‍♂️", "big": "NO", "tone": "loss" },
+        { "text": "At first, it looked smart. Its stock market debut in 2011 valued it at over ten billion dollars.", "emoji": "📈", "tone": "gain" },
+        { "text": "Then growth stalled, copycats appeared, and the stock crashed.", "emoji": "📉", "tone": "loss", "big": "CRASH" },
+        { "text": "Today Groupon is worth a small fraction of that offer. Would you have sold?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 53,
+      "slug": "snapchat-rejected-3-billion-from-facebook",
+      "title": "Snapchat Turned Down $3 Billion in Cash",
+      "description": "In 2013, Facebook offered $3 billion for Snapchat. Its 23-year-old CEO said no.",
+      "hashtags": ["#snapchat", "#facebook"],
+      "thumbnail": { "top": "He said no to", "big": "$3 BILLION", "bottom": "At 23", "emoji": "👻", "tone": "gain" },
+      "sources": ["Wikipedia: Snap Inc. — 2013 Facebook offer, 2017 IPO", "Wikipedia: Evan Spiegel"],
+      "scenes": [
+        { "text": "At twenty three, he turned down three billion dollars in cash.", "emoji": "👻", "big": "$3 BILLION" },
+        { "text": "In 2013, Snapchat had no revenue, but millions of teens were using it.", "emoji": "📱" },
+        { "text": "Facebook offered to buy it for three billion dollars.", "emoji": "💰" },
+        { "text": "CEO Evan Spiegel said no. People called him crazy.", "emoji": "🤪", "big": "CRAZY?" },
+        { "text": "In 2017, Snap went public, valued at over twenty billion dollars.", "emoji": "📈", "big": "$20 BILLION+", "tone": "gain" },
+        { "text": "Sometimes saying no is the best deal. Would you have taken the money?", "emoji": "🤔" }
+      ]
+    },
+    {
+      "number": 54,
+      "slug": "juicero-400-dollar-juicer",
+      "title": "The $400 Juicer You Could Squeeze by Hand",
+      "description": "Juicero raised about $120 million. Then reporters squeezed its juice packs by hand.",
+      "hashtags": ["#juicero", "#startupfail"],
+      "thumbnail": { "top": "$120 million startup", "big": "BY HAND", "bottom": "Juicero", "emoji": "🧃", "tone": "loss" },
+      "sources": ["Wikipedia: Juicero", "Bloomberg, April 2017: hand-squeezing Juicero packs"],
+      "scenes": [
+        { "text": "This startup raised around one hundred and twenty million dollars for a juicer.", "emoji": "🧃", "big": "$120 MILLION" },
+        { "text": "It was called Juicero. A Wi-Fi juice press that squeezed special packs of chopped fruit.", "emoji": "📶" },
+        { "text": "It launched at almost seven hundred dollars, then dropped to four hundred.", "emoji": "💸", "big": "$400" },
+        { "text": "Then reporters showed you could squeeze the packs with your bare hands, just as fast.", "emoji": "✋", "big": "BY HAND", "tone": "loss" },
+        { "text": "The internet laughed. A few months later, in 2017, Juicero shut down.", "emoji": "📉", "tone": "loss", "big": "SHUT DOWN" },
+        { "text": "Lesson: make sure your product does something your hands can't.", "emoji": "🧠" }
+      ]
+    },
+    {
+      "number": 55,
+      "slug": "segway-was-supposed-to-change-the-world",
+      "title": "Segway Was Supposed to Change the World",
+      "description": "Before launch, Segway was hyped as a revolution. It never came close.",
+      "hashtags": ["#segway", "#tech"],
+      "thumbnail": { "top": "It would change", "big": "EVERYTHING", "bottom": "It didn't", "emoji": "🛴", "tone": "loss" },
+      "sources": ["Wikipedia: Segway — 2001 launch, production ended 2020"],
+      "scenes": [
+        { "text": "This invention was supposed to change how cities work.", "emoji": "🏙️" },
+        { "text": "In 2001, before anyone had even seen it, it was one of the most hyped products in tech. Its secret code name was Ginger.", "emoji": "🤫", "big": "\"GINGER\"" },
+        { "text": "Some famous tech leaders reportedly said it could be as big as the personal computer.", "emoji": "💻" },
+        { "text": "Then it was revealed: the Segway, a self-balancing scooter.", "emoji": "🛴", "big": "SEGWAY" },
+        { "text": "It cost thousands of dollars, and many cities didn't know where to allow it. Sales were far below the hype.", "emoji": "📉", "tone": "loss" },
+        { "text": "In 2020, the original Segway stopped being made. Hype is not a business plan.", "emoji": "🧠", "big": "DISCONTINUED", "tone": "loss" }
+      ]
+    },
+    {
+      "number": 56,
+      "slug": "bill-gates-bought-dos-for-75k",
+      "title": "The $75,000 Deal That Made Bill Gates Rich",
+      "description": "Microsoft bought an operating system it didn't create, licensed it to IBM, and kept the rights.",
+      "hashtags": ["#billgates", "#microsoft"],
+      "thumbnail": { "top": "The deal that built", "big": "MICROSOFT", "bottom": "$75,000", "emoji": "💾", "tone": "gain" },
+      "sources": ["Wikipedia: 86-DOS — bought from Seattle Computer Products", "Wikipedia: MS-DOS — IBM PC licensing"],
+      "scenes": [
+        { "text": "The deal that made Bill Gates rich used software he didn't write.", "emoji": "💾" },
+        { "text": "In 1980, IBM needed an operating system for its first personal computer.", "emoji": "🖥️" },
+        { "text": "Microsoft didn't have one. So it bought one from a small Seattle company for about seventy five thousand dollars.", "emoji": "💵", "big": "$75,000" },
+        { "text": "They adapted it and licensed it to IBM. But here's the genius part: Microsoft kept the rights.", "emoji": "🧠", "big": "KEPT THE RIGHTS", "tone": "gain" },
+        { "text": "When other companies copied the IBM PC, they all needed that operating system. And Microsoft sold it to all of them.", "emoji": "💰" },
+        { "text": "That's how Microsoft took over the PC world. Read the contract.", "emoji": "📜", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 57,
+      "slug": "atari-buried-et-games",
+      "title": "Atari Buried Its Failed Game in the Desert",
+      "description": "E.T. for the Atari 2600 was rushed out in weeks. Unsold cartridges ended up in a New Mexico landfill.",
+      "hashtags": ["#atari", "#gaming"],
+      "thumbnail": { "top": "They buried the games", "big": "IN THE DESERT", "bottom": "Atari E.T.", "emoji": "👽", "tone": "loss" },
+      "sources": ["Wikipedia: E.T. the Extra-Terrestrial (video game)", "Wikipedia: Atari video game burial — excavated 2014"],
+      "scenes": [
+        { "text": "Atari buried its failed games in the desert.", "emoji": "🏜️" },
+        { "text": "In 1982, Atari paid a fortune for the rights to make a video game of E.T.", "emoji": "👽" },
+        { "text": "The game was made in about five weeks to hit Christmas.", "emoji": "⏱️", "big": "5 WEEKS" },
+        { "text": "Players hated it. Millions of cartridges didn't sell.", "emoji": "👎", "big": "FLOP", "tone": "loss" },
+        { "text": "In 1983, trucks dumped unsold games in a landfill in New Mexico. For years, people called it a legend.", "emoji": "🚚" },
+        { "text": "In 2014, they dug it up. The games were really there. Rushing can cost you everything.", "emoji": "⛏️", "big": "IT WAS TRUE" }
+      ]
+    },
+    {
+      "number": 58,
+      "slug": "ben-and-jerrys-5-dollar-course",
+      "title": "Ben & Jerry's Started With a $5 Course 🍦",
+      "description": "Two friends split a $5 ice cream course and opened a shop in an old gas station.",
+      "hashtags": ["#benandjerrys", "#icecream"],
+      "thumbnail": { "top": "They started with a", "big": "$5 COURSE", "bottom": "Sold for $326M", "emoji": "🍦", "tone": "gain" },
+      "sources": ["Wikipedia: Ben & Jerry's — founded 1978, acquired by Unilever 2000"],
+      "scenes": [
+        { "text": "Ben and Jerry's started with a five dollar course.", "emoji": "🍦", "big": "$5" },
+        { "text": "Ben Cohen and Jerry Greenfield were childhood friends who wanted to start a food business.", "emoji": "👬" },
+        { "text": "They split the cost of a five dollar mail order course on making ice cream.", "emoji": "✉️" },
+        { "text": "In 1978, with about twelve thousand dollars, they opened a shop in an old gas station in Vermont.", "emoji": "⛽", "big": "$12,000" },
+        { "text": "Big chunks, funny names, and free ice cream days made people love them.", "emoji": "🎉" },
+        { "text": "In 2000, Unilever bought the company for three hundred and twenty six million dollars.", "emoji": "💰", "big": "$326 MILLION", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 59,
+      "slug": "canva-rejected-by-100-investors",
+      "title": "Canva Was Rejected by Over 100 Investors",
+      "description": "Melanie Perkins heard 'no' more than 100 times. Canva is now worth tens of billions.",
+      "hashtags": ["#canva", "#startup"],
+      "thumbnail": { "top": "Rejected by", "big": "100+ INVESTORS", "bottom": "Now worth billions", "emoji": "🎨", "tone": "gain" },
+      "sources": ["Wikipedia: Canva", "Wikipedia: Melanie Perkins — investor rejections"],
+      "scenes": [
+        { "text": "Investors said no to her more than one hundred times.", "emoji": "🙅‍♂️", "big": "100+ NO'S", "tone": "loss" },
+        { "text": "Melanie Perkins was a university student in Australia teaching people to use design software.", "emoji": "🇦🇺" },
+        { "text": "It was too hard to learn. So she imagined a simple design tool anyone could use online.", "emoji": "💡" },
+        { "text": "She pitched investors again and again. Most rejected her.", "emoji": "📉" },
+        { "text": "She kept going. In 2013, Canva launched.", "emoji": "🎨", "big": "CANVA" },
+        { "text": "Today Canva has millions of users and is worth tens of billions of dollars. One yes is enough.", "emoji": "🚀", "big": "BILLIONS", "tone": "gain" }
+      ]
+    },
+    {
+      "number": 60,
+      "slug": "hotmail-sold-for-400-million",
+      "title": "One Line of Text Made Hotmail Worth $400 Million",
+      "description": "Every Hotmail email ended with an ad for Hotmail. Microsoft bought it about 18 months after launch.",
+      "hashtags": ["#hotmail", "#marketing"],
+      "thumbnail": { "top": "One line of text =", "big": "$400M", "bottom": "Hotmail", "emoji": "📧", "tone": "gain" },
+      "sources": ["Wikipedia: Outlook.com — Hotmail history, acquired by Microsoft 1997"],
+      "scenes": [
+        { "text": "One line of text made this startup worth four hundred million dollars.", "emoji": "📧", "big": "$400 MILLION" },
+        { "text": "In 1996, Hotmail launched one of the first free email services you could use from any browser.", "emoji": "🌐" },
+        { "text": "At the bottom of every email, they added a line: get your free email at Hotmail.", "emoji": "✍️", "big": "\"GET YOUR FREE EMAIL\"" },
+        { "text": "So every user became an ad. Friends signed up, then their friends.", "emoji": "📣" },
+        { "text": "It grew to millions of users incredibly fast.", "emoji": "🚀", "big": "MILLIONS", "tone": "gain" },
+        { "text": "In late 1997, Microsoft bought Hotmail for about four hundred million dollars. The best marketing can be free.", "emoji": "💰", "tone": "gain" }
+      ]
+    }
+  ]
+}
