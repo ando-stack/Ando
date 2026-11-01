@@ -31,5 +31,7 @@ if not exist "web\dist\index.html" (
   )
   popd
 )
-start "" http://127.0.0.1:8000
+echo Arrancando el motor (la primera vez puede tardar hasta un minuto)...
+echo El navegador se abrira solo cuando este listo. No cierres esta ventana mientras uses el editor.
+set ESTUDIO_ABRIR_NAVEGADOR=1
 ".venv\Scripts\python.exe" -m engine.server

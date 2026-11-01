@@ -536,12 +536,28 @@ if WEB.exists():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")
 
 
+def _abrir_navegador_cuando_este_listo(puerto: int) -> None:
+    """Abre el navegador solo cuando el servidor ya responde (evita «conexión rechazada»)."""
+    import socket
+    import webbrowser
+
+    for _ in range(240):
+        try:
+            with socket.create_connection(("127.0.0.1", puerto), timeout=1):
+                webbrowser.open(f"http://127.0.0.1:{puerto}")
+                return
+        except OSError:
+            time.sleep(0.5)
+
+
 def main():
     import uvicorn
 
     puerto = int(os.environ.get("ESTUDIO_PUERTO", "8000"))
     log.info("Dispositivo: %s", device.info())
     log.info("Abre http://127.0.0.1:%d en el navegador", puerto)
+    if os.environ.get("ESTUDIO_ABRIR_NAVEGADOR") == "1":
+        threading.Thread(target=_abrir_navegador_cuando_este_listo, args=(puerto,), daemon=True).start()
     uvicorn.run(app, host="127.0.0.1", port=puerto, log_level="warning")
 
 
