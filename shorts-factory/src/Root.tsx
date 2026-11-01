@@ -2,6 +2,7 @@ import React from "react";
 import { Composition, Still } from "remotion";
 import { Short } from "./Short";
 import { Thumbnail } from "./Thumbnail";
+import { Avatar, Banner } from "./Branding";
 import type { ShortProps, ThumbnailProps } from "./types";
 
 const FPS = 30;
@@ -35,6 +36,14 @@ export const Root: React.FC = () => (
       calculateMetadata={({ props }) => ({
         durationInFrames: props.scenes.reduce((a, s) => a + (s.frames ?? 60), 0),
       })}
+    />
+    <Still id="Avatar" component={Avatar} width={800} height={800} />
+    <Still
+      id="Banner"
+      component={Banner}
+      width={2560}
+      height={1440}
+      defaultProps={{ name: "Money Untold", handle: "@MoneyUntold" }}
     />
     <Still id="Thumbnail" component={Thumbnail} width={1080} height={1920} defaultProps={sampleThumb} />
   </>
