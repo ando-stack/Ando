@@ -3,3 +3,9 @@ __pycache__/
 .venv/
 trabajos/
 clips/
+
+# Miniaturero
+miniaturero/modelos/
+miniaturero/herramientas/node_modules/
+.env
+miniaturero/.env

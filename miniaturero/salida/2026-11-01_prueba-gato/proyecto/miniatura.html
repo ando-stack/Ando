@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Miniatura — prueba gato</title>
+<style>
+  /* ====== AJUSTES RÁPIDOS ====== */
+  :root {
+    --fondo-1: #ffd60a;      /* amarillo */
+    --fondo-2: #ff7b00;      /* naranja */
+    --acento:  #e10600;      /* rojo */
+    --texto:   #ffffff;
+    --contorno:#0b0b0b;
+    --tam-texto: 128px;
+    --sujeto-alto: 750px;    /* tamaño del sujeto */
+    --sujeto-x: 545px;       /* posición horizontal del sujeto */
+  }
+  @font-face { font-family: "Anton"; src: url("fonts/Anton-Regular.ttf"); }
+
+  html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #000; }
+  .lienzo { position: relative; width: 1280px; height: 720px; overflow: hidden;
+    background: radial-gradient(circle at 68% 45%, var(--fondo-1) 0%, var(--fondo-2) 55%, #b33a00 100%); }
+
+  /* textura de puntos (trama) generada por código */
+  .trama { position: absolute; inset: 0; opacity: .18;
+    background-image: radial-gradient(#000 1.6px, transparent 1.8px); background-size: 14px 14px;
+    -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 55%); mask-image: linear-gradient(90deg, #000 0%, transparent 55%); }
+  /* rayos detrás del sujeto */
+  .rayos { position: absolute; left: 860px; top: 330px; width: 2400px; height: 2400px; transform: translate(-50%,-50%);
+    background: repeating-conic-gradient(rgba(255,255,255,.22) 0 7deg, transparent 7deg 18deg);
+    -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 38%); mask-image: radial-gradient(circle, #000 0%, transparent 38%); }
+  .vineta { position: absolute; inset: 0; box-shadow: inset 0 0 160px rgba(0,0,0,.55); }
+
+  .sujeto { position: absolute; top: -15px; left: var(--sujeto-x); height: var(--sujeto-alto);
+    filter:
+      drop-shadow(6px 0 0 #fff) drop-shadow(-6px 0 0 #fff) drop-shadow(0 6px 0 #fff) drop-shadow(0 -6px 0 #fff)
+      drop-shadow(0 0 28px rgba(0,0,0,.55)); }
+
+  .texto { position: absolute; left: 48px; top: 70px; width: 520px;
+    font-family: "Anton", sans-serif; font-size: var(--tam-texto); line-height: .9; text-transform: uppercase;
+    color: var(--texto); -webkit-text-stroke: 16px var(--contorno); paint-order: stroke fill;
+    filter: drop-shadow(0 10px 0 rgba(0,0,0,.6)); transform: rotate(-4deg); letter-spacing: 1px; }
+  .texto .marca { color: var(--fondo-1); display: inline-block; background: var(--acento);
+    padding: 0 18px 6px; -webkit-text-stroke: 14px var(--contorno); border: 8px solid var(--contorno); margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="lienzo">
+  <div class="rayos"></div>
+  <div class="trama"></div>
+  <img class="sujeto" src="img/gato_recorte.png" alt="">
+  <div class="vineta"></div>
+  <div class="texto">¿ME ESTÁ<br><span class="marca">VIGILANDO?</span></div>
+</div>
+</body>
+</html>
