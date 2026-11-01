@@ -61,14 +61,14 @@ export const Banner: React.FC<{ name: string; handle: string }> = ({ name, handl
       style={{ background: "radial-gradient(ellipse at 50% 50%, #0000 0%, #000a 70%), #0008" }}
     />
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: 1546, height: 423, display: "flex", alignItems: "center", gap: 60 }}>
-        <Coin size={330} />
+      <div style={{ width: 1546, height: 423, display: "flex", alignItems: "center", gap: 50, justifyContent: "center" }}>
+        <Coin size={280} />
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div
             style={{
               fontFamily: FONT,
               fontWeight: 900,
-              fontSize: 150,
+              fontSize: 118,
               lineHeight: 1,
               color: "#fff",
               textTransform: "uppercase",
@@ -80,7 +80,7 @@ export const Banner: React.FC<{ name: string; handle: string }> = ({ name, handl
           >
             {name.split(" ")[0]} <span style={{ color: COLORS.gold }}>{name.split(" ").slice(1).join(" ")}</span>
           </div>
-          <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 50, color: "#ffffffdd" }}>
+          <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 44, color: "#ffffffdd" }}>
             Real money stories in under 60 seconds
           </div>
           <div style={{ display: "flex", gap: 20, marginTop: 10 }}>
