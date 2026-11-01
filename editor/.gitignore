@@ -1,0 +1,21 @@
+# secretos
+.env
+
+# entornos y dependencias
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+web/node_modules/
+web/dist/
+web/*.tsbuildinfo
+
+# modelos descargados (los descarga scripts/instalar.py)
+engine/models/weights/
+
+# proyectos del usuario y resultados de pruebas generados
+projects/*
+!projects/.gitkeep
+test-images/_fuentes_originales/
+test-images/resultados/*/
+test-images/resultados/e2e/

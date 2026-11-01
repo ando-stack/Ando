@@ -1,0 +1,46 @@
+{
+ "descripcion": "Varios textos girados con distintas fuentes, contornos y una flecha",
+ "textos": [
+  {
+   "texto": "TOP 10",
+   "familia": "Bangers",
+   "relleno": "#ffe600",
+   "contornos": [
+    {
+     "color": "#000000",
+     "ancho": 8
+    }
+   ],
+   "angulo": -15
+  },
+  {
+   "texto": "JUGADAS",
+   "familia": "Russo One",
+   "relleno": "#ffffff",
+   "contornos": [
+    {
+     "color": "#e3122c",
+     "ancho": 7
+    }
+   ],
+   "angulo": 10
+  },
+  {
+   "texto": "DE LA TEMPORADA",
+   "familia": "Teko",
+   "relleno": "#00e5ff",
+   "contornos": [],
+   "angulo": -6
+  }
+ ],
+ "sujetos": 0,
+ "graficos": [
+  "flecha amarilla"
+ ],
+ "fuentes_imagen": [],
+ "archivo": "04_textos_rotados.webp",
+ "tamano": [
+  1280,
+  720
+ ]
+}

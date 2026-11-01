@@ -122,3 +122,12 @@ Opciones: `-n` número de clips · `-d` segundos o `auto` · `-e todo|graciosos|
 - Los trabajos se guardan en `trabajos/` y se borran solos a las 24 h.
 
 Respeta los derechos de autor y las normas de cada plataforma al publicar clips de contenido ajeno.
+
+---
+
+## 🎨 Estudio de Capas (nuevo, en `editor/`)
+
+Este repositorio incluye también un **editor de diseño gráfico local y gratuito** para miniaturas
+de YouTube y pósters deportivos: sube una imagen de inspiración y la IA la separa en capas
+editables (fondo, personas, objetos, textos editables y gráficos). Es un proyecto independiente de
+AutoClips: consulta [`editor/README.md`](editor/README.md) para instalarlo y usarlo.

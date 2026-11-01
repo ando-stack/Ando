@@ -1,0 +1,37 @@
+{
+ "descripcion": "Póster deportivo 4:5 con jugador recortado, banda diagonal y franja inferior",
+ "textos": [
+  {
+   "texto": "GAME DAY",
+   "familia": "Bebas Neue",
+   "relleno": "#ffffff",
+   "contornos": [],
+   "sombra": {
+    "color": "#e3122c",
+    "dx": 12,
+    "dy": 12
+   },
+   "angulo": 0
+  },
+  {
+   "texto": "SÁBADO 20:00",
+   "familia": "Oswald",
+   "relleno": "#101010",
+   "contornos": [],
+   "angulo": 0
+  }
+ ],
+ "sujetos": 1,
+ "graficos": [
+  "banda diagonal naranja",
+  "franja amarilla"
+ ],
+ "fuentes_imagen": [
+  "NASA s90-38573"
+ ],
+ "archivo": "02_poster_deportivo.png",
+ "tamano": [
+  1080,
+  1350
+ ]
+}

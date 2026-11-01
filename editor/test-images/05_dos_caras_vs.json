@@ -1,0 +1,34 @@
+{
+ "descripcion": "Miniatura «VS» con dos caras recortadas con contorno blanco y texto con doble contorno",
+ "textos": [
+  {
+   "texto": "VS",
+   "familia": "Bowlby One",
+   "relleno": "#ffe600",
+   "contornos": [
+    {
+     "color": "#000000",
+     "ancho": 8
+    },
+    {
+     "color": "#ffffff",
+     "ancho": 8
+    }
+   ],
+   "angulo": 0
+  }
+ ],
+ "sujetos": 2,
+ "graficos": [
+  "mitad roja diagonal"
+ ],
+ "fuentes_imagen": [
+  "NASA (Eileen Collins) vía scikit-image",
+  "NASA S84-40242"
+ ],
+ "archivo": "05_dos_caras_vs.jpg",
+ "tamano": [
+  1280,
+  720
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "descripcion": "Producto (taza) con texto en degradado y signos de interrogación",
+ "textos": [
+  {
+   "texto": "EL MEJOR CAFÉ",
+   "familia": "Alfa Slab One",
+   "degradado": [
+    "#ffb000",
+    "#e3122c"
+   ],
+   "contornos": [
+    {
+     "color": "#ffffff",
+     "ancho": 6
+    }
+   ],
+   "angulo": 0
+  },
+  {
+   "texto": "¿LO PROBARÍAS?",
+   "familia": "Poppins",
+   "relleno": "#ffffff",
+   "contornos": [
+    {
+     "color": "#3b1d0f",
+     "ancho": 6
+    }
+   ],
+   "angulo": 0
+  }
+ ],
+ "sujetos": 1,
+ "graficos": [],
+ "fuentes_imagen": [
+  "Rachel Michetti, CC0, vía scikit-image"
+ ],
+ "archivo": "06_producto.jpg",
+ "tamano": [
+  1080,
+  1080
+ ]
+}

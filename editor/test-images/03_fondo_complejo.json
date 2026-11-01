@@ -1,0 +1,36 @@
+{
+ "descripcion": "Foto de fondo complejo (lanzamiento) con titular y rótulo",
+ "textos": [
+  {
+   "texto": "DESPEGUE HISTÓRICO",
+   "familia": "Montserrat",
+   "relleno": "#ffffff",
+   "contornos": [
+    {
+     "color": "#000000",
+     "ancho": 6
+    }
+   ],
+   "angulo": 0
+  },
+  {
+   "texto": "EN DIRECTO",
+   "familia": "Oswald",
+   "relleno": "#ffffff",
+   "contornos": [],
+   "angulo": 0
+  }
+ ],
+ "sujetos": 0,
+ "graficos": [
+  "rectángulo rojo"
+ ],
+ "fuentes_imagen": [
+  "SpaceX (dominio público) vía scikit-image"
+ ],
+ "archivo": "03_fondo_complejo.jpg",
+ "tamano": [
+  1280,
+  854
+ ]
+}

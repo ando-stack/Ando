@@ -1,0 +1,48 @@
+# Motor de IA del Estudio de Capas — versiones fijadas.
+# Python 3.10 a 3.13. Algunas librerías ya no publican versiones nuevas para 3.10:
+# para esa versión se fijan las últimas compatibles (marcadores python_version).
+#
+# PyTorch: el instalador (scripts/instalar.py) elige la variante adecuada:
+#   - NVIDIA (CUDA): índice https://download.pytorch.org/whl/cu126
+#   - Apple Silicon (MPS) y Windows/Linux sin GPU: índice CPU / PyPI
+torch==2.14.1
+torchvision==0.29.2
+
+transformers==5.22.1; python_version >= "3.11"
+transformers==5.20.2; python_version < "3.11"
+huggingface_hub==2.4.0
+safetensors==0.8.0
+tokenizers==0.23.3
+
+onnxruntime==1.31.1; python_version >= "3.11"
+onnxruntime==1.23.2; python_version < "3.11"
+rapidocr==3.10.0
+pyclipper==1.4.0
+shapely==2.2.0; python_version >= "3.11"
+shapely==2.1.2; python_version < "3.11"
+omegaconf==2.4.0
+PyYAML==6.0.3
+
+numpy==2.5.4; python_version >= "3.11"
+numpy==2.2.6; python_version < "3.11"
+pillow==13.0.0; python_version >= "3.11"
+pillow==12.3.0; python_version < "3.11"
+opencv-python-headless==5.0.0.93
+scikit-image==0.26.0; python_version >= "3.11"
+scikit-image==0.25.2; python_version < "3.11"
+scipy==1.18.1; python_version >= "3.11"
+scipy==1.15.3; python_version < "3.11"
+psutil==7.2.2
+
+fastapi==0.162.0
+starlette==1.10.0; python_version >= "3.11"
+starlette==1.7.0; python_version < "3.11"
+pydantic==2.14.2
+uvicorn==0.54.0
+python-multipart==0.0.33; python_version >= "3.11"
+python-multipart==0.0.32; python_version < "3.11"
+python-dotenv==1.2.4
+httpx==0.28.1
+
+# pruebas
+pytest==9.2.0

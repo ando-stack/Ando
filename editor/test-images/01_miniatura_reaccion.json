@@ -1,0 +1,37 @@
+{
+ "descripcion": "Miniatura de YouTube con cara, texto grande con contorno y círculo gráfico",
+ "textos": [
+  {
+   "texto": "¡NO ME LO CREO!",
+   "familia": "Anton",
+   "relleno": "#ffe600",
+   "contornos": [
+    {
+     "color": "#000000",
+     "ancho": 10
+    }
+   ],
+   "angulo": -4
+  },
+  {
+   "texto": "NUEVO",
+   "familia": "Russo One",
+   "relleno": "#ffffff",
+   "contornos": [],
+   "angulo": 0
+  }
+ ],
+ "sujetos": 1,
+ "graficos": [
+  "círculo rojo"
+ ],
+ "fuentes_imagen": [
+  "NASA KSC-2012-1695",
+  "NASA S84-40242"
+ ],
+ "archivo": "01_miniatura_reaccion.jpg",
+ "tamano": [
+  1280,
+  720
+ ]
+}

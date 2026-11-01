@@ -1,0 +1,996 @@
+[
+ {
+  "familia": "Anton",
+  "carpeta": "anton",
+  "categoria": "impacto",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Vernon Adams",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/anton",
+  "archivo_licencia": "anton/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "anton/Anton-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab",
+    "bytes": 170812
+   }
+  ]
+ },
+ {
+  "familia": "Bebas Neue",
+  "carpeta": "bebasneue",
+  "categoria": "impacto",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Ryoichi Tsunekawa",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/bebasneue",
+  "archivo_licencia": "bebasneue/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "bebasneue/BebasNeue-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73",
+    "bytes": 61400
+   }
+  ]
+ },
+ {
+  "familia": "Oswald",
+  "carpeta": "oswald",
+  "categoria": "condensada",
+  "pesos": [
+   500,
+   700
+  ],
+  "licencia": "OFL",
+  "disenador": "Vernon Adams, Kalapi Gajjar, Cyreal",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/oswald",
+  "archivo_licencia": "oswald/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "oswald/Oswald[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "5b38c246e255a12f5712d640d56bcced0472466fc68983d2d0410ec0457c2817",
+    "bytes": 172088
+   }
+  ]
+ },
+ {
+  "familia": "Montserrat",
+  "carpeta": "montserrat",
+  "categoria": "sans",
+  "pesos": [
+   700,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Julieta Ulanovsky, Sol Matas, Juan Pablo del Peral, Jacques Le Bailly",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/montserrat",
+  "archivo_licencia": "montserrat/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "montserrat/Montserrat[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "0f7b311b2f3279e4eef9b2f968bcdbab6e28f4daeb1f049f4f278a902bcd82f7",
+    "bytes": 744936
+   }
+  ]
+ },
+ {
+  "familia": "Bangers",
+  "carpeta": "bangers",
+  "categoria": "comic",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Vernon Adams",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/bangers",
+  "archivo_licencia": "bangers/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "bangers/Bangers-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "4160a7311de9342674cce9160cde9fcbb30f48190397d86ff1b70b455af65824",
+    "bytes": 93148
+   }
+  ]
+ },
+ {
+  "familia": "Archivo Black",
+  "carpeta": "archivoblack",
+  "categoria": "impacto",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Omnibus-Type",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/archivoblack",
+  "archivo_licencia": "archivoblack/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "archivoblack/ArchivoBlack-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "dd9a89a019b4849f66ab75455fe7bdf931311042cbb0f0f97acc061539703180",
+    "bytes": 90988
+   }
+  ]
+ },
+ {
+  "familia": "Russo One",
+  "carpeta": "russoone",
+  "categoria": "deportiva",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Jovanny Lemonad",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/russoone",
+  "archivo_licencia": "russoone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "russoone/RussoOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "bc0abcc660bd8b7ad3000ecb2898a27c58a29a50f7ec81652fa12e75148d09df",
+    "bytes": 39124
+   }
+  ]
+ },
+ {
+  "familia": "Teko",
+  "carpeta": "teko",
+  "categoria": "deportiva",
+  "pesos": [
+   500,
+   700
+  ],
+  "licencia": "OFL",
+  "disenador": "Indian Type Foundry",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/teko",
+  "archivo_licencia": "teko/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "teko/Teko[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "d1321889f262bbbff632e7976349853399cd097b6f382d4b19790c915c13c1ae",
+    "bytes": 292108
+   }
+  ]
+ },
+ {
+  "familia": "Barlow Condensed",
+  "carpeta": "barlowcondensed",
+  "categoria": "condensada",
+  "pesos": [
+   700,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Jeremy Tribby",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/barlowcondensed",
+  "archivo_licencia": "barlowcondensed/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "barlowcondensed/BarlowCondensed-Bold.ttf",
+    "variable": false,
+    "peso": 700,
+    "sha256": "e476562ec9c1e16cf16475895b511f08c804f438cc9a9f80a44ea50a0eeb5b65",
+    "bytes": 109912
+   },
+   {
+    "archivo": "barlowcondensed/BarlowCondensed-Black.ttf",
+    "variable": false,
+    "peso": 900,
+    "sha256": "e74b750df582c608f35db467b711b2b60d2217618e85e60b72b42dfd00446cab",
+    "bytes": 110828
+   }
+  ]
+ },
+ {
+  "familia": "Staatliches",
+  "carpeta": "staatliches",
+  "categoria": "deportiva",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Brian LaRossa, Erica Carras",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/staatliches",
+  "archivo_licencia": "staatliches/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "staatliches/Staatliches-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "8395212aa4c6c3534bd39a745d956305ff080c3f3ed73ba61e4fbaae951e55cc",
+    "bytes": 63316
+   }
+  ]
+ },
+ {
+  "familia": "Black Ops One",
+  "carpeta": "blackopsone",
+  "categoria": "deportiva",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "James Grieshaber, Eben Sorkin",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/blackopsone",
+  "archivo_licencia": "blackopsone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "blackopsone/BlackOpsOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "282a825b5f294377387e3969f765408157dbea8da0f5d0aae68c6bc704b145b3",
+    "bytes": 166532
+   }
+  ]
+ },
+ {
+  "familia": "Poppins",
+  "carpeta": "poppins",
+  "categoria": "sans",
+  "pesos": [
+   700,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Indian Type Foundry, Jonny Pinhorn, Ninad Kale",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/poppins",
+  "archivo_licencia": "poppins/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "poppins/Poppins-Bold.ttf",
+    "variable": false,
+    "peso": 700,
+    "sha256": "983676516167748b74de6f4771fb384c664fd913acb8b471122ecacf5da5ea6c",
+    "bytes": 155996
+   },
+   {
+    "archivo": "poppins/Poppins-Black.ttf",
+    "variable": false,
+    "peso": 900,
+    "sha256": "d82aaaf98a9283f9a8edd24e51173337d8eaf09e25cd3d98831f8ec8461748a1",
+    "bytes": 153440
+   }
+  ]
+ },
+ {
+  "familia": "Roboto",
+  "carpeta": "roboto",
+  "categoria": "sans",
+  "pesos": [
+   400,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Christian Robertson, ParaType, Font Bureau",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/roboto",
+  "archivo_licencia": "roboto/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "roboto/Roboto[wdth,wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134",
+    "bytes": 488584
+   }
+  ]
+ },
+ {
+  "familia": "Roboto Condensed",
+  "carpeta": "robotocondensed",
+  "categoria": "condensada",
+  "pesos": [
+   700
+  ],
+  "licencia": "OFL",
+  "disenador": "Christian Robertson",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/robotocondensed",
+  "archivo_licencia": "robotocondensed/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "robotocondensed/RobotoCondensed[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "dace262afcee68a5276f200d8026c57221735c0118ab5fda8c2c0d3dc409a8d0",
+    "bytes": 371616
+   }
+  ]
+ },
+ {
+  "familia": "Lilita One",
+  "carpeta": "lilitaone",
+  "categoria": "redondeada",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Juan Montoreano",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/lilitaone",
+  "archivo_licencia": "lilitaone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "lilitaone/LilitaOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "f5b641c45c69d772ee4eda687bc9fda411d5cad6b0b45371491da4580cbc8d59",
+    "bytes": 28092
+   }
+  ]
+ },
+ {
+  "familia": "Passion One",
+  "carpeta": "passionone",
+  "categoria": "impacto",
+  "pesos": [
+   400,
+   700
+  ],
+  "licencia": "OFL",
+  "disenador": "Fontstage",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/passionone",
+  "archivo_licencia": "passionone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "passionone/PassionOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "86fea5001e5d751cf5696f0ecd4754db80918adbb12658add959f5bcdc92b09b",
+    "bytes": 24940
+   },
+   {
+    "archivo": "passionone/PassionOne-Bold.ttf",
+    "variable": false,
+    "peso": 700,
+    "sha256": "3a7249909b2e56e831f8a357a4ee549e9c5945cd003f0e5e3bd8791a76d98b7e",
+    "bytes": 24716
+   }
+  ]
+ },
+ {
+  "familia": "Righteous",
+  "carpeta": "righteous",
+  "categoria": "display",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Astigmatic",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/righteous",
+  "archivo_licencia": "righteous/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "righteous/Righteous-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "2ffb3fe5c27d7e6571210b800448c4e234e651b46c6b4426c1bb567e5341348a",
+    "bytes": 43104
+   }
+  ]
+ },
+ {
+  "familia": "Alfa Slab One",
+  "carpeta": "alfaslabone",
+  "categoria": "serif",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "JM Solé",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/alfaslabone",
+  "archivo_licencia": "alfaslabone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "alfaslabone/AlfaSlabOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "28664afa698a3393bd5a29eec750230a0645c5301d62200e5f2d3a027fb2299d",
+    "bytes": 97376
+   }
+  ]
+ },
+ {
+  "familia": "Fjalla One",
+  "carpeta": "fjallaone",
+  "categoria": "condensada",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Sorkin Type, Irina Smirnova",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/fjallaone",
+  "archivo_licencia": "fjallaone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "fjallaone/FjallaOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "ce3b299625abe3c76f8acd235b57b3e07ac6ee2d550e106a4b4e4d60095ae2ba",
+    "bytes": 209052
+   }
+  ]
+ },
+ {
+  "familia": "League Gothic",
+  "carpeta": "leaguegothic",
+  "categoria": "condensada",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Tyler Finck, Caroline Hadilaksono, Micah Rich",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/leaguegothic",
+  "archivo_licencia": "leaguegothic/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "leaguegothic/LeagueGothic[wdth].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "3b0e998c9a0034222394ffecdd383e6948259ad037b95555b139a217629ce1d0",
+    "bytes": 65972
+   }
+  ]
+ },
+ {
+  "familia": "Rubik",
+  "carpeta": "rubik",
+  "categoria": "sans",
+  "pesos": [
+   700,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Hubert and Fischer, Meir Sadan, Cyreal, Daniel Grumer, Omaima Dajani",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/rubik",
+  "archivo_licencia": "rubik/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "rubik/Rubik[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "1b3a7437ba2af80e465e773ed60c5036d1ba6ace492d89046dbcf18fb31e4e88",
+    "bytes": 359804
+   }
+  ]
+ },
+ {
+  "familia": "Inter",
+  "carpeta": "inter",
+  "categoria": "sans",
+  "pesos": [
+   400,
+   800
+  ],
+  "licencia": "OFL",
+  "disenador": "Rasmus Andersson",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/inter",
+  "archivo_licencia": "inter/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "inter/Inter[opsz,wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+    "bytes": 876576
+   }
+  ]
+ },
+ {
+  "familia": "Bowlby One",
+  "carpeta": "bowlbyone",
+  "categoria": "impacto",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Vernon Adams",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/bowlbyone",
+  "archivo_licencia": "bowlbyone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "bowlbyone/BowlbyOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "c46a806d7b51fd4987e5f0be449fe40a944cb407e43290ce1cdeed029a8cdc1d",
+    "bytes": 59856
+   }
+  ]
+ },
+ {
+  "familia": "Titan One",
+  "carpeta": "titanone",
+  "categoria": "redondeada",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Rodrigo Fuenzalida",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/titanone",
+  "archivo_licencia": "titanone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "titanone/TitanOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "563ff6de179bbd44bcd7d2a6c448d6dc3bf935834237cf1250e506e65cd86ff1",
+    "bytes": 55712
+   }
+  ]
+ },
+ {
+  "familia": "Bungee",
+  "carpeta": "bungee",
+  "categoria": "display",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "David Jonathan Ross",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/bungee",
+  "archivo_licencia": "bungee/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "bungee/Bungee-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "c4f5361ce120af3e6b9156d0bf379fa19cda2ea0cd18ac01fd99596c6bf66e3f",
+    "bytes": 118996
+   }
+  ]
+ },
+ {
+  "familia": "Changa One",
+  "carpeta": "changaone",
+  "categoria": "impacto",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Eduardo Tunni",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/changaone",
+  "archivo_licencia": "changaone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "changaone/ChangaOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "7ac4d26a3a45b4731904b59cbb8a9cc15b7b70d447fc2b5dda40ef17c5d2e16d",
+    "bytes": 22736
+   }
+  ]
+ },
+ {
+  "familia": "Squada One",
+  "carpeta": "squadaone",
+  "categoria": "deportiva",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Joe Prince",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/squadaone",
+  "archivo_licencia": "squadaone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "squadaone/SquadaOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "5b34a1633dbc48db3835d8a847bc475e6e0267121d3435854729ba4b407a05df",
+    "bytes": 19072
+   }
+  ]
+ },
+ {
+  "familia": "Kanit",
+  "carpeta": "kanit",
+  "categoria": "sans",
+  "pesos": [
+   700,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Cadson Demak",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/kanit",
+  "archivo_licencia": "kanit/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "kanit/Kanit-Bold.ttf",
+    "variable": false,
+    "peso": 700,
+    "sha256": "5dec5b080dab13de9d2295437c0ff3ec05c9e75587dfc31358c005eb4efa5e70",
+    "bytes": 176136
+   },
+   {
+    "archivo": "kanit/Kanit-Black.ttf",
+    "variable": false,
+    "peso": 900,
+    "sha256": "5d290c2cc9926764bd782aa6abc47a8f55bd64641d0afb56e115ee522698ee7e",
+    "bytes": 176856
+   }
+  ]
+ },
+ {
+  "familia": "Abril Fatface",
+  "carpeta": "abrilfatface",
+  "categoria": "serif",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "TypeTogether",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/abrilfatface",
+  "archivo_licencia": "abrilfatface/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "abrilfatface/AbrilFatface-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "5971d4a3758a922a9fedc7f6fb825a96341a2e718c45a4b2c9a6b417c8c4dbe9",
+    "bytes": 67364
+   }
+  ]
+ },
+ {
+  "familia": "Pacifico",
+  "carpeta": "pacifico",
+  "categoria": "manuscrita",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Vernon Adams, Jacques Le Bailly, Botjo Nikoltchev, Ani Petrova",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/pacifico",
+  "archivo_licencia": "pacifico/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "pacifico/Pacifico-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "5b6c0d5334a7bf77dea52b975c5a0c408878c0f7115ed5b6fb151f634b7bf701",
+    "bytes": 329380
+   }
+  ]
+ },
+ {
+  "familia": "Lobster",
+  "carpeta": "lobster",
+  "categoria": "manuscrita",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Impallari Type",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/lobster",
+  "archivo_licencia": "lobster/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "lobster/Lobster-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "d6568e697fd50cedc0be04d8aae4127fe95add607e7bff954ca88604be80c205",
+    "bytes": 406076
+   }
+  ]
+ },
+ {
+  "familia": "Orbitron",
+  "carpeta": "orbitron",
+  "categoria": "tecno",
+  "pesos": [
+   700,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Matt McInerney",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/orbitron",
+  "archivo_licencia": "orbitron/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "orbitron/Orbitron[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "f42db2dd16e642258e35782916eceb1dcdbea06fb958d77ad71dc5963587e8fd",
+    "bytes": 38576
+   }
+  ]
+ },
+ {
+  "familia": "Audiowide",
+  "carpeta": "audiowide",
+  "categoria": "tecno",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Astigmatic",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/audiowide",
+  "archivo_licencia": "audiowide/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "audiowide/Audiowide-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "c7c0f2b0f6fad8c623e31772ce79f94a4edb9321ffce9fce978ea892d20ae730",
+    "bytes": 69916
+   }
+  ]
+ },
+ {
+  "familia": "Racing Sans One",
+  "carpeta": "racingsansone",
+  "categoria": "deportiva",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Impallari Type",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/racingsansone",
+  "archivo_licencia": "racingsansone/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "racingsansone/RacingSansOne-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "8b5cada83e3e4692f624f1b583a069b34e457e07a4210ceddbb1133b3383673e",
+    "bytes": 145796
+   }
+  ]
+ },
+ {
+  "familia": "Playfair Display",
+  "carpeta": "playfairdisplay",
+  "categoria": "serif",
+  "pesos": [
+   700,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Claus Eggers Sørensen",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/playfairdisplay",
+  "archivo_licencia": "playfairdisplay/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "playfairdisplay/PlayfairDisplay[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "c40f2293766a503bc70cce9e512ef844a4ccb7cbcde792fe2ea31d191917d8d6",
+    "bytes": 300724
+   }
+  ]
+ },
+ {
+  "familia": "Open Sans",
+  "carpeta": "opensans",
+  "categoria": "sans",
+  "pesos": [
+   400,
+   800
+  ],
+  "licencia": "OFL",
+  "disenador": "Steve Matteson",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/opensans",
+  "archivo_licencia": "opensans/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "opensans/OpenSans[wdth,wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878",
+    "bytes": 532636
+   }
+  ]
+ },
+ {
+  "familia": "Lato",
+  "carpeta": "lato",
+  "categoria": "sans",
+  "pesos": [
+   400,
+   900
+  ],
+  "licencia": "OFL",
+  "disenador": "Łukasz Dziedzic",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/lato",
+  "archivo_licencia": "lato/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "lato/Lato-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "d636e4683231f931eda222d588e944d082bfd3bdba02f928bee461c0f185b251",
+    "bytes": 656568
+   },
+   {
+    "archivo": "lato/Lato-Black.ttf",
+    "variable": false,
+    "peso": 900,
+    "sha256": "808c62839c62dbce7de689af7603666fc7f8b81e0df537d8a5212c87580d4337",
+    "bytes": 664748
+   }
+  ]
+ },
+ {
+  "familia": "Nunito",
+  "carpeta": "nunito",
+  "categoria": "redondeada",
+  "pesos": [
+   800
+  ],
+  "licencia": "OFL",
+  "disenador": "Vernon Adams, Cyreal, Jacques Le Bailly",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/nunito",
+  "archivo_licencia": "nunito/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "nunito/Nunito[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207",
+    "bytes": 276932
+   }
+  ]
+ },
+ {
+  "familia": "Caveat",
+  "carpeta": "caveat",
+  "categoria": "manuscrita",
+  "pesos": [
+   700
+  ],
+  "licencia": "OFL",
+  "disenador": "Impallari Type",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/caveat",
+  "archivo_licencia": "caveat/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "caveat/Caveat[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "0bdb6b660482d31531b3945849fba5916b3ef8695da7024a9e6b9ee3c4157988",
+    "bytes": 403648
+   }
+  ]
+ },
+ {
+  "familia": "Shrikhand",
+  "carpeta": "shrikhand",
+  "categoria": "display",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Jonny Pinhorn",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/shrikhand",
+  "archivo_licencia": "shrikhand/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "shrikhand/Shrikhand-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "8ba32f6d6a96fb8dbc92fc1acfbc4d2123d5348063d89b2c3dd784e7afcb81af",
+    "bytes": 220804
+   }
+  ]
+ },
+ {
+  "familia": "Chakra Petch",
+  "carpeta": "chakrapetch",
+  "categoria": "tecno",
+  "pesos": [
+   700
+  ],
+  "licencia": "OFL",
+  "disenador": "Cadson Demak",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/chakrapetch",
+  "archivo_licencia": "chakrapetch/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "chakrapetch/ChakraPetch-Bold.ttf",
+    "variable": false,
+    "peso": 700,
+    "sha256": "65fbf76d95651697275e19db4d717c0e95a789ddd3476478b05292104db278a0",
+    "bytes": 78384
+   }
+  ]
+ },
+ {
+  "familia": "Exo 2",
+  "carpeta": "exo2",
+  "categoria": "tecno",
+  "pesos": [
+   800
+  ],
+  "licencia": "OFL",
+  "disenador": "Natanael Gama",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/exo2",
+  "archivo_licencia": "exo2/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "exo2/Exo2[wght].ttf",
+    "variable": true,
+    "peso": 400,
+    "sha256": "205a448676a2586f9c57c25f3d5c58ca8db7e6cf5edf7506783a010c6fe2bfb5",
+    "bytes": 303940
+   }
+  ]
+ },
+ {
+  "familia": "Saira Condensed",
+  "carpeta": "sairacondensed",
+  "categoria": "condensada",
+  "pesos": [
+   800
+  ],
+  "licencia": "OFL",
+  "disenador": "Omnibus-Type",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/sairacondensed",
+  "archivo_licencia": "sairacondensed/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "sairacondensed/SairaCondensed-ExtraBold.ttf",
+    "variable": false,
+    "peso": 800,
+    "sha256": "8821cabbc8bb3b0727be0a82d192c96baadbaf608012aff557eaaced1897ae84",
+    "bytes": 96580
+   }
+  ]
+ },
+ {
+  "familia": "Six Caps",
+  "carpeta": "sixcaps",
+  "categoria": "condensada",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Vernon Adams",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/sixcaps",
+  "archivo_licencia": "sixcaps/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "sixcaps/SixCaps.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "7b54a46671722fb670647c9c3951e6e618b6a9d876fc5d9ae34dfd311628ae5a",
+    "bytes": 46388
+   }
+  ]
+ },
+ {
+  "familia": "DM Serif Display",
+  "carpeta": "dmserifdisplay",
+  "categoria": "serif",
+  "pesos": [
+   400
+  ],
+  "licencia": "OFL",
+  "disenador": "Colophon Foundry",
+  "origen": "https://github.com/google/fonts/tree/main/ofl/dmserifdisplay",
+  "archivo_licencia": "dmserifdisplay/OFL.txt",
+  "ficheros": [
+   {
+    "archivo": "dmserifdisplay/DMSerifDisplay-Regular.ttf",
+    "variable": false,
+    "peso": 400,
+    "sha256": "8cc3643535edf039aa5d95440a8542735e9197e4f4b8d9303e980fefbf5ab616",
+    "bytes": 76580
+   }
+  ]
+ }
+]

@@ -1,0 +1,31 @@
+{
+ "descripcion": "Mascota sobre foto con franja lateral de color y texto en dos líneas",
+ "textos": [
+  {
+   "texto": "¿QUIÉN",
+   "familia": "Archivo Black",
+   "relleno": "#111827",
+   "contornos": [],
+   "angulo": 0
+  },
+  {
+   "texto": "GANA?",
+   "familia": "Archivo Black",
+   "relleno": "#111827",
+   "contornos": [],
+   "angulo": 0
+  }
+ ],
+ "sujetos": 1,
+ "graficos": [
+  "franja amarilla"
+ ],
+ "fuentes_imagen": [
+  "Stefan van der Walt, CC0, vía scikit-image"
+ ],
+ "archivo": "07_mascota.png",
+ "tamano": [
+  1280,
+  720
+ ]
+}
