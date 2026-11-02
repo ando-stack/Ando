@@ -4,8 +4,9 @@
 - **Referencia:** póster "Match Day" de un club (solo como inspiración de composición: jugador a la izquierda, "MATCH DAY" grande arriba a la derecha, franjas en diagonal, texto repetido de fondo, competición abajo). No se ha copiado ningún elemento.
 - **Colores:** rojo #d6001c, blanco y fondo casi negro #14060a.
 - **Fuentes:** Anton y Bebas Neue (titulares), Montserrat (datos). Todas con licencia SIL OFL.
-- **Jugador:** Anai Morales (nombre en el póster). **Silueta provisional dibujada con código**. No se usa la foto de ningún jugador real sin permiso. Para ponerlo: deja la foto en `entrada/` → `mini.py recortar` → `proyecto/img/jugador.png` → sustituir el `<svg class="jugador">` por `<img class="jugador" src="img/jugador.png">`.
-- **Escudos:** no se han puesto (derechos de los clubes). Se añaden si los aportas y confirmas que puedes usarlos.
+- **Jugador:** Anai Morales (UD Logroñés). Foto aportada por el usuario (`entrada/anai_morales.webp`, gráfico del club), recortada con BiRefNet → `proyecto/img/jugador.png`. Solo se usa el jugador (sin el texto, el estadio ni el escudo del gráfico). El escudo y el patrocinador de la camiseta vienen en la propia foto.
+- **Escudos:** no se han añadido aparte. Se pueden añadir si los aportas y confirmas que puedes usarlos.
+- **Revisión:** 1) el nombre del jugador abajo quedaba apagado y competía con "COPA DEL REY" → eliminado (pediste solo al jugador). 2) OK.
 
 ## Archivos
 - `matchday_4x5.png` (2160×2700, feed de Instagram) y `matchday_9x16.png` (2160×3840, stories; margen abajo para la interfaz).
