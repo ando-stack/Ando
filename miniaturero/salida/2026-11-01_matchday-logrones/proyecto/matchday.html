@@ -61,6 +61,14 @@
   .pie .datos i { font-style: normal; color: var(--rojo); padding: 0 10px; }
   .pie .campo { font-family: "Montserrat"; font-weight: 600; font-size: 28px; letter-spacing: 3px; opacity: .85; margin-top: 4px; text-transform: uppercase; }
 
+  /* nombre del jugador, sobre el pecho de la silueta, a la izquierda */
+  .nombre { position: absolute; left: 5%; bottom: 25%; color: var(--blanco); transform: rotate(-4deg); transform-origin: left bottom; }
+  .nombre span { display: block; }
+  .nombre .pila { font-family: "Bebas"; font-size: 60px; letter-spacing: 10px; line-height: 1;
+    background: var(--rojo); display: inline-block; padding: 4px 14px 0 14px; }
+  .nombre .apellido { font-size: 120px; line-height: .95; -webkit-text-stroke: 10px var(--fondo); paint-order: stroke fill;
+    text-shadow: 6px 6px 0 var(--rojo); }
+
   /* formato vertical 9:16: más aire */
   @media (min-aspect-ratio: 0/1) and (max-aspect-ratio: 10/16) {
     .titulo { top: 6%; font-size: 240px; }
@@ -100,6 +108,8 @@
   </svg>
 
   <div class="vineta"></div>
+
+  <div class="nombre"><span class="pila">ANAI</span><span class="apellido">MORALES</span></div>
 
   <div class="titulo"><span>MATCH</span><span class="hueco">DAY</span></div>
 
