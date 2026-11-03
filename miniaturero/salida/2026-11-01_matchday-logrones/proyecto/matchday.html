@@ -37,9 +37,13 @@
 
   .vineta { position: absolute; inset: 0; box-shadow: inset 0 0 220px rgba(0,0,0,.85); pointer-events: none; }
 
+  /* contraluz: foco detrás de la cabeza del jugador */
+  .contraluz { position: absolute; left: -12%; top: 18%; width: 80%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,235,235,.55) 0%, rgba(255,40,60,.35) 30%, rgba(214,0,28,0) 65%);
+    mix-blend-mode: screen; }
   /* jugador recortado */
   .jugador { position: absolute; bottom: 0; left: -7%; height: var(--jugador-alto);
-    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 24px rgba(214,0,28,.9)); }
+    filter: drop-shadow(0 0 1px rgba(255,255,255,.7)) drop-shadow(0 0 22px rgba(214,0,28,.7)) drop-shadow(14px 18px 30px rgba(0,0,0,.6)); }
 
   .titulo { position: absolute; right: 5%; top: 4%; text-align: right; color: var(--blanco);
     font-size: 210px; line-height: .86; letter-spacing: 2px;
@@ -87,7 +91,8 @@
   <div class="eco">COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·<br>COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·<br>COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·</div>
 
   <!-- Jugador: Anai Morales, recortado de la foto aportada por el usuario (entrada/anai_morales.webp) -->
-  <img class="jugador" src="img/jugador.png" alt="Anai Morales">
+  <div class="contraluz"></div>
+  <img class="jugador" src="img/jugador_iluminado.png" alt="Anai Morales">
 
   <div class="vineta"></div>
 

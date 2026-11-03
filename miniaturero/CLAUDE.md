@@ -32,6 +32,7 @@ Este entorno puede ser temporal (sesión en la nube): los modelos (`modelos/`, ~
 | Borrar elementos / texto / persona | `mini.py borrar FOTO MASCARA SALIDA` o `--caja x,y,w,h` (LaMa) | Apache-2.0 |
 | Detectar caras y tamaño | `mini.py caras` (YuNet) | MIT |
 | Cambiar solo la cara | `mini.py cambiar-cara MI_CARA DESTINO SALIDA --indice N` (inswapper + ArcFace + GFPGAN) | **NO COMERCIAL** |
+| Iluminación de estudio (luz principal, contornos de color, contraste, fundido abajo) | `mini.py iluminar RECORTE SALIDA [--rim-der #hex --rim-izq #hex --clave 0.55 --fundido 0.4]` + en el HTML un `.contraluz` (degradado radial con `mix-blend-mode: screen`) detrás de la cabeza | — |
 | Igualar luz/color de un recorte | `mini.py igualar-luz RECORTE REFERENCIA SALIDA --fuerza 0.6` | — |
 | Revisión grande + móvil | `mini.py revisar A.png [B.png…] --salida comparativa.png` | — |
 | JPG ≤ 2 MB | `mini.py exportar miniatura.png` | — |

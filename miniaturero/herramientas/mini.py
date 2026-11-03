@@ -9,6 +9,7 @@ Uso:
   python3 herramientas/mini.py caras      FOTO                                 # lista caras y avisa si son pequeñas
   python3 herramientas/mini.py cambiar-cara MI_CARA DESTINO SALIDA [--indice 0] [--sin-mejora]
   python3 herramientas/mini.py igualar-luz RECORTE.png REFERENCIA SALIDA.png [--fuerza 0.6]
+  python3 herramientas/mini.py iluminar   RECORTE.png SALIDA.png [--rim-der #ff1a2e --rim-izq #dfe9ff]  # luz de estudio
   python3 herramientas/mini.py revisar    MINIATURA.png [MAS.png ...] --salida comparativa.png
   python3 herramientas/mini.py exportar   MINIATURA.png                        # crea la versión JPG <= 2 MB
 
@@ -276,6 +277,65 @@ def cmd_igualar_luz(a):
     print(f"Luz/color igualados en {a.salida}")
 
 
+def color_hex(h):
+    h = h.lstrip("#"); return np.array([int(h[i:i + 2], 16) for i in (0, 2, 4)], np.float32) / 255
+
+
+def iluminar(rgba, rim_der="#ff1a2e", rim_izq="#dfe9ff", fuerza_rim=1.0, clave=0.55, fundido=0.4):
+    """Iluminación de estudio sobre un recorte RGBA:
+    luz principal suave desde arriba a la izquierda, luces de contorno (rim) de color por los bordes,
+    más contraste local y la parte de abajo fundida en sombra."""
+    rgb = rgba[..., :3].astype(np.float32) / 255
+    a = rgba[..., 3].astype(np.float32) / 255
+    h, w = a.shape
+    ys, xs = np.where(a > 0.5)
+    x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
+    # 1) contraste local ("clarity") y curva en S suave
+    lum = rgb.mean(2, keepdims=True)
+    rgb = rgb + (rgb - cv2.GaussianBlur(rgb, (0, 0), max(h, w) * 0.03)) * 0.35
+    rgb = rgb.clip(0, 1)
+    rgb = rgb + (rgb - 0.5) * 0.12 - 0.12 * (rgb - 0.5) ** 3 * 4
+    # 2) luz principal: más luz arriba-izquierda, cae hacia abajo-derecha
+    gx = (np.arange(w)[None, :] - x0) / max(x1 - x0, 1)
+    gy = (np.arange(h)[:, None] - y0) / max(y1 - y0, 1)
+    g = np.clip(1 - (0.55 * gx + 0.75 * gy), 0, 1)
+    rgb = rgb * (1 - clave * 0.5 + clave * g[..., None] ** 1.2)
+    # 3) fundido a sombra en la parte de abajo
+    f = np.clip((gy - 0.62) / 0.38, 0, 1) ** 1.3 * fundido * 2
+    rgb = rgb * (1 - np.clip(f, 0, 0.85))[..., None]
+    # 4) luces de contorno: según hacia dónde mira cada borde
+    # se calcula con margen alrededor: si el recorte toca el borde de la imagen, las normales salen bien
+    m = int(max(h, w) * 0.1)
+    ap = cv2.copyMakeBorder(a, m, m, m, m, cv2.BORDER_CONSTANT, value=0)
+    ancho = max(h, w) * 0.016
+    d = cv2.distanceTransform((ap > 0.5).astype(np.uint8), cv2.DIST_L2, 5)[m:-m, m:-m]
+    borde = np.exp(-d / ancho) * a
+    ab = cv2.GaussianBlur(ap, (0, 0), ancho * 3)
+    nx = -cv2.Sobel(ab, cv2.CV_32F, 1, 0, ksize=5)[m:-m, m:-m]
+    ny = -cv2.Sobel(ab, cv2.CV_32F, 0, 1, ksize=5)[m:-m, m:-m]
+    # los bordes que solo son el corte de la foto (abajo del todo) no llevan luz
+    borde[int(h * 0.97):] = 0
+    n = np.sqrt(nx ** 2 + ny ** 2) + 1e-6
+    nx, ny = nx / n, ny / n
+    # mezcla gradual: bordes que miran a la izquierda -> luz fría, a la derecha -> luz de color
+    t = np.clip(0.5 + 0.8 * nx, 0, 1); t = t * t * (3 - 2 * t)
+    orienta = np.clip(0.35 + 0.65 * np.maximum(np.abs(nx), -ny), 0, 1)   # menos luz en bordes que miran abajo
+    color = (1 - t)[..., None] * color_hex(rim_izq) * 1.25 + t[..., None] * color_hex(rim_der) * 1.6
+    luz = (borde * orienta)[..., None] * color
+    luz = luz * fuerza_rim * (1 - np.clip(f, 0, 1))[..., None]
+    rgb = 1 - (1 - rgb.clip(0, 1)) * (1 - luz.clip(0, 1))       # mezcla "trama" (screen)
+    out = (rgb.clip(0, 1) * 255).astype(np.uint8)
+    return np.dstack([out, rgba[..., 3]])
+
+
+def cmd_iluminar(a):
+    no_pisar(a.recorte, a.salida)
+    im = np.array(Image.open(a.recorte).convert("RGBA"))
+    res = iluminar(im, a.rim_der, a.rim_izq, a.fuerza_rim, a.clave, a.fundido)
+    Image.fromarray(res).save(a.salida)
+    print(f"Iluminación de estudio aplicada en {a.salida}")
+
+
 # ---------------------------------------------------------------- revisión y exportación
 def fuente(tam):
     f = BASE / "assets/fonts/Montserrat-Variable.ttf"
@@ -345,6 +405,10 @@ def main():
     s.add_argument("--indice", type=int, default=0); s.add_argument("--sin-mejora", action="store_true"); s.set_defaults(f=cmd_cambiar_cara)
     s = sp.add_parser("igualar-luz"); s.add_argument("recorte"); s.add_argument("referencia"); s.add_argument("salida")
     s.add_argument("--fuerza", type=float, default=0.6); s.set_defaults(f=cmd_igualar_luz)
+    s = sp.add_parser("iluminar"); s.add_argument("recorte"); s.add_argument("salida")
+    s.add_argument("--rim-der", default="#ff1a2e"); s.add_argument("--rim-izq", default="#dfe9ff")
+    s.add_argument("--fuerza-rim", type=float, default=1.0); s.add_argument("--clave", type=float, default=0.55)
+    s.add_argument("--fundido", type=float, default=0.4); s.set_defaults(f=cmd_iluminar)
     s = sp.add_parser("revisar"); s.add_argument("imagenes", nargs="+"); s.add_argument("--salida", required=True); s.set_defaults(f=cmd_revisar)
     s = sp.add_parser("exportar"); s.add_argument("imagen"); s.set_defaults(f=cmd_exportar)
     a = p.parse_args()
