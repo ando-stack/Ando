@@ -328,10 +328,97 @@ def iluminar(rgba, rim_der="#ff1a2e", rim_izq="#dfe9ff", fuerza_rim=1.0, clave=0
     return np.dstack([out, rgba[..., 3]])
 
 
+def profundidad(rgb):
+    """Profundidad relativa (más alto = más cerca) con Depth Anything V2 Small."""
+    h, w = rgb.shape[:2]
+    H = 14 * round(700 / 14); W = 14 * max(1, round(w * H / h / 14))
+    x = cv2.resize(rgb, (W, H), interpolation=cv2.INTER_CUBIC).astype(np.float32) / 255
+    x = ((x - [0.485, 0.456, 0.406]) / [0.229, 0.224, 0.225]).transpose(2, 0, 1)[None].astype(np.float32)
+    d = sesion("depth_anything_v2_small.onnx").run(None, {"pixel_values": x})[0][0]
+    return cv2.resize(d, (w, h), interpolation=cv2.INTER_CUBIC)
+
+
+def _dir(v):
+    v = np.array(v, np.float32); return v / np.linalg.norm(v)
+
+
+def iluminar_3d(rgba, rim_der="#ff1a2e", rim_izq="#e6eeff", fuerza_rim=1.0, clave=1.0, fundido=0.2,
+                key=(-0.55, -0.55, 0.62), devolver_mapas=False):
+    """Reiluminación tipo estudio usando el relieve estimado.
+    Ejes: x a la derecha, y hacia abajo, z hacia la cámara."""
+    rgb = rgba[..., :3].astype(np.float32) / 255
+    a = rgba[..., 3].astype(np.float32) / 255
+    h, w = a.shape
+    m = a > 0.5
+    # profundidad sobre fondo gris neutro
+    base = (rgb * a[..., None] + 0.5 * (1 - a[..., None]))
+    d = profundidad((base * 255).astype(np.uint8))
+    lo, hi = np.percentile(d[m], 2), np.percentile(d[m], 98)
+    d = np.clip((d - lo) / (hi - lo + 1e-6), 0, 1)
+    d = cv2.bilateralFilter(d.astype(np.float32), 9, 0.08, 5)
+    gx = cv2.Sobel(d, cv2.CV_32F, 1, 0, ksize=5) / 128
+    gy = cv2.Sobel(d, cv2.CV_32F, 0, 1, ksize=5) / 128
+    esc = 0.55 / (np.median(np.sqrt(gx ** 2 + gy ** 2)[m]) + 1e-6)
+    nx, ny = -gx * esc, -gy * esc
+    # cerca de la silueta las normales giran hacia fuera (como en un objeto real)
+    pad = int(max(h, w) * 0.1)
+    ap = cv2.copyMakeBorder(a, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=0)
+    ab = cv2.GaussianBlur(ap, (0, 0), max(h, w) * 0.025)
+    ex = -cv2.Sobel(ab, cv2.CV_32F, 1, 0, ksize=5)[pad:-pad, pad:-pad]
+    ey = -cv2.Sobel(ab, cv2.CV_32F, 0, 1, ksize=5)[pad:-pad, pad:-pad]
+    en = np.sqrt(ex ** 2 + ey ** 2) + 1e-6
+    dist = cv2.distanceTransform((ap > 0.5).astype(np.uint8), cv2.DIST_L2, 5)[pad:-pad, pad:-pad]
+    peso = np.exp(-dist / (max(h, w) * 0.02))
+    nx = nx + peso * ex / en * 2.5
+    ny = ny + peso * ey / en * 2.5
+    nz = np.ones_like(nx)
+    nn = np.sqrt(nx ** 2 + ny ** 2 + nz ** 2)
+    N = np.dstack([nx / nn, ny / nn, nz / nn])
+
+    def lambert(L, envolver=0.0):
+        return np.clip((N @ _dir(L) + envolver) / (1 + envolver), 0, 1)
+
+    L_key = _dir(key)
+    k = lambert(L_key, 0.25) ** 1.2                       # foco principal (ventana grande)
+    fill = lambert((0.7, -0.1, 0.7), 0.5)                 # relleno suave desde la derecha
+    amb = 0.22
+    luz = amb + 1.05 * clave * k + 0.22 * fill
+    # normalizar para no oscurecer/aclarar en conjunto
+    luz = luz / (np.median(luz[m]) + 1e-6) * 1.02
+    out = rgb * luz[..., None]
+    # brillo especular suave del foco principal (piel, pelo)
+    Hv = _dir(L_key + np.array([0, 0, 1], np.float32))
+    lumi = rgb.mean(2)
+    spec = np.clip(N @ Hv, 0, 1) ** 60 * 0.12 * np.clip(lumi * 2.5, 0, 1)   # sin manchas en zonas oscuras (pelo)
+    out = out + spec[..., None] * np.array([1.0, 0.97, 0.92])
+    # contraluces (rim) detrás del sujeto
+    fres = np.clip(1 - N[..., 2], 0, 1) ** 1.4
+    r1 = np.clip(N @ _dir((0.9, -0.15, -0.35)), 0, 1) ** 1.6 * fres
+    r2 = np.clip(N @ _dir((-0.85, -0.45, -0.3)), 0, 1) ** 1.6 * fres
+    gy01 = (np.arange(h)[:, None] - np.where(m)[0].min()) / max(np.ptp(np.where(m)[0]), 1)
+    caida = 1 - np.clip((gy01 - 0.75) / 0.25, 0, 1) ** 1.5 * fundido * 2
+    caida = np.clip(caida, 0.15, 1)
+    rim = (r1[..., None] * color_hex(rim_der) * 2.2 + r2[..., None] * color_hex(rim_izq) * 1.6) * fuerza_rim
+    cerca = np.exp(-dist / (max(h, w) * 0.03)) ** 1.5      # los contraluces solo "lamen" el borde
+    rim = rim * (caida * cerca)[..., None]
+    out = 1 - (1 - out.clip(0, 1)) * (1 - rim.clip(0, 1))
+    # sombra inferior + contraste final
+    out = out * caida[..., None]
+    out = np.clip(out, 0, 1)
+    out = out + (out - cv2.GaussianBlur(out, (0, 0), max(h, w) * 0.02)) * 0.25
+    res = np.dstack([(out.clip(0, 1) * 255).astype(np.uint8), rgba[..., 3]])
+    if devolver_mapas:
+        return res, d, N, luz
+    return res
+
+
 def cmd_iluminar(a):
     no_pisar(a.recorte, a.salida)
     im = np.array(Image.open(a.recorte).convert("RGBA"))
-    res = iluminar(im, a.rim_der, a.rim_izq, a.fuerza_rim, a.clave, a.fundido)
+    if a.modo == "plano":
+        res = iluminar(im, a.rim_der, a.rim_izq, a.fuerza_rim, 0.55, a.fundido)
+    else:
+        res = iluminar_3d(im, a.rim_der, a.rim_izq, a.fuerza_rim, a.clave, a.fundido)
     Image.fromarray(res).save(a.salida)
     print(f"Iluminación de estudio aplicada en {a.salida}")
 
@@ -407,8 +494,9 @@ def main():
     s.add_argument("--fuerza", type=float, default=0.6); s.set_defaults(f=cmd_igualar_luz)
     s = sp.add_parser("iluminar"); s.add_argument("recorte"); s.add_argument("salida")
     s.add_argument("--rim-der", default="#ff1a2e"); s.add_argument("--rim-izq", default="#dfe9ff")
-    s.add_argument("--fuerza-rim", type=float, default=1.0); s.add_argument("--clave", type=float, default=0.55)
-    s.add_argument("--fundido", type=float, default=0.4); s.set_defaults(f=cmd_iluminar)
+    s.add_argument("--fuerza-rim", type=float, default=1.0); s.add_argument("--clave", type=float, default=1.0)
+    s.add_argument("--modo", choices=["3d", "plano"], default="3d")
+    s.add_argument("--fundido", type=float, default=0.2); s.set_defaults(f=cmd_iluminar)
     s = sp.add_parser("revisar"); s.add_argument("imagenes", nargs="+"); s.add_argument("--salida", required=True); s.set_defaults(f=cmd_revisar)
     s = sp.add_parser("exportar"); s.add_argument("imagen"); s.set_defaults(f=cmd_exportar)
     a = p.parse_args()

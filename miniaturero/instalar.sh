@@ -23,6 +23,7 @@ echo "== Modelos (todos desde Hugging Face)"
 baja "$HF/onnx-community/BiRefNet-ONNX/resolve/main/onnx/model.onnx"                  "$M/birefnet.onnx"          # recorte (MIT)
 baja "$HF/Carve/LaMa-ONNX/resolve/main/lama_fp32.onnx"                               "$M/lama_fp32.onnx"         # relleno (Apache-2.0)
 baja "$HF/opencv/face_detection_yunet/resolve/main/face_detection_yunet_2023mar.onnx" "$M/yunet.onnx"            # caras (MIT)
+baja "$HF/onnx-community/depth-anything-v2-small/resolve/main/onnx/model.onnx"       "$M/depth_anything_v2_small.onnx" # profundidad para iluminar (Apache-2.0)
 # Sustitución de caras: SOLO USO NO COMERCIAL (ver docs/licencias.md)
 baja "$HF/facefusion/models-3.0.0/resolve/main/inswapper_128.onnx"                   "$M/inswapper_128.onnx"
 baja "$HF/facefusion/models-3.0.0/resolve/main/arcface_w600k_r50.onnx"               "$M/arcface_w600k_r50.onnx"

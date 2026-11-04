@@ -9,6 +9,7 @@ Si una licencia cambia, actualiza esta tabla antes de seguir usando el recurso.
 |---|---|---|---|---|
 | Quitar fondo | **BiRefNet** (export ONNX) | `huggingface.co/onnx-community/BiRefNet-ONNX` (original: `ZhengPeng7/BiRefNet`) | MIT | ✅ Sí |
 | Relleno inteligente | **LaMa** (big-lama, export ONNX `lama_fp32.onnx`) | `huggingface.co/Carve/LaMa-ONNX` (original: `advimman/lama`) | Apache-2.0 | ✅ Sí |
+| Profundidad (para iluminar en 3D) | **Depth Anything V2 Small** (export ONNX) | `huggingface.co/onnx-community/depth-anything-v2-small` (original: `depth-anything/Depth-Anything-V2-Small`) | Apache-2.0 (ojo: las versiones Base/Large son CC BY-NC 4.0, no usarlas) | ✅ Sí |
 | Detección de caras | **YuNet** 2023mar | `huggingface.co/opencv/face_detection_yunet` | MIT | ✅ Sí |
 | Sustitución de cara | **inswapper_128** (InsightFace) | `huggingface.co/facefusion/models-3.0.0` | Modelos InsightFace: **solo investigación no comercial**. Desde 2025-11 InsightFace pide contactar con `contact@insightface.ai` para licenciar inswapper. | ❌ **No** |
 | Identidad de la cara (para el anterior) | **ArcFace w600k_r50** (buffalo_l, InsightFace) | `huggingface.co/facefusion/models-3.0.0` | Igual que arriba: **no comercial** | ❌ **No** |
@@ -17,7 +18,7 @@ Si una licencia cambia, actualiza esta tabla antes de seguir usando el recurso.
 Librerías: onnxruntime (MIT), OpenCV (Apache-2.0), Pillow (MIT-CMU), NumPy (BSD), onnx (Apache-2.0), Playwright (Apache-2.0), Chromium (BSD y otras).
 
 ### Qué significa en la práctica
-- **Recortar, borrar elementos, detectar caras, componer y renderizar**: todo con licencias que permiten uso comercial. Sirve para un canal monetizado.
+- **Recortar, borrar elementos, iluminar en 3D, detectar caras, componer y renderizar**: todo con licencias que permiten uso comercial. Sirve para un canal monetizado.
 - **"Cambiar solo la cara"** (inswapper + ArcFace + GFPGAN): **solo para uso personal/no comercial**. Si el canal está monetizado o es para un cliente, la alternativa es **"cambiar la persona completa"** (recorte de tu foto + relleno con LaMa), que no usa esos modelos.
 - Antes de cada cambio de cara en un encargo, el miniaturero debe recordarlo y preguntar si el uso es comercial.
 
