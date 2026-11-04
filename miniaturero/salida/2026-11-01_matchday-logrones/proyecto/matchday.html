@@ -51,11 +51,14 @@
   .titulo span { display: block; }
   .titulo .hueco { color: transparent; -webkit-text-stroke: 4px var(--blanco); text-shadow: 6px 6px 0 var(--rojo); }
 
-  .equipos { position: absolute; right: 5%; top: 44%; text-align: right; color: var(--blanco); }
-  .equipos .eq { font-size: 74px; line-height: 1; text-shadow: 0 4px 0 rgba(0,0,0,.5); }
-  .equipos .vs { font-family: "Bebas"; font-size: 54px; color: var(--fondo); background: var(--blanco);
-    display: inline-block; padding: 2px 16px 0; margin: 10px 0; transform: skew(-10deg); }
-  .equipos .nuestro { color: var(--blanco); background: var(--fondo); display: inline-block; padding: 4px 16px 0; border-left: 10px solid var(--rojo); }
+  /* escudos (aportados por el usuario) */
+  .equipos { position: absolute; right: 4%; top: 41%; display: flex; align-items: center; gap: 22px; }
+  .equipos .club { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .equipos .club img { height: 250px; filter: drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 12px 18px rgba(0,0,0,.55)); }
+  .equipos .club span { font-family: "Bebas"; font-size: 34px; letter-spacing: 2px; color: var(--blanco);
+    background: var(--fondo); padding: 3px 12px 0; }
+  .equipos .vs { font-family: "Anton"; font-size: 64px; color: var(--blanco); transform: skew(-10deg);
+    text-shadow: 4px 4px 0 var(--fondo); margin-bottom: 40px; }
 
   .pie { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 5% 34px; text-align: right;
     background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.7) 70%, transparent 100%); color: var(--blanco); }
@@ -76,7 +79,7 @@
   /* formato vertical 9:16: más aire */
   @media (min-aspect-ratio: 0/1) and (max-aspect-ratio: 10/16) {
     .titulo { top: 6%; font-size: 240px; }
-    .equipos { top: 40%; }
+    .equipos { top: 35.5%; }
     .jugador { height: 62%; }
     .nombre { bottom: 9%; }
     .pie { padding-bottom: 120px; }   /* margen para la interfaz de stories */
@@ -100,9 +103,9 @@
   <div class="titulo"><span>MATCH</span><span class="hueco">DAY</span></div>
 
   <div class="equipos">
-    <div class="eq">SD AMOREBIETA</div>
-    <div class="vs">VS</div><br>
-    <div class="eq nuestro">UD LOGROÑÉS</div>
+    <div class="club"><img src="img/escudo_amorebieta.png" alt="SD Amorebieta"><span>SD AMOREBIETA</span></div>
+    <div class="vs">VS</div>
+    <div class="club"><img src="img/escudo_logrones.png" alt="UD Logroñés"><span>UD LOGROÑÉS</span></div>
   </div>
 
   <div class="pie">
