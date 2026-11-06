@@ -2,7 +2,14 @@ import math, random, os, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 
-W, H, FPS = 1280, 720, 24
+# Layout is defined on a 1280x720 grid; K scales the output resolution
+# (1 = 720p, 1.5 = 1080p, 3 = 4K). R is the logo layer's render scale,
+# kept above the largest on-screen size so the logo is only ever downsampled.
+W0, H0, FPS = 1280, 720, 24
+K = float(sys.argv[2]) if len(sys.argv) > 2 else 1.5
+R = K * 1.35
+W, H = int(round(W0 * K)), int(round(H0 * K))
+LW, LH = int(round(W0 * R)), int(round(H0 * R))
 DUR = 2.2
 N = int(DUR * FPS)
 OUT = sys.argv[1]
@@ -46,16 +53,19 @@ def torn_poly(w, h, jitter, n=40, seed=0):
 
 def paper_noise(img, amt=14, seed=0):
     a = np.asarray(img).astype(np.int16)
-    g = np.random.default_rng(seed).integers(-amt, amt, a.shape[:2])[..., None]
+    bh, bw = max(1, int(a.shape[0] / R)), max(1, int(a.shape[1] / R))
+    g0 = np.random.default_rng(seed).integers(-amt, amt, (bh, bw)).astype(np.float32)
+    g = np.asarray(Image.fromarray(g0, 'F').resize((a.shape[1], a.shape[0]), Image.BILINEAR))
+    g = np.round(g).astype(np.int16)[..., None]
     a[..., :3] = np.clip(a[..., :3] + g, 0, 255)
     return Image.fromarray(a.astype(np.uint8), 'RGBA')
 
 
 def make_tile(ch, font, fsize, bg, fg, outline, size, seed):
-    S = 3  # supersample
+    S = 3 * R  # supersample
     w, h = size
     pad = 30
-    im = Image.new('RGBA', ((w + pad * 2) * S, (h + pad * 2) * S), (0, 0, 0, 0))
+    im = Image.new('RGBA', (int((w + pad * 2) * S), int((h + pad * 2) * S)), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     off = pad * S
     outer = [(x * S + off, y * S + off) for x, y in torn_poly(w, h, 0.10, 46, seed)]
@@ -65,27 +75,27 @@ def make_tile(ch, font, fsize, bg, fg, outline, size, seed):
         inner = [((x + (w - iw) / 2) * S + off, (y + (h - ih) / 2) * S + off)
                  for x, y in torn_poly(iw, ih, 0.08, 40, seed + 1)]
         d.polygon(inner, fill=bg + (255,))
-    f = ImageFont.truetype(font, fsize * S)
+    f = ImageFont.truetype(font, int(round(fsize * S)))
     cx, cy = (w / 2 + pad) * S, (h / 2 + pad) * S
     d.text((cx, cy), ch, font=f, fill=fg + (255,), anchor='mm',
-           stroke_width=int(3 * S) if outline else 0, stroke_fill=outline + (255,) if outline else None)
-    im = im.resize((w + pad * 2, h + pad * 2), Image.LANCZOS)
+           stroke_width=int(round(3 * S)) if outline else 0, stroke_fill=outline + (255,) if outline else None)
+    im = im.resize((int((w + pad * 2) * R), int((h + pad * 2) * R)), Image.LANCZOS)
     im = paper_noise(im, 10, seed)
     # soft drop shadow
     a = im.split()[3]
     sh = Image.new('RGBA', im.size, (0, 0, 0, 0))
-    sh.putalpha(a.point(lambda v: int(v * 0.55)).filter(ImageFilter.GaussianBlur(6)))
+    sh.putalpha(a.point(lambda v: int(v * 0.55)).filter(ImageFilter.GaussianBlur(6 * R)))
     out = Image.new('RGBA', im.size, (0, 0, 0, 0))
-    out.alpha_composite(sh, (4, 6))
+    out.alpha_composite(sh, (int(4 * R), int(6 * R)))
     out.alpha_composite(im)
     return out
 
 
 def make_flag(seed=3):
-    S = 3
+    S = 3 * R
     w, h = 120, 80
     pad = 30
-    im = Image.new('RGBA', ((w + pad * 2) * S, (h + pad * 2) * S), (0, 0, 0, 0))
+    im = Image.new('RGBA', (int((w + pad * 2) * S), int((h + pad * 2) * S)), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     off = pad * S
     outer = [(x * S + off, y * S + off) for x, y in torn_poly(w, h, 0.06, 40, seed)]
@@ -97,24 +107,24 @@ def make_flag(seed=3):
     # tiny simplified coat-of-arms block
     ax = fx0 + (fx1 - fx0) * 0.30
     ay = fy0 + fh / 2
-    d.rounded_rectangle([ax - 7 * S, ay - 9 * S, ax + 7 * S, ay + 9 * S], radius=3 * S, fill=(170, 21, 27, 255))
+    d.rounded_rectangle([ax - 7 * S, ay - 9 * S, ax + 7 * S, ay + 9 * S], radius=int(3 * S), fill=(170, 21, 27, 255))
     d.rectangle([ax - 11 * S, ay - 8 * S, ax - 9 * S, ay + 9 * S], fill=(200, 200, 200, 255))
     d.rectangle([ax + 9 * S, ay - 8 * S, ax + 11 * S, ay + 9 * S], fill=(200, 200, 200, 255))
     d.ellipse([ax - 5 * S, ay - 14 * S, ax + 5 * S, ay - 8 * S], fill=(230, 170, 0, 255))
-    im = im.resize((w + pad * 2, h + pad * 2), Image.LANCZOS)
+    im = im.resize((int((w + pad * 2) * R), int((h + pad * 2) * R)), Image.LANCZOS)
     # slight wave via column offsets
     a = np.asarray(im).copy()
     out = np.zeros_like(a)
     for x in range(a.shape[1]):
-        dy = int(round(3 * math.sin(x / 18.0)))
+        dy = int(round(3 * R * math.sin(x / (18.0 * R))))
         out[:, x] = np.roll(a[:, x], dy, axis=0)
     im = Image.fromarray(out, 'RGBA')
     im = paper_noise(im, 8, seed)
     a = im.split()[3]
     sh = Image.new('RGBA', im.size, (0, 0, 0, 0))
-    sh.putalpha(a.point(lambda v: int(v * 0.55)).filter(ImageFilter.GaussianBlur(6)))
+    sh.putalpha(a.point(lambda v: int(v * 0.55)).filter(ImageFilter.GaussianBlur(6 * R)))
     o = Image.new('RGBA', im.size, (0, 0, 0, 0))
-    o.alpha_composite(sh, (4, 6))
+    o.alpha_composite(sh, (int(4 * R), int(6 * R)))
     o.alpha_composite(im)
     return o
 
@@ -130,20 +140,20 @@ TILES = [
 tile_imgs = [make_tile(c, f, s, bg, fg, ol, sz, 11 + i * 5) for i, (c, f, s, bg, fg, ol, sz, _) in enumerate(TILES)]
 flag_img = make_flag()
 
-ed = Image.new('RGBA', (260, 60), (0, 0, 0, 0))
+ed = Image.new('RGBA', (int(260 * R), int(60 * R)), (0, 0, 0, 0))
 dd = ImageDraw.Draw(ed)
-dd.text((10, 8), 'edited by', font=ImageFont.truetype(FONTS['black'], 30), fill=(255, 255, 255, 255),
-        stroke_width=2, stroke_fill=(10, 10, 10, 255))
+dd.text((10 * R, 8 * R), 'edited by', font=ImageFont.truetype(FONTS['black'], int(round(30 * R))), fill=(255, 255, 255, 255),
+        stroke_width=int(round(2 * R)), stroke_fill=(10, 10, 10, 255))
 
 # background
-yy, xx = np.mgrid[0:H, 0:W]
+yy, xx = np.mgrid[0:H, 0:W].astype(np.float32) / K  # logical 1280x720 coords
 bg = np.full((H, W, 3), 11, np.float32)
 grid = ((xx % 14 < 2) & (yy % 14 < 2)).astype(np.float32) * 6
 bg += grid[..., None]
 vign = 1 - 0.45 * (((xx - W / 2) / (W / 2)) ** 2 + ((yy - H / 2) / (H / 2)) ** 2)
 bg *= np.clip(vign, 0.4, 1)[..., None]
 
-CX, CY = W / 2 + 10, H / 2 - 20
+CX, CY = W0 / 2 + 10, H0 / 2 - 20
 
 
 def ease_out_back(t, s=1.9):
@@ -168,6 +178,9 @@ def place(canvas, img, x, y, scale=1.0, rot=0.0, alpha=1.0, pix=1, mblur=(0, 0),
     im = img.resize((max(1, int(w * sx)), max(1, int(h * sy))), Image.BILINEAR)
     if rot:
         im = im.rotate(rot, resample=Image.BICUBIC, expand=True)
+    x, y = x * R, y * R
+    mblur = (mblur[0] * R, mblur[1] * R)
+    pix = int(round(pix * R)) if pix > 1 else 1
     if pix > 1:
         sw, shh = im.size
         im = im.resize((max(1, sw // pix), max(1, shh // pix)), Image.BILINEAR).resize((sw, shh), Image.NEAREST)
@@ -191,10 +204,10 @@ def place(canvas, img, x, y, scale=1.0, rot=0.0, alpha=1.0, pix=1, mblur=(0, 0),
 
 def ring_layer(t_draw, front, wob, jit):
     """ellipse orbit ring; draws on from 0..1, returns RGBA layer"""
-    S = 2
-    L = Image.new('RGBA', (W * S, H * S), (0, 0, 0, 0))
+    S = R * (2 if R < 2 else 1)
+    L = Image.new('RGBA', (int(W0 * S), int(H0 * S)), (0, 0, 0, 0))
     if t_draw <= 0:
-        return L.resize((W, H))
+        return Image.new('RGBA', (LW, LH), (0, 0, 0, 0))
     d = ImageDraw.Draw(L)
     rx, ry = 255, 82
     tilt = math.radians(-12 + jit)
@@ -216,10 +229,11 @@ def ring_layer(t_draw, front, wob, jit):
             d.line([prev, p], fill=col + (255,), width=wdt)
             d.ellipse([p[0] - wdt / 2, p[1] - wdt / 2, p[0] + wdt / 2, p[1] + wdt / 2], fill=col + (255,))
         prev = p
-    L = L.resize((W, H), Image.LANCZOS)
+    if L.size != (LW, LH):
+        L = L.resize((LW, LH), Image.LANCZOS)
     # highlight / glow
-    glow = L.filter(ImageFilter.GaussianBlur(8))
-    out = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    glow = L.filter(ImageFilter.GaussianBlur(8 * R))
+    out = Image.new('RGBA', (LW, LH), (0, 0, 0, 0))
     out.alpha_composite(glow)
     out.alpha_composite(L)
     return out
@@ -232,17 +246,17 @@ def flare(canvas_np, cx, cy, r, col, strength):
 
 
 FLARES = [  # time center, x, y, r, color
-    (0.55, W * 0.98, H * 0.55, 110, (255, 80, 40)),
-    (1.35, W * 0.95, H * 0.42, 90, (255, 170, 30)),
-    (1.55, W * 0.04, H * 0.50, 120, (230, 40, 40)),
-    (1.62, W * 0.70, H * 0.44, 60, (255, 200, 60)),
-    (2.05, W * 0.62, H * 0.32, 70, (255, 120, 40)),
+    (0.55, W0 * 0.98, H0 * 0.55, 110, (255, 80, 40)),
+    (1.35, W0 * 0.95, H0 * 0.42, 90, (255, 170, 30)),
+    (1.55, W0 * 0.04, H0 * 0.50, 120, (230, 40, 40)),
+    (1.62, W0 * 0.70, H0 * 0.44, 60, (255, 200, 60)),
+    (2.05, W0 * 0.62, H0 * 0.32, 70, (255, 120, 40)),
 ]
 
 frng = random.Random(42)
 for fi in range(N):
     t = fi / FPS
-    logo = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    logo = Image.new('RGBA', (LW, LH), (0, 0, 0, 0))
     # stop-motion jitter, changes every 2 frames
     jr = random.Random(fi // 2 * 13 + 5)
     jit = lambda a: jr.uniform(-a, a)
@@ -310,16 +324,16 @@ for fi in range(N):
         syg *= (1 - 0.95 * k)
         sxg *= (1 + 0.35 * k)
     if t > 1.98:
-        logo = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        logo = Image.new('RGBA', (LW, LH), (0, 0, 0, 0))
     if True:
         lw, lh = int(W * sxg), max(1, int(H * syg))
-        sm = logo.resize((lw, lh), Image.BILINEAR)
+        sm = logo.resize((lw, lh), Image.LANCZOS)
         logo = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        logo.alpha_composite(sm, (int(CX - CX * sxg), int(CY - CY * syg)))
+        logo.alpha_composite(sm, (int(round((CX - CX * sxg) * K)), int(round((CY - CY * syg) * K))))
         if t > 1.78:
-            logo = logo.filter(ImageFilter.BoxBlur(int(2 + 10 * clamp((t - 1.78) / 0.2))))
+            logo = logo.filter(ImageFilter.BoxBlur(int((2 + 10 * clamp((t - 1.78) / 0.2)) * K)))
     if 0.62 < t < 0.8:
-        g = logo.filter(ImageFilter.GaussianBlur(12))
+        g = logo.filter(ImageFilter.GaussianBlur(12 * K))
         a = g.split()[3].point(lambda v: int(v * 0.8))
         g.putalpha(a)
         glow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
@@ -340,6 +354,8 @@ for fi in range(N):
     al = la[..., 3:4] / 255
     frame = frame * (1 - al) + la[..., :3] * al
     # grain
-    frame += np.random.default_rng(fi).normal(0, 5, (H, W))[..., None]
+    g0 = np.random.default_rng(fi).normal(0, 5, (H0, W0)).astype(np.float32)
+    g = np.asarray(Image.fromarray(g0, 'F').resize((W, H), Image.BILINEAR)) if K != 1 else g0
+    frame += g[..., None] * (1 + 0.25 * (K > 1))
     Image.fromarray(np.clip(frame, 0, 255).astype(np.uint8)).save(f'{OUT}/f_{fi:03d}.png')
 print('done', N)
