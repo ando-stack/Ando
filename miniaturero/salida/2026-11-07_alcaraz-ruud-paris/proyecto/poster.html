@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Alcaraz vs Ruud — Semifinal París</title>
+<style>
+  /* ====== AJUSTES RÁPIDOS ====== */
+  :root {
+    --es-rojo: #c60b1e;  --es-amarillo: #ffc400;     /* lado Alcaraz */
+    --no-azul: #00205b;  --no-rojo: #ba0c2f;          /* lado Ruud */
+    --blanco: #ffffff;   --fondo: #07080d;
+    --pelota: #d7f53a;
+  }
+  @font-face { font-family: "Anton"; src: url("fonts/Anton-Regular.ttf"); }
+  @font-face { font-family: "Bebas"; src: url("fonts/BebasNeue-Regular.ttf"); }
+  @font-face { font-family: "Montserrat"; src: url("fonts/Montserrat-Variable.ttf"); font-weight: 100 900; }
+
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: var(--fondo); }
+  .poster { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--fondo); font-family: "Anton", sans-serif; }
+
+  /* dos mitades en diagonal */
+  .lado { position: absolute; inset: 0; }
+  .lado.es { background: radial-gradient(ellipse at 15% 25%, var(--es-amarillo) 0%, #f08a00 18%, var(--es-rojo) 45%, #3a0308 85%);
+    clip-path: polygon(0 0, 78% 0, 22% 100%, 0 100%); }
+  .lado.no { background: radial-gradient(ellipse at 85% 78%, #2a5bd7 0%, var(--no-azul) 40%, #01081c 90%);
+    clip-path: polygon(78% 0, 100% 0, 100% 100%, 22% 100%); }
+  /* cruz nórdica muy sutil en el lado de Ruud */
+  .lado.no::after { content: ""; position: absolute; inset: 0; opacity: .14;
+    background:
+      linear-gradient(90deg, transparent 63%, var(--blanco) 63%, var(--blanco) 71%, transparent 71%),
+      linear-gradient(0deg, transparent 22%, var(--blanco) 22%, var(--blanco) 28%, transparent 28%); }
+  .lado.no::before { content: ""; position: absolute; inset: 0; opacity: .22;
+    background:
+      linear-gradient(90deg, transparent 65%, var(--no-rojo) 65%, var(--no-rojo) 69%, transparent 69%),
+      linear-gradient(0deg, transparent 23.5%, var(--no-rojo) 23.5%, var(--no-rojo) 26.5%, transparent 26.5%); }
+  /* raya de luz en el corte */
+  .corte { position: absolute; left: 50%; top: -15%; width: 14px; height: 130%; background: var(--blanco);
+    transform: translateX(-50%) rotate(24.1deg);
+    -webkit-mask-image: linear-gradient(180deg, transparent 14%, #000 24%, #000 72%, transparent 80%); mask-image: linear-gradient(180deg, transparent 14%, #000 24%, #000 72%, transparent 80%);
+    box-shadow: 0 0 30px 8px rgba(255,255,255,.6), 0 0 120px 30px rgba(215,245,58,.25); }
+
+  /* pista en perspectiva */
+  .pista { position: absolute; left: 0; bottom: 0; width: 100%; height: 42%; opacity: .28; }
+
+  /* grano */
+  .grano { position: absolute; inset: 0; opacity: .08; mix-blend-mode: overlay;
+    background-image: repeating-radial-gradient(circle at 30% 40%, #fff 0 1px, transparent 1px 3px); }
+  .vineta { position: absolute; inset: 0; box-shadow: inset 0 0 220px rgba(0,0,0,.85); }
+
+  /* cabecera */
+  .cabecera { position: absolute; top: 4.5%; left: 0; right: 0; text-align: center; color: var(--blanco); }
+  .cabecera .ronda { display: inline-block; font-family: "Bebas"; font-size: 46px; letter-spacing: 12px;
+    background: var(--blanco); color: var(--fondo); padding: 6px 14px 0 26px; }
+  .cabecera .torneo { font-size: 78px; letter-spacing: 6px; margin-top: 12px; text-shadow: 0 6px 0 rgba(0,0,0,.4); }
+  .cabecera .torneo b { font-weight: normal; color: var(--pelota); }
+
+  /* nombres */
+  .nombre { position: absolute; color: var(--blanco); line-height: .85; text-shadow: 8px 8px 0 rgba(0,0,0,.45); }
+  .nombre .bandera { display: block; height: 18px; width: 150px; margin-bottom: 18px; }
+  .nombre.alcaraz { left: 5%; top: 27%; font-size: 200px; transform: rotate(-8deg); transform-origin: left top; }
+  .nombre.alcaraz .bandera { background: linear-gradient(0deg, var(--es-rojo) 25%, var(--es-amarillo) 25% 75%, var(--es-rojo) 75%); }
+  .nombre.ruud { right: 6%; bottom: 25%; font-size: 260px; text-align: right; transform: rotate(-8deg); transform-origin: right bottom; }
+  .nombre.ruud .bandera { margin-left: auto; position: relative;
+    background:
+      linear-gradient(90deg, transparent 27%, var(--no-azul) 27% 37%, transparent 37%),
+      linear-gradient(0deg, transparent 38%, var(--no-azul) 38% 62%, transparent 62%),
+      linear-gradient(90deg, var(--no-rojo) 22%, var(--blanco) 22% 42%, var(--no-rojo) 42%); }
+  .nombre.ruud .bandera::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(0deg, transparent 28%, var(--blanco) 28% 38%, transparent 38% 62%, var(--blanco) 62% 72%, transparent 72%);
+    -webkit-mask: linear-gradient(90deg, #000 22%, transparent 22% 42%, #000 42%); mask: linear-gradient(90deg, #000 22%, transparent 22% 42%, #000 42%); }
+
+  /* pelota = VS */
+  .pelota { position: absolute; left: 50%; top: 53%; width: 230px; height: 230px; transform: translate(-50%, -50%) rotate(-20deg); }
+  .pelota .vs { position: absolute; inset: 0; display: grid; place-items: center; font-size: 96px; color: var(--fondo);
+    transform: rotate(20deg); letter-spacing: 2px; }
+
+  /* pie */
+  .pie { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 0 4%;
+    background: linear-gradient(0deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.6) 65%, transparent 100%); text-align: center; color: var(--blanco); }
+  .pie .dia { font-size: 92px; letter-spacing: 4px; line-height: 1; }
+  .pie .dia i { font-style: normal; color: var(--pelota); padding: 0 16px; }
+  .pie .hora { font-family: "Montserrat"; font-weight: 700; font-size: 28px; letter-spacing: 5px; margin-top: 10px; opacity: .9; }
+
+  /* 9:16 */
+  @media (max-aspect-ratio: 10/16) {
+    .cabecera { top: 7%; }
+    .corte { transform: translateX(-50%) rotate(17.5deg); }
+    .nombre.alcaraz { top: 25%; font-size: 210px; }
+    .nombre.ruud { bottom: 27%; font-size: 280px; }
+    .pelota { top: 51%; width: 250px; height: 250px; }
+    .pie { padding-bottom: 9%; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="lado es"></div>
+  <div class="lado no"></div>
+
+  <svg class="pista" viewBox="0 0 1000 420" preserveAspectRatio="none" fill="none" stroke="#fff" stroke-width="4">
+    <!-- pista vista desde el fondo, dibujada por código -->
+    <path d="M300 20 L700 20 L1000 420 L0 420 Z"/>
+    <path d="M345 20 L80 420 M655 20 L920 420"/>
+    <path d="M330 90 L670 90"/>
+    <path d="M500 90 L500 300"/>
+    <path d="M150 300 L850 300"/>
+    <path d="M300 20 L700 20" stroke-width="10"/>
+  </svg>
+
+  <div class="corte"></div>
+  <div class="grano"></div>
+  <div class="vineta"></div>
+
+  <div class="cabecera">
+    <div class="ronda">SEMIFINAL</div>
+    <div class="torneo">PARIS <b>MASTERS 1000</b></div>
+  </div>
+
+  <div class="nombre alcaraz"><span class="bandera"></span>ALCARAZ</div>
+  <div class="nombre ruud"><span class="bandera"></span>RUUD</div>
+
+  <!-- pelota de tenis dibujada por código -->
+  <div class="pelota">
+    <svg viewBox="0 0 200 200" width="100%" height="100%">
+      <defs>
+        <radialGradient id="g" cx="35%" cy="30%" r="75%">
+          <stop offset="0" stop-color="#f4ff9a"/><stop offset=".45" stop-color="#d7f53a"/><stop offset="1" stop-color="#7d9a0c"/>
+        </radialGradient>
+        <filter id="brillo" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <circle cx="100" cy="100" r="92" fill="url(#g)" filter="url(#brillo)"/>
+      <path d="M22 50 C 70 75, 70 125, 22 150" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M178 50 C 130 75, 130 125, 178 150" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="vs">VS</div>
+  </div>
+
+  <div class="pie">
+    <div class="dia">SÁB 7 NOV</div>
+    <div class="hora">NO ANTES DE LAS 17:00 · HORA DE PARÍS</div>
+  </div>
+</div>
+</body>
+</html>
