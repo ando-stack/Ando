@@ -1,5 +1,6 @@
 # Alcaraz vs Ruud — Semifinal París Masters 1000 (sáb 7/11/2026)
 
+- **Hora (7/11):** el usuario indica 17:15 → "SÁB 7 NOV · 17:15 · HORA DE PARÍS" (se quita "no antes de las 17:00").
 - **Datos (verificados el 7/11):** semifinal del Paris Masters 1000, sábado 7 de noviembre, **no antes de las 17:00 (hora de París, CET)**. Alcaraz ganó a Fritz y Ruud a Borges en cuartos (Flashscore, ATP Tour). La sede no se nombra (dudas sobre su nombre actual).
 - **Concepto:** duelo tipográfico. Póster partido en diagonal: lado de Alcaraz con colores de España (rojo/amarillo) y lado de Ruud con colores de Noruega (azul/rojo/blanco, con una cruz nórdica muy sutil). La pelota de tenis hace de "VS". Pista dibujada en perspectiva al fondo.
 - **Jugadores (añadidos el 7/11):** fotos aportadas por el usuario (`entrada/alcaraz.png`, `entrada/ruud.png`). Alcaraz ya venía sin fondo; a Ruud se le quitó con BiRefNet. Ambas son pequeñas (~600 px de alto), así que a 4K se ven algo blandas.
