@@ -54,12 +54,17 @@
   .cabecera .torneo { font-size: 78px; letter-spacing: 6px; margin-top: 12px; text-shadow: 0 6px 0 rgba(0,0,0,.4); }
   .cabecera .torneo b { font-weight: normal; color: var(--pelota); }
 
+  /* jugadores (fotos aportadas por el usuario, recortadas e iluminadas en 3D) */
+  .jugador { position: absolute; bottom: 0; height: 69%; filter: drop-shadow(0 20px 40px rgba(0,0,0,.7)); }
+  .jugador.alcaraz { left: 2%; }
+  .jugador.ruud { right: 1%; }
+
   /* nombres */
   .nombre { position: absolute; color: var(--blanco); line-height: .85; text-shadow: 8px 8px 0 rgba(0,0,0,.45); }
-  .nombre .bandera { display: block; height: 18px; width: 150px; margin-bottom: 18px; }
-  .nombre.alcaraz { left: 5%; top: 27%; font-size: 200px; transform: rotate(-8deg); transform-origin: left top; }
+  .nombre .bandera { display: block; height: 14px; width: 110px; margin-bottom: 12px; }
+  .nombre.alcaraz { left: 4%; top: 19.5%; font-size: 112px; transform: rotate(-4deg); transform-origin: left top; }
   .nombre.alcaraz .bandera { background: linear-gradient(0deg, var(--es-rojo) 25%, var(--es-amarillo) 25% 75%, var(--es-rojo) 75%); }
-  .nombre.ruud { right: 6%; bottom: 25%; font-size: 260px; text-align: right; transform: rotate(-8deg); transform-origin: right bottom; }
+  .nombre.ruud { right: 4%; top: 19.5%; font-size: 112px; text-align: right; transform: rotate(-4deg); transform-origin: right top; }
   .nombre.ruud .bandera { margin-left: auto; position: relative;
     background:
       linear-gradient(90deg, transparent 27%, var(--no-azul) 27% 37%, transparent 37%),
@@ -70,8 +75,8 @@
     -webkit-mask: linear-gradient(90deg, #000 22%, transparent 22% 42%, #000 42%); mask: linear-gradient(90deg, #000 22%, transparent 22% 42%, #000 42%); }
 
   /* pelota = VS */
-  .pelota { position: absolute; left: 50%; top: 53%; width: 230px; height: 230px; transform: translate(-50%, -50%) rotate(-20deg); }
-  .pelota .vs { position: absolute; inset: 0; display: grid; place-items: center; font-size: 96px; color: var(--fondo);
+  .pelota { position: absolute; left: 50%; top: 26%; width: 150px; height: 150px; transform: translate(-50%, -50%) rotate(-20deg); }
+  .pelota .vs { position: absolute; inset: 0; display: grid; place-items: center; font-size: 80px; color: var(--fondo);
     transform: rotate(20deg); letter-spacing: 2px; }
 
   /* pie */
@@ -85,9 +90,9 @@
   @media (max-aspect-ratio: 10/16) {
     .cabecera { top: 7%; }
     .corte { transform: translateX(-50%) rotate(17.5deg); }
-    .nombre.alcaraz { top: 25%; font-size: 210px; }
-    .nombre.ruud { bottom: 27%; font-size: 280px; }
-    .pelota { top: 51%; width: 250px; height: 250px; }
+    .jugador { height: 55%; bottom: 7%; }
+    .nombre.alcaraz, .nombre.ruud { top: 22%; font-size: 120px; }
+    .pelota { top: 28%; width: 170px; height: 170px; }
     .pie { padding-bottom: 9%; }
   }
 </style>
@@ -110,6 +115,9 @@
   <div class="corte"></div>
   <div class="grano"></div>
   <div class="vineta"></div>
+
+  <img class="jugador alcaraz" src="img/alcaraz_iluminado.png" alt="Carlos Alcaraz">
+  <img class="jugador ruud" src="img/ruud_iluminado.png" alt="Casper Ruud">
 
   <div class="cabecera">
     <div class="ronda">SEMIFINAL</div>
