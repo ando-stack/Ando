@@ -5,35 +5,32 @@
 <title>Squad Victory — edición</title>
 <style>
   /* Se maqueta sobre la imagen original (720x404) y se escala a 1280x720. */
-  @font-face { font-family: "AB"; src: url("fonts/ArchivoBlack-Regular.ttf"); }
+  @font-face { font-family: "Inter"; src: url("fonts/Inter-Variable.ttf"); font-weight: 100 900; }
   html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #000; }
   .lienzo { position: absolute; left: 0; top: 0; width: 720px; height: 404px; transform: scale(1.77778); transform-origin: 0 0;
     background: url("img/base_sin_textos.png") 0 0 / 720px 404px no-repeat; }
 
-  /* ====== textos de la tarjeta (posiciones medidas sobre el original) ====== */
-  .nombre { position: absolute; left: 105px; font-family: "AB"; font-size: 23.6px; line-height: 1; color: #000;
-    white-space: nowrap; transform-origin: 0 0; letter-spacing: -0.2px;
-    -webkit-text-stroke: 0.45px #000; filter: blur(0.3px); }
-  .l1 { top: var(--l1-top, 119px); transform: scaleX(var(--l1-ancho, .66)); }
-  .l2 { top: var(--l2-top, 143px); transform: scaleX(.80); }
-  .puntos { position: absolute; left: 305px; top: var(--p-top, 119px); font-family: "AB"; font-size: 51.5px; line-height: 1;
-    color: #000; transform: scaleX(.88); transform-origin: 0 0; letter-spacing: -0.5px;
-    -webkit-text-stroke: 0.6px #000; filter: blur(0.35px); }
+  /* ====== textos de la tarjeta: Inter Black, negro, sin deformar ====== */
+  .nombres { position: absolute; left: 105px; top: var(--n-top, 119.6px); font-family: "Inter"; font-weight: 900;
+    font-size: var(--n-tam, 18px); line-height: 1.28; color: #000; white-space: nowrap; letter-spacing: -0.3px; }
+  .puntos { position: absolute; left: var(--p-left, 308px); top: var(--p-top, 121px); font-family: "Inter"; font-weight: 900;
+    font-size: 48.6px; line-height: 1; color: #000; letter-spacing: -1px; }
 
-  .bandera { position: absolute; left: 403.5px; top: 124.5px; width: 38px; height: 38px; filter: blur(0.25px); }
+  .bandera { position: absolute; left: 403.5px; top: 124.5px; width: 38px; height: 38px; }
 </style>
 </head>
 <body>
 <div class="lienzo">
-  <div class="nombre l1">ism4 PWR, Tinka PWR</div>
-  <div class="nombre l2">Zdog &amp; Crusades</div>
+  <div class="nombres">ism4, PWR Tinka<br>PWR Zdog &amp; Crusades</div>
   <div class="puntos">100</div>
 
-  <!-- media bandera de España (izquierda) y media de Australia (derecha), en círculo -->
+  <!-- bandera en diagonal: España arriba-izquierda, Australia abajo-derecha -->
   <svg class="bandera" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <clipPath id="circ"><circle cx="50" cy="50" r="49"/></clipPath>
-      <clipPath id="canton"><rect x="50" y="8" width="40" height="34"/></clipPath>
+      <clipPath id="tri-es"><polygon points="0,0 100,0 0,100"/></clipPath>
+      <clipPath id="tri-au"><polygon points="100,0 100,100 0,100"/></clipPath>
+      <clipPath id="canton"><rect x="52" y="50" width="36" height="26"/></clipPath>
       <radialGradient id="brillo" cx="32%" cy="26%" r="70%">
         <stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/>
         <stop offset="1" stop-color="#000" stop-opacity=".18"/>
@@ -41,25 +38,28 @@
       <polygon id="estrella" points="0,-10 2.9,-4 9.5,-3.1 4.7,1.5 5.9,8.1 0,5 -5.9,8.1 -4.7,1.5 -9.5,-3.1 -2.9,-4"/>
     </defs>
     <g clip-path="url(#circ)">
-      <!-- España -->
-      <rect x="0" y="0" width="50" height="100" fill="#AA151B"/>
-      <rect x="0" y="25" width="50" height="50" fill="#F1BF00"/>
-      <!-- Australia -->
-      <rect x="50" y="0" width="50" height="100" fill="#012169"/>
-      <g clip-path="url(#canton)">
-        <rect x="50" y="8" width="40" height="34" fill="#012169"/>
-        <path d="M50 8 L90 42 M90 8 L50 42" stroke="#fff" stroke-width="7"/>
-        <path d="M50 8 L90 42 M90 8 L50 42" stroke="#C8102E" stroke-width="2.4"/>
-        <path d="M70 8 V42 M50 25 H90" stroke="#fff" stroke-width="10"/>
-        <path d="M70 8 V42 M50 25 H90" stroke="#C8102E" stroke-width="6"/>
+      <!-- España (franjas horizontales 1:2:1) -->
+      <g clip-path="url(#tri-es)">
+        <rect x="0" y="0" width="100" height="100" fill="#AA151B"/>
+        <rect x="0" y="25" width="100" height="50" fill="#F1BF00"/>
       </g>
-      <use href="#estrella" transform="translate(70 64) scale(1.05)" fill="#fff"/>
-      <use href="#estrella" transform="translate(92 30) scale(.45)" fill="#fff"/>
-      <use href="#estrella" transform="translate(84 52) scale(.45)" fill="#fff"/>
-      <use href="#estrella" transform="translate(93 64) scale(.45)" fill="#fff"/>
-      <use href="#estrella" transform="translate(86 84) scale(.5)" fill="#fff"/>
-      <!-- línea de unión -->
-      <rect x="49.3" y="0" width="1.4" height="100" fill="#fff" opacity=".9"/>
+      <!-- Australia -->
+      <g clip-path="url(#tri-au)">
+        <rect x="0" y="0" width="100" height="100" fill="#012169"/>
+        <g clip-path="url(#canton)">
+          <rect x="52" y="50" width="36" height="26" fill="#012169"/>
+          <path d="M52 50 L88 76 M88 50 L52 76" stroke="#fff" stroke-width="6"/>
+          <path d="M52 50 L88 76 M88 50 L52 76" stroke="#C8102E" stroke-width="2"/>
+          <path d="M70 50 V76 M52 63 H88" stroke="#fff" stroke-width="8.5"/>
+          <path d="M70 50 V76 M52 63 H88" stroke="#C8102E" stroke-width="5"/>
+        </g>
+        <use href="#estrella" transform="translate(68 89) scale(.75)" fill="#fff"/>
+        <use href="#estrella" transform="translate(92 46) scale(.4)" fill="#fff"/>
+        <use href="#estrella" transform="translate(88 86) scale(.4)" fill="#fff"/>
+        <use href="#estrella" transform="translate(44 94) scale(.4)" fill="#fff"/>
+      </g>
+      <!-- línea diagonal de unión -->
+      <path d="M100 0 L0 100" stroke="#fff" stroke-width="1.6" opacity=".9"/>
       <circle cx="50" cy="50" r="49" fill="url(#brillo)"/>
     </g>
   </svg>
