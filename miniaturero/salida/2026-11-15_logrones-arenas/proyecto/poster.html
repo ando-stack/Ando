@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Match Day — UD Logroñés vs Arenas Club</title>
+<style>
+  /* ====== AJUSTES RÁPIDOS ====== */
+  :root {
+    --rojo: #d6001c; --rojo-osc: #6e0010; --oro: #e7b955; --oro-osc: #8a5a17;
+    --blanco: #ffffff; --fondo: #12060a;
+    --estadio-opacidad: .16;      /* foto de Las Gaunas: muy suave para no molestar */
+    --jugador-alto: 74%;
+  }
+  @font-face { font-family: "Anton"; src: url("fonts/Anton-Regular.ttf"); }
+  @font-face { font-family: "Bebas"; src: url("fonts/BebasNeue-Regular.ttf"); }
+  @font-face { font-family: "Montserrat"; src: url("fonts/Montserrat-Variable.ttf"); font-weight: 100 900; }
+
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: var(--fondo); }
+  .poster { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--fondo); font-family: "Anton", sans-serif; }
+
+  /* foto del estadio, casi invisible y teñida de rojo */
+  .estadio { position: absolute; inset: 0; background: url("img/gaunas.jpg") center 35% / cover no-repeat;
+    opacity: var(--estadio-opacidad); filter: grayscale(1) contrast(1.15) blur(1.5px); }
+  .tinte { position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 55%, rgba(120,8,22,.55) 0%, rgba(18,6,10,.2) 55%, rgba(18,6,10,.85) 100%);
+    mix-blend-mode: multiply; }
+  .polvo { position: absolute; inset: 0; opacity: .5;
+    background: radial-gradient(ellipse at 28% 62%, rgba(231,185,85,.28) 0%, transparent 45%); }
+  /* franjas rojiblancas en diagonal (como el Match Day anterior) */
+  .franjas { position: absolute; left: -32%; top: -15%; width: 62%; height: 140%; transform: rotate(14deg);
+    background: repeating-linear-gradient(90deg, var(--rojo) 0 70px, var(--blanco) 70px 120px); opacity: .55;
+    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent 100%); mask-image: linear-gradient(90deg, #000 30%, transparent 100%); }
+  .vineta { position: absolute; inset: 0; box-shadow: inset 0 0 220px rgba(0,0,0,.9); pointer-events: none; }
+
+  /* gladiador: capa detrás, jugador, escudo delante */
+  .gladiador { position: absolute; left: -4%; bottom: 0; height: var(--jugador-alto); aspect-ratio: 570 / 754; }
+  .gladiador > * { position: absolute; }
+  .capa { left: -10%; top: 50%; width: 230%; height: 56%; }
+  .jugador { left: 0; top: 0; width: 100%; height: 100%;
+    filter: drop-shadow(0 0 1px rgba(255,220,180,.5)) drop-shadow(16px 22px 34px rgba(0,0,0,.75)); }
+  .broche { width: 6%; aspect-ratio: 1; top: 61.5%; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff3c4 0%, var(--oro) 40%, var(--oro-osc) 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,.6), inset 0 0 0 2px rgba(90,50,10,.6); }
+  .broche.izq { left: 9%; } .broche.der { right: 7%; }
+  .escudo-romano { left: 16%; top: 62%; width: 54%; height: 48%; transform: rotate(-9deg); transform-origin: 50% 50%;
+    filter: drop-shadow(10px 14px 18px rgba(0,0,0,.7)); }
+
+  /* título */
+  .titulo { position: absolute; right: 5%; top: 4%; text-align: right; color: var(--blanco);
+    font-size: 200px; line-height: .86; letter-spacing: 2px; text-shadow: 6px 6px 0 var(--rojo), 12px 12px 0 rgba(0,0,0,.6); }
+  .titulo span { display: block; }
+  .titulo .hueco { color: transparent; -webkit-text-stroke: 4px var(--blanco); text-shadow: 6px 6px 0 var(--rojo); }
+  .lema { position: absolute; right: 5%; top: 34.5%; font-family: "Bebas"; font-size: 46px; letter-spacing: 8px; color: var(--oro);
+    text-shadow: 0 3px 0 rgba(0,0,0,.6); }
+
+  /* equipos */
+  .equipos { position: absolute; right: 4%; top: 41%; display: flex; align-items: center; gap: 22px; }
+  .club { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .club img { height: 210px; filter: drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 12px 18px rgba(0,0,0,.55)); }
+  .club span { font-family: "Bebas"; font-size: 32px; letter-spacing: 2px; color: var(--blanco); background: var(--fondo); padding: 3px 12px 0; }
+  .vs { font-size: 64px; color: var(--blanco); transform: skew(-10deg); text-shadow: 4px 4px 0 var(--rojo); margin-bottom: 40px; }
+
+  /* pie */
+  .pie { position: absolute; right: 5%; top: 67%; text-align: right; color: var(--blanco); }
+  .pie .dia { font-size: 96px; line-height: .95; letter-spacing: 2px; text-shadow: 5px 5px 0 var(--rojo-osc); }
+  .pie .dia b { color: var(--rojo); font-weight: normal; }
+  .pie .hora { font-size: 120px; line-height: 1; color: var(--blanco); text-shadow: 6px 6px 0 var(--rojo); }
+  .pie .campo { font-family: "Montserrat"; font-weight: 800; font-size: 30px; letter-spacing: 4px; margin-top: 10px; text-transform: uppercase;
+    display: inline-block; background: var(--rojo); padding: 6px 14px; }
+  .credito { position: absolute; left: 1.2%; bottom: .8%; font-family: "Montserrat"; font-weight: 500; font-size: 13px; color: rgba(255,255,255,.45); }
+
+  /* 9:16 */
+  @media (max-aspect-ratio: 10/16) {
+    .titulo { top: 6%; font-size: 230px; }
+    .lema { top: 30%; }
+    .equipos { top: 36%; }
+    .gladiador { height: 64%; bottom: 6%; }
+    .pie { top: 60%; }
+    .escudo-romano { left: 12%; width: 50%; top: 64%; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="estadio"></div>
+  <div class="tinte"></div>
+  <div class="franjas"></div>
+  <div class="polvo"></div>
+
+  <div class="gladiador">
+    <!-- capa roja (dibujada con código) -->
+    <svg class="capa" viewBox="0 0 820 470" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="tela" x1="0" x2="1">
+          <stop offset="0" stop-color="#4a000a"/><stop offset=".25" stop-color="#b3001a"/><stop offset=".45" stop-color="#7a0012"/>
+          <stop offset=".6" stop-color="#c4061f"/><stop offset=".8" stop-color="#6a000e"/><stop offset="1" stop-color="#3a0008"/>
+        </linearGradient>
+        <linearGradient id="sombra" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#000" stop-opacity=".1"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
+        </linearGradient>
+      </defs>
+      <path id="tela-forma" d="M90 30 C 60 150, 20 320, 0 470 L 560 470 C 640 420, 720 400, 820 430 C 760 360, 700 300, 690 230 C 740 200, 790 190, 815 150 C 720 150, 640 120, 590 60 C 520 45, 300 50, 90 30 Z" fill="url(#tela)"/>
+      <use href="#tela-forma" fill="url(#sombra)"/>
+      <filter id="suave" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+      <clipPath id="tela-clip"><use href="#tela-forma"/></clipPath>
+      <g clip-path="url(#tela-clip)" filter="url(#suave)" fill="none" stroke-linecap="round">
+        <!-- pliegues: sombras -->
+        <path d="M150 60 C 120 200, 90 330, 70 480 M320 60 C 330 220, 320 350, 300 480 M470 70 C 500 220, 520 340, 540 480
+                 M600 90 C 650 190, 720 250, 820 300 M560 120 C 610 270, 660 360, 760 450" stroke="#1e0004" stroke-opacity=".6" stroke-width="34"/>
+        <!-- pliegues: luces -->
+        <path d="M230 60 C 220 200, 200 330, 185 480 M400 70 C 420 210, 425 340, 420 480 M610 70 C 680 130, 740 160, 820 180
+                 M590 150 C 640 260, 700 330, 800 380" stroke="#ff3a50" stroke-opacity=".5" stroke-width="26"/>
+      </g>
+      <path d="M600 72 C 680 120, 740 140, 815 150" stroke="#ff8a96" stroke-opacity=".55" stroke-width="5" fill="none"/>
+      <use href="#tela-forma" fill="none" stroke="#3a0008" stroke-width="4" stroke-opacity=".7"/>
+    </svg>
+    <img class="jugador" src="img/anai_iluminado.png" alt="Anai Morales">
+    <!-- escudo romano (scutum) dibujado con código, con el escudo del Logroñés -->
+    <svg class="escudo-romano" viewBox="0 0 300 400">
+      <defs>
+        <linearGradient id="curva" x1="0" x2="1">
+          <stop offset="0" stop-color="#5a0010"/><stop offset=".22" stop-color="#c10820"/><stop offset=".5" stop-color="#e01530"/>
+          <stop offset=".78" stop-color="#b0061c"/><stop offset="1" stop-color="#4a000c"/>
+        </linearGradient>
+        <linearGradient id="oro" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff0b8"/><stop offset=".35" stop-color="#e7b955"/><stop offset=".7" stop-color="#b07a24"/><stop offset="1" stop-color="#6e4510"/>
+        </linearGradient>
+        <radialGradient id="umbo" cx="38%" cy="32%" r="70%">
+          <stop offset="0" stop-color="#fff6cf"/><stop offset=".4" stop-color="#e7b955"/><stop offset="1" stop-color="#6e4510"/>
+        </radialGradient>
+        <clipPath id="cuerpo"><rect x="14" y="14" width="272" height="372" rx="34"/></clipPath>
+      </defs>
+      <rect x="4" y="4" width="292" height="392" rx="42" fill="url(#oro)"/>
+      <rect x="14" y="14" width="272" height="372" rx="34" fill="url(#curva)"/>
+      <g clip-path="url(#cuerpo)" stroke="url(#oro)" stroke-width="9" fill="none" opacity=".95">
+        <path d="M150 14 V386 M14 200 H286"/>
+        <path d="M40 50 L110 120 M260 50 L190 120 M40 350 L110 280 M260 350 L190 280" stroke-width="6"/>
+      </g>
+      <g clip-path="url(#cuerpo)" fill="none" stroke="#000" stroke-opacity=".18" stroke-width="2">
+        <rect x="24" y="24" width="252" height="352" rx="28"/>
+      </g>
+      <circle cx="150" cy="200" r="74" fill="url(#umbo)" stroke="#6e4510" stroke-width="4"/>
+      <circle cx="150" cy="200" r="62" fill="#1a0306" opacity=".25"/>
+      <image href="img/escudo_logrones.png" x="113" y="146" width="74" height="108" preserveAspectRatio="xMidYMid meet"/>
+      <ellipse cx="118" cy="168" rx="20" ry="12" fill="#fff" opacity=".35"/>
+      <rect x="14" y="14" width="272" height="372" rx="34" fill="url(#curva)" opacity="0"/>
+    </svg>
+  </div>
+
+  <div class="vineta"></div>
+
+  <div class="titulo"><span>MATCH</span><span class="hueco">DAY</span></div>
+  <div class="lema">A LA ARENA</div>
+
+  <div class="equipos">
+    <div class="club"><img src="img/escudo_logrones.png" alt="UD Logroñés"><span>UD LOGROÑÉS</span></div>
+    <div class="vs">VS</div>
+    <div class="club"><img src="img/escudo_arenas.png" alt="Arenas Club"><span>ARENAS CLUB</span></div>
+  </div>
+
+  <div class="pie">
+    <div class="dia">DOM 15 NOV</div>
+    <div class="hora">16:30</div>
+    <div class="campo">Estadio Las Gaunas</div>
+  </div>
+  <div class="credito">Foto estadio: Dilema / Wikimedia Commons · CC BY 3.0</div>
+</div>
+</body>
+</html>
