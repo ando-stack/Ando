@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Resultado — Amorebieta 1-0 UD Logroñés</title>
+<style>
+  /* ====== AJUSTES RÁPIDOS ====== */
+  :root {
+    --rojo: #d6001c;
+    --rojo-osc: #7a0010;
+    --blanco: #ffffff;
+    --fondo: #14060a;
+    --jugador-alto: 70%;   /* tamaño del jugador respecto al alto del póster */
+  }
+  @font-face { font-family: "Anton"; src: url("fonts/Anton-Regular.ttf"); }
+  @font-face { font-family: "Bebas"; src: url("fonts/BebasNeue-Regular.ttf"); }
+  @font-face { font-family: "Montserrat"; src: url("fonts/Montserrat-Variable.ttf"); font-weight: 100 900; }
+
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: var(--fondo); }
+  .poster { position: relative; width: 100%; height: 100%; overflow: hidden;
+    background: radial-gradient(ellipse at 30% 55%, #3a0a12 0%, var(--fondo) 65%); font-family: "Anton", sans-serif; }
+
+  /* franjas rojiblancas en diagonal (eco de la referencia, con colores del Logroñés) */
+  .franjas { position: absolute; left: -28%; top: -15%; width: 70%; height: 140%; transform: rotate(14deg);
+    background: repeating-linear-gradient(90deg, var(--rojo) 0 70px, var(--blanco) 70px 120px);
+    opacity: .92;
+    -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent 100%); mask-image: linear-gradient(90deg, #000 40%, transparent 100%); }
+  /* mancha roja con borde rasgado a la derecha */
+  .mancha { position: absolute; right: -6%; top: 30%; width: 70%; height: 46%; background: var(--rojo); opacity: .9;
+    clip-path: polygon(8% 6%, 22% 0, 38% 5%, 55% 1%, 72% 6%, 100% 0, 100% 100%, 80% 95%, 63% 100%, 44% 94%, 26% 99%, 10% 93%, 0 98%, 4% 70%, 0 45%, 5% 22%); }
+  .mancha::after { content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(100deg, rgba(0,0,0,.18) 0 3px, transparent 3px 11px); }
+
+  /* texto repetido de fondo */
+  .eco { position: absolute; left: -20%; top: 18%; width: 160%; transform: rotate(-14deg); color: rgba(255,255,255,.06);
+    font-size: 64px; line-height: 1.15; letter-spacing: 4px; white-space: nowrap; }
+
+  .vineta { position: absolute; inset: 0; box-shadow: inset 0 0 220px rgba(0,0,0,.85); pointer-events: none; }
+
+  /* contraluz: foco detrás de la cabeza del jugador */
+  .contraluz { position: absolute; left: -12%; top: 18%; width: 80%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,225,225,.30) 0%, rgba(255,40,60,.18) 30%, rgba(214,0,28,0) 62%);
+    mix-blend-mode: screen; }
+  /* jugador recortado */
+  .jugador { position: absolute; bottom: 0; left: -7%; height: var(--jugador-alto);
+    filter: drop-shadow(18px 24px 36px rgba(0,0,0,.75)); }
+
+  .titulo { position: absolute; right: 5%; top: 4%; text-align: right; color: var(--blanco);
+    font-size: 210px; line-height: .86; letter-spacing: 2px;
+    text-shadow: 6px 6px 0 var(--rojo), 12px 12px 0 rgba(0,0,0,.6); }
+  .titulo span { display: block; }
+  .titulo .hueco { color: transparent; -webkit-text-stroke: 4px var(--blanco); text-shadow: 6px 6px 0 var(--rojo); }
+
+  /* escudos (aportados por el usuario) */
+  .equipos { position: absolute; right: 4%; top: 41%; display: flex; align-items: center; gap: 22px; }
+  .equipos .club { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .equipos .club img { height: 250px; filter: drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 12px 18px rgba(0,0,0,.55)); }
+  .equipos .club span { font-family: "Bebas"; font-size: 34px; letter-spacing: 2px; color: var(--blanco);
+    background: var(--fondo); padding: 3px 12px 0; }
+  /* marcador final en lugar del VS */
+  .equipos .marcador { font-family: "Anton"; font-size: 120px; line-height: 1; color: var(--blanco); margin-bottom: 44px;
+    text-shadow: 5px 5px 0 var(--fondo); letter-spacing: 2px; white-space: nowrap; }
+  .equipos .marcador i { font-style: normal; color: var(--blanco); opacity: .8; padding: 0 10px; font-size: .7em; vertical-align: 12%; }
+  .equipos .vs { font-family: "Anton"; font-size: 64px; color: var(--blanco); transform: skew(-10deg);
+    text-shadow: 4px 4px 0 var(--fondo); margin-bottom: 40px; }
+
+  .pie { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 5% 34px; text-align: right;
+    background: linear-gradient(0deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.7) 70%, transparent 100%); color: var(--blanco); }
+  .pie .copa { font-size: 96px; line-height: 1; letter-spacing: 2px; }
+  .pie .copa b { color: var(--rojo); font-weight: normal; text-shadow: 0 0 1px #fff; }
+  .pie .datos { font-family: "Montserrat"; font-weight: 800; font-size: 34px; letter-spacing: 1px; margin-top: 8px; }
+  .pie .datos i { font-style: normal; color: var(--rojo); padding: 0 10px; }
+  .pie .campo { font-family: "Montserrat"; font-weight: 600; font-size: 28px; letter-spacing: 3px; opacity: .85; margin-top: 4px; text-transform: uppercase; }
+
+  /* nombre del jugador, sobre el pecho de la silueta, a la izquierda */
+  .nombre { position: absolute; left: 4%; bottom: 4%; color: var(--blanco); transform: rotate(-4deg); transform-origin: left bottom; }
+  .nombre span { display: block; }
+  .nombre .pila { font-family: "Bebas"; font-size: 60px; letter-spacing: 10px; line-height: 1;
+    background: var(--rojo); display: inline-block; padding: 4px 14px 0 14px; }
+  .nombre .apellido { font-size: 120px; line-height: .95; -webkit-text-stroke: 10px var(--fondo); paint-order: stroke fill;
+    text-shadow: 6px 6px 0 var(--rojo); }
+
+  /* formato vertical 9:16: más aire */
+  @media (min-aspect-ratio: 0/1) and (max-aspect-ratio: 10/16) {
+    .titulo { top: 6%; font-size: 240px; }
+    .equipos { top: 35.5%; }
+    .jugador { height: 62%; }
+    .nombre { bottom: 9%; }
+    .pie { padding-bottom: 120px; }   /* margen para la interfaz de stories */
+    .mancha { top: 34%; height: 36%; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="franjas"></div>
+  <div class="mancha"></div>
+  <div class="eco">COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·<br>COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·<br>COPA DEL REY · COPA DEL REY · COPA DEL REY · COPA DEL REY<br>· URRITXE · URRITXE · URRITXE · URRITXE · URRITXE ·</div>
+
+  <!-- Jugador: Anai Morales, recortado de la foto aportada por el usuario (entrada/anai_morales.webp) -->
+  <div class="contraluz"></div>
+  <img class="jugador" src="img/jugador_iluminado.png" alt="Anai Morales">
+
+  <div class="vineta"></div>
+
+
+  <div class="titulo"><span>FULL</span><span class="hueco">TIME</span></div>
+
+  <div class="equipos">
+    <div class="club"><img src="img/escudo_amorebieta.png" alt="SD Amorebieta"><span>SD AMOREBIETA</span></div>
+    <div class="marcador">1<i>-</i>0</div>
+    <div class="club"><img src="img/escudo_logrones.png" alt="UD Logroñés"><span>UD LOGROÑÉS</span></div>
+  </div>
+
+  <div class="pie">
+    <div class="copa"><b>COPA</b> DEL REY</div>
+    <div class="datos">RESULTADO FINAL<i>|</i>MAR 10 NOV</div>
+    <div class="campo">Campo Municipal de Urritxe</div>
+  </div>
+</div>
+</body>
+</html>

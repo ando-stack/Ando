@@ -16,3 +16,8 @@
 - `matchday_4x5.png` (2160×2700, feed de Instagram) y `matchday_9x16.png` (2160×3840, stories; margen abajo para la interfaz).
 - `comparativa.png`, `proyecto/matchday.html` (variables en `:root`).
 - Re-render: `node herramientas/render.js proyecto/matchday.html matchday_4x5.png 1080 1350 2` (y `1080 1920 2` para 9:16).
+
+## Póster de resultado (10/11)
+- Partido terminado: **SD Amorebieta 1-0 UD Logroñés** (dato del usuario).
+- Archivos nuevos: `resultado_4x5.png`, `resultado_9x16.png`, `comparativa_resultado.png`, `proyecto/resultado.html` (copia del Match Day). El Match Day sigue igual.
+- Cambios: "MATCH DAY" → "FULL TIME" (mismo estilo), "VS" → marcador "1-0" entre los escudos, pie "RESULTADO FINAL | MAR 10 NOV". Jugador, escudos, colores y campo sin cambios.
