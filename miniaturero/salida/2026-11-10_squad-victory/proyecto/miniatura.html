@@ -5,23 +5,28 @@
 <title>Squad Victory — edición</title>
 <style>
   /* Se maqueta sobre la imagen original (720x404) y se escala a 1280x720. */
+  @font-face { font-family: "Archivo"; src: url("fonts/Archivo-Variable.ttf"); font-weight: 100 900; font-stretch: 62% 125%; }
   @font-face { font-family: "Inter"; src: url("fonts/Inter-Variable.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "WorkSans"; src: url("fonts/WorkSans-Variable.ttf"); font-weight: 100 900; }
   html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #000; }
   .lienzo { position: absolute; left: 0; top: 0; width: 720px; height: 404px; transform: scale(1.77778); transform-origin: 0 0;
     background: url("img/base_sin_textos.png") 0 0 / 720px 404px no-repeat; }
 
-  /* ====== textos de la tarjeta: Inter Black, negro, sin deformar ====== */
-  .nombres { position: absolute; left: 105px; top: var(--n-top, 119.6px); font-family: "Inter"; font-weight: 900;
-    font-size: var(--n-tam, 18px); line-height: 1.28; color: #000; white-space: nowrap; letter-spacing: -0.3px; }
-  .puntos { position: absolute; left: var(--p-left, 308px); top: var(--p-top, 121px); font-family: "Inter"; font-weight: 900;
-    font-size: 48.6px; line-height: 1; color: #000; letter-spacing: -1px; }
+  /* ====== textos: nombres en Archivo 900 inclinada 4° (como el original), número en Work Sans 900 recto ====== */
+  .nombres { position: absolute; left: var(--n-left, 104px); top: var(--n-top, 121.6px); font-family: "Archivo";
+    font-weight: 900; font-stretch: var(--n-ancho, 75%); font-size: var(--n-tam, 21.5px); line-height: var(--n-lh, 23px); color: #000;
+    white-space: nowrap; letter-spacing: -0.2px; -webkit-text-stroke: var(--n-grueso, 0.35px) #000;
+    transform: skewX(-4deg); transform-origin: 0 100%; }   /* el original va inclinado unos 4 grados */
+  .nombres .amp { font-family: "Inter"; font-weight: 900; font-size: 0.97em; }   /* "&" clásico, como el original */
+  .puntos { position: absolute; left: var(--p-left, 305px); top: var(--p-top, 118px); font-family: "WorkSans"; font-weight: 900;
+    font-size: var(--p-tam, 52.4px); line-height: 1; color: #000; letter-spacing: -1px; -webkit-text-stroke: var(--p-grueso, 0.3px) #000; }
 
   .bandera { position: absolute; left: 403.5px; top: 124.5px; width: 38px; height: 38px; }
 </style>
 </head>
 <body>
 <div class="lienzo">
-  <div class="nombres">ism4, PWR Tinka<br>PWR Zdog &amp; Crusades</div>
+  <div class="nombres">ism4, PWR Tinka<br>PWR Zdog <span class="amp">&amp;</span> Crusades</div>
   <div class="puntos">100</div>
 
   <!-- bandera en diagonal: España arriba-izquierda, Australia abajo-derecha -->

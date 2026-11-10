@@ -11,6 +11,7 @@
   - Línea 1 a la misma altura y posición que el original; interlineado igual (23 px).
   - "PWR Zdog & Crusades" es más largo que "Phenom & Jayse": para que quepa antes del 100 sin deformar, los nombres van un poco más pequeños (unos 18 px frente a ~23).
   - "100": misma altura, línea base y centro que el "200".
+- **Fuente (versión 3, actual):** comparando de cerca con el original se vio que sus nombres van **inclinados unos 4°** (medido en la "D" y la "P": 3,4–4,6°) y el número va recto. Nombres: **Archivo 900** (ancho 75 %) inclinada exactamente 4°, con el "&" clásico de Inter Black. Número: **Work Sans 900** recto. Posiciones medidas al píxel: líneas a 124 y 147 px y número en la misma caja que el "200" (306–393 × 126–161). Para que quepa "PWR Zdog & Crusades" sin deformar, los nombres van un 9 % más bajos que los originales.
 - **Resolución:** el original es 720×404; se exporta a 3840×2160 pero la imagen de fondo sigue siendo la misma (algo blanda). Si tienes el archivo original a más resolución, queda más nítida.
 
 ## Archivos
