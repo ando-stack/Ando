@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 570 754">
+  <!-- Coraza de gladiador: diseño original dibujado con código (inspirado en la idea de coraza musculada dorada) -->
+  <defs>
+    <linearGradient id="oro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff2b0"/><stop offset=".25" stop-color="#e8b84a"/><stop offset=".55" stop-color="#b9801f"/>
+      <stop offset=".8" stop-color="#e2a83a"/><stop offset="1" stop-color="#6e4310"/>
+    </linearGradient>
+    <radialGradient id="brillo" cx="30%" cy="25%" r="60%">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity=".85"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="plata" x1="0" x2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".5" stop-color="#9aa3ab"/><stop offset="1" stop-color="#e2e6ea"/></linearGradient>
+    <linearGradient id="cuero" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a34"/><stop offset="1" stop-color="#4a2a14"/></linearGradient>
+    <filter id="sombra"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="grano" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="4"/>
+      <feColorMatrix values="0 0 0 0 .35  0 0 0 0 .2  0 0 0 0 .05  0 0 0 -2.2 1.25"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <clipPath id="torso"><path id="t" d="M150 470 C 210 448, 360 448, 420 470 C 470 492, 520 540, 540 600 L 552 754 L 46 754 L 58 600 C 70 540, 100 492, 150 470 Z"/></clipPath>
+  </defs>
+
+  <!-- ribetes plateados sobre la coraza -->
+  <g fill="none" stroke="url(#plata)" stroke-linecap="round">
+    <path d="M168 446 C 240 478, 395 478, 468 444" stroke-width="10"/>
+    <path d="M110 640 C 170 690, 250 690, 300 632 C 350 690, 430 690, 500 640" stroke-width="8"/>
+    <path d="M300 632 L 300 754" stroke-width="7"/>
+  </g>
+  <path d="M286 620 L 300 592 L 314 620 L 300 646 Z" fill="url(#plata)" stroke="#5b636b" stroke-width="2"/>
+  <!-- hombreras de cuero/bronce -->
+  <path d="M90 470 C 120 420, 185 405, 225 428 C 195 480, 165 545, 150 615 C 110 610, 60 590, 30 570 C 36 530, 60 495, 90 470 Z" fill="url(#cuero)" stroke="#2e1708" stroke-width="3"/>
+  <path d="M90 470 C 120 428, 175 415, 215 432" fill="none" stroke="url(#oro)" stroke-width="8"/>
+  <path d="M505 470 C 480 420, 420 405, 385 428 C 410 480, 440 545, 455 615 C 495 610, 540 590, 566 570 C 560 530, 535 495, 505 470 Z" fill="url(#cuero)" stroke="#2e1708" stroke-width="3"/>
+  <path d="M505 470 C 480 428, 425 415, 395 432" fill="none" stroke="url(#oro)" stroke-width="8"/>
+
+  <!-- correa cruzada con hebillas -->
+  <path d="M392 455 L 480 560 L 464 572 L 378 467 Z" fill="url(#cuero)" stroke="#2e1708" stroke-width="2"/>
+  <rect x="410" y="500" width="22" height="16" rx="3" fill="none" stroke="url(#plata)" stroke-width="4" transform="rotate(48 421 508)"/>
+  <rect x="436" y="530" width="22" height="16" rx="3" fill="none" stroke="url(#plata)" stroke-width="4" transform="rotate(48 447 538)"/>
+</svg>
