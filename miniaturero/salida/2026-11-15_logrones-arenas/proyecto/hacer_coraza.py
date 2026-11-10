@@ -22,7 +22,8 @@ def escote(x):
 
 
 cuello = escote(xx)
-cuerpo = ((yy > cuello) & (a > .5)).astype(np.uint8)
+libres = np.array(Image.open(D + '_mascara_brazos.png')) > 0      # brazos y manos: sin armadura
+cuerpo = ((yy > cuello) & (a > .5) & ~libres).astype(np.uint8)
 
 # ---------- materiales: 0 nada, 1 oro (coraza), 2 plata (ribetes/remaches), 3 bronce (hombreras)
 mat = np.zeros((h, w), np.uint8)
@@ -106,6 +107,7 @@ for xr in np.linspace(235, 400, 5):
         z += rem
         mat[rem > .25] = 2
 
+mat[libres & (mat != 3)] = 0                                      # las hombreras sí pueden ir sobre el brazo
 cubre = (mat > 0)
 alfa = cv2.GaussianBlur(cubre.astype(np.float32), (0, 0), .9) * a
 
