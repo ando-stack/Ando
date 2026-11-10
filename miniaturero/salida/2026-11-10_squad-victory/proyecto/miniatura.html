@@ -10,9 +10,14 @@
   @font-face { font-family: "WorkSans"; src: url("fonts/WorkSans-Variable.ttf"); font-weight: 100 900; }
   html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #000; }
   .lienzo { position: absolute; left: 0; top: 0; width: 720px; height: 404px; transform: scale(1.77778); transform-origin: 0 0;
-    background: url("img/base_fondo_morado.png") 0 0 / 720px 404px no-repeat; }
+    background: url("img/base_sin_personaje.png") 0 0 / 720px 404px no-repeat; }
 
   /* ====== textos: nombres en Archivo 900 inclinada 4° (como el original), número en Work Sans 900 recto ====== */
+  /* skin nueva (imagen aportada por el usuario) y la tarjeta del #1 por delante, como en el original */
+  .skin { position: absolute; left: var(--skin-x, 350px); top: var(--skin-y, -8px); height: var(--skin-alto, 440px);
+    filter: drop-shadow(-6px 8px 14px rgba(40,0,50,.45)); }
+  .tarjeta { position: absolute; left: 8px; top: 106px; width: 458px; height: 77px; }
+
   .nombres { position: absolute; left: var(--n-left, 104px); top: var(--n-top, 121.6px); font-family: "Archivo";
     font-weight: 900; font-stretch: var(--n-ancho, 75%); font-size: var(--n-tam, 21.5px); line-height: var(--n-lh, 23px); color: #000;
     white-space: nowrap; letter-spacing: -0.2px; -webkit-text-stroke: var(--n-grueso, 0.35px) #000;
@@ -26,6 +31,8 @@
 </head>
 <body>
 <div class="lienzo">
+  <img class="skin" src="img/skin_nueva_iluminada.png" alt="">
+  <img class="tarjeta" src="img/capa_tarjeta.png" alt="">
   <div class="nombres">ism4, PWR Tinka<br>PWR Zdog <span class="amp">&amp;</span> Crusades</div>
   <div class="puntos">100</div>
 
