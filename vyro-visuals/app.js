@@ -41,6 +41,15 @@
   const ytThumb = id => `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;
   const ytEmbed = id => `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0`;
 
+  // Los vídeos de la cuadrícula se reproducen solos (sin sonido, en bucle) mientras están en pantalla
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const autoPlayer = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      const v = en.target;
+      if (en.isIntersecting) { v.muted = true; v.play().catch(() => {}); } else v.pause();
+    });
+  }, { threshold: 0.25 });
+
   // ---------- Tarjetas ----------
   function mediaFor(item, cat) {
     const alt = item.titulo || "";
@@ -48,7 +57,7 @@
     if (item.portada) return el("img", { src: item.portada, alt, loading: "lazy" });
     if (item.youtube) return el("img", { src: ytThumb(item.youtube), alt, loading: "lazy" });
     if (item.video) {
-      const v = el("video", { src: item.video + "#t=0.1", muted: "", playsinline: "", preload: "metadata", loop: "" });
+      const v = el("video", { src: item.video, muted: "", playsinline: "", preload: "metadata", loop: "", "aria-hidden": "true" });
       v.muted = true;
       return v;
     }
@@ -73,8 +82,8 @@
     btn.addEventListener("click", () => Viewer.open(list, index, cat));
     const vid = btn.querySelector("video");
     if (vid) {
-      btn.addEventListener("mouseenter", () => vid.play().catch(() => {}));
-      btn.addEventListener("mouseleave", () => { vid.pause(); });
+      vid.autoplay = true;
+      if (!reduceMotion) autoPlayer.observe(vid);
     }
     if (!(editor && item._id)) return btn;
 
