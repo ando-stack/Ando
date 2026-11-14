@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vyro Visuals — Diseño gráfico y edición de vídeo</title>
+  <meta name="description" content="Vyro Visuals: diseño GFX para deportes y gaming, miniaturas, edición de vídeo VFX y animaciones.">
+  <link rel="icon" href="media/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- ===== NAV ===== -->
+  <header class="nav" id="nav">
+    <a href="#inicio" class="nav__brand" aria-label="Vyro Visuals, inicio">
+      <img src="media/logo.png" alt="" width="40" height="40">
+      <span>VYRO<em>VISUALS</em></span>
+    </a>
+    <button class="nav__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+    <nav class="nav__links" id="navLinks">
+      <a href="#gfx">GFX</a>
+      <a href="#vfx">VFX</a>
+      <a href="#animaciones">Animaciones</a>
+      <a href="#contacto" class="btn btn--small">Contacto</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="inicio">
+      <div class="hero__glow hero__glow--a"></div>
+      <div class="hero__glow hero__glow--b"></div>
+      <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
+      <span class="corner corner--bl"></span><span class="corner corner--br"></span>
+      <span class="cross cross--t"></span><span class="cross cross--b"></span>
+
+      <div class="hero__inner">
+        <p class="eyebrow">Diseño gráfico · Edición de vídeo</p>
+        <h1 class="hero__title">VYRO<span>VISUALS</span></h1>
+        <p class="hero__lead">GFX para deportes y gaming, miniaturas que se clican, edits con VFX y animaciones con movimiento de verdad.</p>
+        <div class="hero__cta">
+          <a href="#gfx" class="btn">Ver portfolio</a>
+          <a href="#contacto" class="btn btn--ghost">Pedir un encargo</a>
+        </div>
+        <ul class="hero__stats" id="heroStats"></ul>
+      </div>
+    </section>
+
+    <!-- ===== GFX ===== -->
+    <section class="section" id="gfx">
+      <div class="section__head">
+        <span class="section__num">01</span>
+        <div>
+          <h2 class="section__title">GFX</h2>
+          <p class="section__sub">Posts, pósters y miniaturas.</p>
+        </div>
+      </div>
+      <div class="tabs" role="tablist" data-group="gfx">
+        <button role="tab" class="tab is-active" data-cat="deportes">Deportes</button>
+        <button role="tab" class="tab" data-cat="gaming">Gaming</button>
+        <button role="tab" class="tab" data-cat="miniaturas">Miniaturas</button>
+      </div>
+      <div class="grid" id="grid-gfx" aria-live="polite"></div>
+    </section>
+
+    <!-- ===== VFX ===== -->
+    <section class="section" id="vfx">
+      <div class="section__head">
+        <span class="section__num">02</span>
+        <div>
+          <h2 class="section__title">VFX</h2>
+          <p class="section__sub">Edición de vídeo y efectos visuales.</p>
+        </div>
+      </div>
+      <div class="tabs" role="tablist" data-group="vfx">
+        <button role="tab" class="tab is-active" data-cat="largos">Vídeos largos</button>
+        <button role="tab" class="tab" data-cat="shorts">Shorts</button>
+      </div>
+      <div class="grid" id="grid-vfx" aria-live="polite"></div>
+    </section>
+
+    <!-- ===== ANIMACIONES ===== -->
+    <section class="section" id="animaciones">
+      <div class="section__head">
+        <span class="section__num">03</span>
+        <div>
+          <h2 class="section__title">Animaciones</h2>
+          <p class="section__sub">Motion graphics, intros y logos animados.</p>
+        </div>
+      </div>
+      <div class="grid grid--wide" id="grid-animaciones" aria-live="polite"></div>
+    </section>
+
+    <!-- ===== CONTACTO ===== -->
+    <section class="section contact" id="contacto">
+      <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
+      <span class="corner corner--bl"></span><span class="corner corner--br"></span>
+      <p class="eyebrow">¿Hablamos?</p>
+      <h2 class="contact__title">Lleva tu contenido<br>al siguiente <span>nivel</span>.</h2>
+      <p class="contact__lead">Escríbeme para encargos de GFX, miniaturas, edición o animación.</p>
+      <div class="contact__links" id="contactLinks"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© <span id="year"></span> Vyro Visuals</span>
+    <a href="#inicio">Volver arriba ↑</a>
+  </footer>
+
+  <!-- ===== VISOR ===== -->
+  <div class="viewer" id="viewer" hidden>
+    <button class="viewer__close" id="viewerClose" aria-label="Cerrar">✕</button>
+    <button class="viewer__nav viewer__nav--prev" id="viewerPrev" aria-label="Anterior">‹</button>
+    <figure class="viewer__body">
+      <div class="viewer__media" id="viewerMedia"></div>
+      <figcaption id="viewerCaption"></figcaption>
+    </figure>
+    <button class="viewer__nav viewer__nav--next" id="viewerNext" aria-label="Siguiente">›</button>
+  </div>
+
+  <script src="contenido.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
