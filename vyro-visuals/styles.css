@@ -240,6 +240,63 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .viewer__nav--prev { left: 14px; } .viewer__nav--next { right: 14px; }
 .viewer__nav[hidden] { display: none; }
 
+/* ===== Modo editor (subir arrastrando) ===== */
+.drop {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 18px; padding: 18px 20px;
+  border: 1.5px dashed rgba(43,255,136,.45); border-radius: var(--radius); cursor: pointer;
+  background: rgba(43,255,136,.04); transition: background .2s, border-color .2s, transform .2s;
+}
+.drop:hover, .drop:focus-within { background: rgba(43,255,136,.08); border-color: var(--green); }
+.drop.is-over { background: rgba(43,255,136,.14); border-color: var(--green); border-style: solid; transform: scale(1.01); box-shadow: 0 0 40px var(--green-glow); }
+.drop__icon { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 1.6rem; color: #031008; background: var(--green); box-shadow: 0 0 20px var(--green-glow); }
+.drop__text { display: flex; flex-direction: column; min-width: 0; }
+.drop__text b { font-weight: 600; }
+.drop__cat { color: var(--green); }
+.drop__text small { color: var(--muted); font-size: .82rem; }
+
+.card-wrap { position: relative; min-width: 0; }
+.card-tools { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity .2s; z-index: 2; }
+.card-wrap:hover .card-tools, .card-wrap:focus-within .card-tools { opacity: 1; }
+@media (hover: none) { .card-tools { opacity: 1; } }
+.tool { width: 34px; height: 34px; border-radius: 50%; background: rgba(5,6,5,.8); border: 1px solid #ffffff30; font-size: .95rem; backdrop-filter: blur(6px); }
+.tool:hover { border-color: var(--green); color: var(--green); }
+.tool--danger:hover { border-color: #ff5d5d; color: #ff5d5d; }
+.btn--danger { background: #ff5d5d; color: #1a0303; }
+.btn--danger:hover { box-shadow: 0 8px 30px rgba(255,93,93,.35); }
+.btn[disabled] { opacity: .6; pointer-events: none; }
+
+.rename {
+  position: absolute; inset: auto 8px 8px 8px; z-index: 3; display: flex; flex-direction: column; gap: 8px;
+  padding: 12px; border-radius: 12px; background: rgba(8,10,9,.96); border: 1px solid var(--green);
+  box-shadow: 0 10px 40px rgba(0,0,0,.6);
+}
+.rename p { font-size: .9rem; }
+.rename__input { width: 100%; padding: .6em .8em; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: .9rem; }
+.rename__input:focus { outline: none; border-color: var(--green); }
+.rename__row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+.card--pending .card__media img { position: absolute; inset: 0; opacity: .35; filter: blur(2px); }
+.card--pending .empty-label { position: relative; color: var(--green); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .4; } }
+
+.editor-bar {
+  position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60;
+  display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 999px; max-width: calc(100% - 32px);
+  background: rgba(8,10,9,.92); border: 1px solid rgba(43,255,136,.45); backdrop-filter: blur(10px); font-size: .85rem; color: var(--muted);
+}
+.editor-bar[hidden] { display: none; }
+.editor-bar b { color: var(--green); }
+.editor-bar__dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+.toast {
+  position: fixed; left: 50%; top: calc(80px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -20px); z-index: 300; opacity: 0; pointer-events: none;
+  padding: 12px 20px; border-radius: 12px; background: var(--green); color: #031008; font-weight: 600; max-width: calc(100% - 32px); text-align: center;
+  transition: opacity .25s, transform .25s; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+.toast--error { background: #ff5d5d; color: #1a0303; }
+body.is-editor .footer { padding-bottom: 80px; }
+@media (max-width: 760px) { .editor-bar { font-size: .78rem; border-radius: 14px; } }
+
 /* ===== Responsive ===== */
 @media (max-width: 760px) {
   .nav__toggle { display: block; }

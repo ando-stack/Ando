@@ -4,14 +4,27 @@
 
   // Forma de las tarjetas por categoría
   const SHAPES = {
-    deportes:   { shape: "portrait", ratio: "4 / 5",  badge: "Deportes" },
-    gaming:     { shape: "square",   ratio: "1 / 1",  badge: "Gaming" },
-    miniaturas: { shape: "wide",     ratio: "16 / 9", badge: "Miniatura" },
-    largos:     { shape: "wide",     ratio: "16 / 9", badge: "Vídeo" },
-    shorts:     { shape: "portrait", ratio: "9 / 16", badge: "Short" },
-    animaciones:{ shape: "wide",     ratio: "16 / 9", badge: "Animación" },
+    deportes:   { shape: "portrait", ratio: "4 / 5",  badge: "Deportes",   label: "Deportes" },
+    gaming:     { shape: "square",   ratio: "1 / 1",  badge: "Gaming",     label: "Gaming" },
+    miniaturas: { shape: "wide",     ratio: "16 / 9", badge: "Miniatura",  label: "Miniaturas" },
+    largos:     { shape: "wide",     ratio: "16 / 9", badge: "Vídeo",      label: "Vídeos largos" },
+    shorts:     { shape: "portrait", ratio: "9 / 16", badge: "Short",      label: "Shorts" },
+    animaciones:{ shape: "wide",     ratio: "16 / 9", badge: "Animación",  label: "Animaciones" },
   };
   const VIDEO_CATS = new Set(["largos", "shorts", "animaciones"]);
+  const MAX_BYTES = 20 * 1024 * 1024;
+
+  // Trabajos fijos (contenido.js) + trabajos subidos arrastrando (solo en la vista de Claude)
+  const STATIC = {
+    deportes: data.gfx?.deportes || [], gaming: data.gfx?.gaming || [], miniaturas: data.gfx?.miniaturas || [],
+    largos: data.vfx?.largos || [], shorts: data.vfx?.shorts || [], animaciones: data.animaciones || [],
+  };
+  const uploaded = Object.fromEntries(Object.keys(SHAPES).map(k => [k, []]));
+  const pending = Object.fromEntries(Object.keys(SHAPES).map(k => [k, []]));
+  const listFor = cat => [...uploaded[cat], ...STATIC[cat]];
+
+  const active = { gfx: "deportes", vfx: "largos", animaciones: "animaciones" };
+  let editor = null; // { db, assets, col } cuando quien mira puede editar
 
   const $ = (s, el = document) => el.querySelector(s);
   const el = (tag, attrs = {}, ...kids) => {
@@ -30,12 +43,11 @@
 
   // ---------- Tarjetas ----------
   function mediaFor(item, cat) {
-    const isVideo = VIDEO_CATS.has(cat);
-    if (!isVideo) return el("img", { src: item.imagen, alt: item.titulo || "", loading: "lazy" });
-    if (item.portada) return el("img", { src: item.portada, alt: item.titulo || "", loading: "lazy" });
-    if (item.youtube) return el("img", { src: ytThumb(item.youtube), alt: item.titulo || "", loading: "lazy" });
+    const alt = item.titulo || "";
+    if (item.imagen) return el("img", { src: item.imagen, alt, loading: "lazy" });
+    if (item.portada) return el("img", { src: item.portada, alt, loading: "lazy" });
+    if (item.youtube) return el("img", { src: ytThumb(item.youtube), alt, loading: "lazy" });
     if (item.video) {
-      // Vista previa silenciosa que se reproduce al pasar el ratón
       const v = el("video", { src: item.video + "#t=0.1", muted: "", playsinline: "", preload: "metadata", loop: "" });
       v.muted = true;
       return v;
@@ -45,7 +57,7 @@
 
   function card(item, cat, index, list) {
     const cfg = SHAPES[cat];
-    const isVideo = VIDEO_CATS.has(cat);
+    const isVideo = !item.imagen;
     const meta = item.cliente || item.fecha || "";
     const btn = el("button", { class: "card", style: `--ratio:${cfg.ratio}; animation-delay:${Math.min(index, 8) * 50}ms`, "aria-label": `Ver ${item.titulo || cfg.badge}` },
       el("div", { class: "card__media" },
@@ -64,7 +76,65 @@
       btn.addEventListener("mouseenter", () => vid.play().catch(() => {}));
       btn.addEventListener("mouseleave", () => { vid.pause(); });
     }
-    return btn;
+    if (!(editor && item._id)) return btn;
+
+    // Controles del editor: renombrar y borrar
+    const wrap = el("div", { class: "card-wrap" }, btn);
+    const tools = el("div", { class: "card-tools" },
+      el("button", { class: "tool", type: "button", title: "Cambiar título", "aria-label": "Cambiar título" }, "✎"),
+      el("button", { class: "tool tool--danger", type: "button", title: "Borrar", "aria-label": "Borrar" }, "✕")
+    );
+    const [renameBtn, delBtn] = tools.children;
+    renameBtn.addEventListener("click", () => startRename(wrap, item));
+    delBtn.addEventListener("click", () => confirmDelete(wrap, item));
+    wrap.append(tools);
+    return wrap;
+  }
+
+  function startRename(wrap, item) {
+    if (wrap.querySelector(".rename")) return;
+    const input = el("input", { class: "rename__input", type: "text", id: "rename-" + item._id, value: item.titulo || "", "aria-label": "Título", maxlength: "80" });
+    const client = el("input", { class: "rename__input", type: "text", id: "client-" + item._id, value: item.cliente || "", placeholder: "Cliente (opcional)", "aria-label": "Cliente", maxlength: "60" });
+    const save = el("button", { class: "btn btn--small", type: "submit" }, "Guardar");
+    const cancel = el("button", { class: "btn btn--small btn--ghost", type: "button" }, "Cancelar");
+    const form = el("form", { class: "rename" }, input, client, el("div", { class: "rename__row" }, cancel, save));
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      save.disabled = true;
+      try {
+        await editor.col.doc(item._id).update({ titulo: input.value.trim(), cliente: client.value.trim() });
+        toast("Guardado");
+      } catch (err) { toast("No se pudo guardar. Inténtalo otra vez.", true); save.disabled = false; return; }
+      form.remove();
+    });
+    cancel.addEventListener("click", () => form.remove());
+    wrap.append(form);
+    input.focus(); input.select();
+  }
+
+  function confirmDelete(wrap, item) {
+    if (wrap.querySelector(".rename")) return;
+    const yes = el("button", { class: "btn btn--small btn--danger", type: "button" }, "Sí, borrar");
+    const no = el("button", { class: "btn btn--small btn--ghost", type: "button" }, "Cancelar");
+    const box = el("div", { class: "rename rename--confirm" }, el("p", {}, "¿Borrar este trabajo de la web?"), el("div", { class: "rename__row" }, no, yes));
+    no.addEventListener("click", () => box.remove());
+    yes.addEventListener("click", async () => {
+      yes.disabled = true;
+      try {
+        await editor.col.doc(item._id).delete();
+        if (item._asset) editor.assets.delete(item._asset).catch(() => {});
+        toast("Borrado");
+      } catch (err) { toast("No se pudo borrar. Inténtalo otra vez.", true); box.remove(); }
+    });
+    wrap.append(box);
+  }
+
+  function pendingCard(p) {
+    const cfg = SHAPES[p.cat];
+    return el("div", { class: "card card--empty card--pending", style: `--ratio:${cfg.ratio}` },
+      el("div", { class: "card__media" }, p.preview ? el("img", { src: p.preview, alt: "" }) : null, el("span", { class: "empty-label" }, "Subiendo…")),
+      el("div", { class: "card__info" }, el("span", { class: "card__title" }, p.name))
+    );
   }
 
   function emptyCards(cat, n) {
@@ -77,34 +147,45 @@
     );
   }
 
-  function render(grid, list, cat) {
+  function render(group) {
+    const cat = active[group];
+    const grid = $(`#grid-${group}`);
     const cfg = SHAPES[cat];
+    const list = listFor(cat);
     grid.dataset.shape = cfg.shape;
-    grid.replaceChildren();
-    if (!list || !list.length) {
-      const n = cfg.shape === "portrait" ? 4 : 3;
-      grid.append(...emptyCards(cat, n));
-      return;
+    grid.replaceChildren(...pending[cat].map(pendingCard));
+    if (!list.length && !pending[cat].length) {
+      grid.append(...emptyCards(cat, cfg.shape === "portrait" ? 4 : 3));
+    } else {
+      grid.append(...list.map((item, i) => card(item, cat, i, list)));
     }
-    grid.append(...list.map((item, i) => card(item, cat, i, list)));
+    const drop = $(`.drop[data-group="${group}"]`);
+    if (drop) drop.querySelector(".drop__cat").textContent = cfg.label;
+  }
+
+  function renderAll() {
+    ["gfx", "vfx", "animaciones"].forEach(render);
+    document.querySelectorAll(".tab").forEach(t => {
+      const n = listFor(t.dataset.cat).length;
+      let c = t.querySelector(".count");
+      if (!n) { c && c.remove(); return; }
+      if (!c) { c = el("span", { class: "count" }); t.append(c); }
+      c.textContent = String(n);
+    });
+    renderStats();
   }
 
   // ---------- Tabs ----------
-  function setupTabs(group, source) {
-    const tablist = $(`.tabs[data-group="${group}"]`);
-    const grid = $(`#grid-${group}`);
-    const tabs = [...tablist.querySelectorAll(".tab")];
+  function setupTabs(group) {
+    const tabs = [...document.querySelectorAll(`.tabs[data-group="${group}"] .tab`)];
     tabs.forEach(t => {
-      const n = (source[t.dataset.cat] || []).length;
-      if (n) t.append(el("span", { class: "count" }, String(n)));
       t.setAttribute("aria-selected", t.classList.contains("is-active"));
       t.addEventListener("click", () => {
         tabs.forEach(x => { x.classList.toggle("is-active", x === t); x.setAttribute("aria-selected", x === t); });
-        render(grid, source[t.dataset.cat], t.dataset.cat);
+        active[group] = t.dataset.cat;
+        render(group);
       });
     });
-    const active = tabs.find(t => t.classList.contains("is-active"));
-    render(grid, source[active.dataset.cat], active.dataset.cat);
   }
 
   // ---------- Visor (lightbox) ----------
@@ -116,7 +197,7 @@
     function show() {
       const item = list[idx];
       media.replaceChildren();
-      if (!VIDEO_CATS.has(cat)) {
+      if (item.imagen) {
         media.append(el("img", { src: item.imagen, alt: item.titulo || "" }));
       } else if (item.youtube) {
         media.append(el("iframe", {
@@ -165,6 +246,113 @@
     return { open };
   })();
 
+  // ---------- Avisos ----------
+  let toastTimer;
+  function toast(msg, isError) {
+    let t = $("#toast");
+    if (!t) { t = el("div", { id: "toast", class: "toast", role: "status" }); document.body.append(t); }
+    t.textContent = msg;
+    t.classList.toggle("toast--error", !!isError);
+    t.classList.add("is-on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("is-on"), isError ? 5000 : 2200);
+  }
+
+  // ---------- Subir arrastrando (solo para quien puede editar) ----------
+  function titleFromName(name) {
+    return name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+  }
+
+  async function uploadFiles(files, cat) {
+    const wantsVideo = VIDEO_CATS.has(cat);
+    for (const file of files) {
+      const isImg = file.type.startsWith("image/");
+      const isVid = file.type.startsWith("video/");
+      if (!isImg && !isVid) { toast(`"${file.name}" no es una imagen ni un vídeo.`, true); continue; }
+      if (!wantsVideo && !isImg) { toast(`En ${SHAPES[cat].label} solo van imágenes. Suelta los vídeos en VFX o Animaciones.`, true); continue; }
+      if (file.size > MAX_BYTES) { toast(`"${file.name}" pesa más de 20 MB. Comprímelo o súbelo a YouTube.`, true); continue; }
+
+      const p = { cat, name: file.name, preview: isImg ? URL.createObjectURL(file) : null };
+      pending[cat].push(p); renderAll();
+      try {
+        const res = await editor.assets.upload(file);
+        await editor.col.add({
+          cat, kind: isImg ? "image" : "video", asset: res.id,
+          titulo: titleFromName(file.name), cliente: "", createdAt: Date.now(),
+        });
+        toast(`Subido a ${SHAPES[cat].label}`);
+      } catch (err) {
+        const code = err && err.code;
+        toast(code === "quota_exceeded" ? "Se ha llenado el espacio de la web. Borra algún trabajo antiguo."
+          : code === "unsupported_type" ? `Ese formato no se admite: ${file.name}`
+          : `No se pudo subir "${file.name}". Inténtalo otra vez.`, true);
+      } finally {
+        pending[cat] = pending[cat].filter(x => x !== p);
+        if (p.preview) URL.revokeObjectURL(p.preview);
+        renderAll();
+      }
+    }
+  }
+
+  function setupDropzones() {
+    document.body.classList.add("is-editor");
+    const zones = [["gfx", "#grid-gfx", "image/*"], ["vfx", "#grid-vfx", "video/*"], ["animaciones", "#grid-animaciones", "video/*,image/gif"]];
+    zones.forEach(([group, gridSel, accept]) => {
+      const input = el("input", { type: "file", id: "file-" + group, multiple: "", accept, hidden: "" });
+      const zone = el("label", { class: "drop", "data-group": group, for: "file-" + group },
+        el("span", { class: "drop__icon", "aria-hidden": "true" }, "+"),
+        el("span", { class: "drop__text" },
+          el("b", {}, "Suelta aquí tus archivos de ", el("span", { class: "drop__cat" }, SHAPES[active[group]].label)),
+          el("small", {}, group === "gfx" ? "Imágenes JPG, PNG, WEBP o GIF · máx. 20 MB · o pulsa para elegirlas" : "Vídeos MP4 o WEBM · máx. 20 MB · o pulsa para elegirlos")
+        ),
+        input
+      );
+      input.addEventListener("change", () => { uploadFiles([...input.files], active[group]); input.value = ""; });
+      // Toda la sección acepta archivos, no solo la caja
+      const section = $(gridSel).closest(".section");
+      let depth = 0;
+      section.addEventListener("dragenter", e => { if (!hasFiles(e)) return; e.preventDefault(); depth++; zone.classList.add("is-over"); });
+      section.addEventListener("dragover", e => { if (hasFiles(e)) e.preventDefault(); });
+      section.addEventListener("dragleave", () => { depth = Math.max(0, depth - 1); if (!depth) zone.classList.remove("is-over"); });
+      section.addEventListener("drop", e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault(); depth = 0; zone.classList.remove("is-over");
+        uploadFiles([...e.dataTransfer.files], active[group]);
+      });
+      $(gridSel).before(zone);
+    });
+    // Evita que el navegador abra el archivo si se suelta fuera de una sección
+    addEventListener("dragover", e => { if (hasFiles(e)) e.preventDefault(); });
+    addEventListener("drop", e => { if (hasFiles(e)) { e.preventDefault(); toast("Suéltalo dentro de GFX, VFX o Animaciones."); } });
+    $("#editorBar").hidden = false;
+  }
+  const hasFiles = e => [...(e.dataTransfer?.types || [])].includes("Files");
+
+  async function setupEditor() {
+    if (!window.claude || typeof window.claude.use !== "function") return;
+    const db = await window.claude.use("db");
+    if (!db) return;
+    const col = db.collection("trabajos");
+    col.orderBy("createdAt", "desc").onSnapshot(snap => {
+      Object.keys(uploaded).forEach(k => { uploaded[k] = []; });
+      snap.docs.forEach(d => {
+        const v = d.data();
+        if (!v || !uploaded[v.cat] || typeof v.asset !== "string") return;
+        const src = "/_blob/" + v.asset;
+        uploaded[v.cat].push({
+          _id: d.id, _asset: v.asset, titulo: String(v.titulo || ""), cliente: String(v.cliente || ""),
+          ...(v.kind === "video" ? { video: src } : { imagen: src }),
+        });
+      });
+      renderAll();
+    }, () => {});
+    const assets = await window.claude.use("assets");
+    if (!assets) return; // visitantes: solo ven el portfolio
+    editor = { db, assets, col };
+    setupDropzones();
+    renderAll();
+  }
+
   // ---------- Contacto ----------
   function setupContact() {
     const p = data.perfil || {};
@@ -187,18 +375,17 @@
   }
 
   // ---------- Stats del hero ----------
-  function setupStats() {
-    const g = data.gfx || {}, v = data.vfx || {};
-    const count = o => Object.values(o).reduce((a, l) => a + (l?.length || 0), 0);
-    const stats = [
-      [count(g), "GFX"],
-      [count(v), "Edits VFX"],
-      [(data.animaciones || []).length, "Animaciones"],
+  function renderStats() {
+    const n = cats => cats.reduce((a, c) => a + listFor(c).length, 0);
+    let stats = [
+      [n(["deportes", "gaming", "miniaturas"]), "GFX"],
+      [n(["largos", "shorts"]), "Edits VFX"],
+      [n(["animaciones"]), "Animaciones"],
     ];
-    if (stats.every(([n]) => n === 0)) {
-      stats.splice(0, 3, ["GFX", "Deportes · Gaming"], ["VFX", "Largos · Shorts"], ["Motion", "Animaciones"]);
+    if (stats.every(([x]) => x === 0)) {
+      stats = [["GFX", "Deportes · Gaming"], ["VFX", "Largos · Shorts"], ["Motion", "Animaciones"]];
     }
-    $("#heroStats").append(...stats.map(([n, l]) => el("li", {}, el("b", {}, String(n)), el("small", {}, l))));
+    $("#heroStats").replaceChildren(...stats.map(([v, l]) => el("li", {}, el("b", {}, String(v)), el("small", {}, l))));
   }
 
   // ---------- Nav ----------
@@ -223,10 +410,10 @@
   }
 
   setupNav();
-  setupStats();
-  setupTabs("gfx", data.gfx || {});
-  setupTabs("vfx", data.vfx || {});
-  render($("#grid-animaciones"), data.animaciones, "animaciones");
+  setupTabs("gfx");
+  setupTabs("vfx");
+  renderAll();
   setupContact();
   $("#year").textContent = new Date().getFullYear();
+  setupEditor();
 })();
