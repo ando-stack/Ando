@@ -13,16 +13,61 @@ export interface WhisperWord {
   end: number;
 }
 
-export function whisperAvailable(): boolean {
-  return fs.existsSync(path.join(WHISPER_DIR, `ggml-${WHISPER_MODEL}.bin`));
+const IS_WIN = process.platform === "win32";
+
+/** Where @remotion/install-whisper-cpp expects the CLI for whisper.cpp >= 1.7.4. */
+export function whisperExe(): string {
+  return path.join(WHISPER_DIR, "build", "bin", IS_WIN ? "whisper-cli.exe" : "whisper-cli");
 }
 
-/** Install whisper.cpp + model on first use (one-time ~150 MB download + build). */
+const modelFile = () => path.join(WHISPER_DIR, `ggml-${WHISPER_MODEL}.bin`);
+
+export function whisperAvailable(): boolean {
+  return fs.existsSync(modelFile()) && fs.existsSync(whisperExe());
+}
+
+/**
+ * The official Windows release zip unpacks to "Release/whisper-cli.exe" (+ DLLs), but
+ * Remotion looks in "build/bin". Copy the whole folder there so the DLLs sit next to the exe.
+ */
+function fixWindowsLayout() {
+  if (!IS_WIN || fs.existsSync(whisperExe()) || !fs.existsSync(WHISPER_DIR)) return;
+  const find = (dir: string, depth = 0): string | null => {
+    if (depth > 3) return null;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isFile() && e.name.toLowerCase() === "whisper-cli.exe") return p;
+      if (e.isDirectory()) {
+        const hit = find(p, depth + 1);
+        if (hit) return hit;
+      }
+    }
+    return null;
+  };
+  const exe = find(WHISPER_DIR);
+  if (!exe) return;
+  const from = path.dirname(exe);
+  const to = path.dirname(whisperExe());
+  fs.mkdirSync(to, { recursive: true });
+  for (const f of fs.readdirSync(from)) {
+    const src = path.join(from, f);
+    if (fs.statSync(src).isFile()) fs.copyFileSync(src, path.join(to, f));
+  }
+}
+
+/** Install whisper.cpp + model on first use (one-time ~150 MB download). */
 export async function ensureWhisper() {
   if (whisperAvailable()) return;
   const { installWhisperCpp, downloadWhisperModel } = await import("@remotion/install-whisper-cpp");
-  await installWhisperCpp({ to: WHISPER_DIR, version: WHISPER_VERSION, printOutput: false });
-  await downloadWhisperModel({ model: WHISPER_MODEL, folder: WHISPER_DIR, printOutput: false });
+  fixWindowsLayout();
+  if (!fs.existsSync(whisperExe())) {
+    // A folder without a usable binary (e.g. an interrupted install) blocks reinstalling: start clean.
+    if (fs.existsSync(WHISPER_DIR) && !fs.existsSync(modelFile())) fs.rmSync(WHISPER_DIR, { recursive: true, force: true });
+    if (!fs.existsSync(WHISPER_DIR)) await installWhisperCpp({ to: WHISPER_DIR, version: WHISPER_VERSION, printOutput: false });
+    fixWindowsLayout();
+  }
+  if (!fs.existsSync(modelFile())) await downloadWhisperModel({ model: WHISPER_MODEL, folder: WHISPER_DIR, printOutput: false });
+  if (!fs.existsSync(whisperExe())) throw new Error(`whisper.cpp executable not found at ${whisperExe()} after install`);
 }
 
 /** Transcribe with word-level timestamps. Input can be any audio ffmpeg reads. */
