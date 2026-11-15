@@ -157,3 +157,15 @@ test("secrets are redacted and config merges deeply", () => {
   assert.equal(redact("key sk-ant-abcdefghijklmnop123 here"), "key [REDACTED] here");
   assert.deepEqual(deepMerge({ a: { b: 1, c: 2 } }, { a: { c: 3 } }), { a: { b: 1, c: 3 } });
 });
+
+test("speech matching survives misheard names and split words", async () => {
+  const { matchSpeech } = await import("../src/render/qc.ts");
+  const cap = "The Real Dimez blew up with an early hit alongside local rapper DWNPLY five years later they signed to Only Raw Records".split(" ").map((t, i) => ({ text: t, start: i * 0.3 }));
+  // whisper mishears the names, splits a word, and inserts filler for a while
+  const heardText = "The real dimes blue up with an early hit along side local wrapper down play five years later they signed to only raw records";
+  const heard = heardText.split(" ").map((t, i) => ({ text: t, start: i * 0.3 + 0.05 }));
+  const r = matchSpeech(cap, heard);
+  assert.ok(r.matched / r.considered >= 0.7, `${r.matched}/${r.considered}`);
+  const garbage = matchSpeech(cap, "completely different words about weather and cooking".split(" ").map((t, i) => ({ text: t, start: i })));
+  assert.ok(garbage.matched / garbage.considered < 0.3);
+});

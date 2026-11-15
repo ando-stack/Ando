@@ -135,22 +135,7 @@ export async function runQc(opts: {
     execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", opts.video, "-vn", "-ac", "1", "-ar", "16000", wav]);
     const heard = await transcribeWords(wav);
     fs.rmSync(wav, { force: true });
-    let matched = 0;
-    const offsets: number[] = [];
-    let j = 0;
-    for (const w of words) {
-      const target = normSpoken(w.text);
-      if (target.length < 3) continue;
-      for (let k = j; k < Math.min(heard.length, j + 6); k++) {
-        if (normSpoken(heard[k].text) === target) {
-          offsets.push(Math.abs(heard[k].start - w.start));
-          matched++;
-          j = k + 1;
-          break;
-        }
-      }
-    }
-    const considered = words.filter((w) => normSpoken(w.text).length >= 3).length;
+    const { matched, considered, offsets } = matchSpeech(words, heard);
     const median = offsets.sort((x, y) => x - y)[Math.floor(offsets.length / 2)] ?? 99;
     add("Speech matches script", matched / Math.max(1, considered) >= 0.7, `${matched}/${considered} caption words heard in the final audio`);
     add("Caption sync", median <= 0.25, `median caption offset ${(median * 1000).toFixed(0)} ms vs. speech`);
@@ -187,6 +172,47 @@ export async function runQc(opts: {
   add("Asset variety", new Set(assetUse).size === assetUse.length, `${assetUse.length - new Set(assetUse).size} reused library assets`, "warning");
 
   return checks;
+}
+
+function near(a: string, b: string): boolean {
+  if (a === b) return true;
+  if (Math.min(a.length, b.length) >= 4 && (a.startsWith(b) || b.startsWith(a))) return true;
+  if (Math.min(a.length, b.length) < 5 || Math.abs(a.length - b.length) > 1) return false;
+  // edit distance <= 1
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++;
+    else if (b.length > a.length) j++;
+    else { i++; j++; }
+  }
+  return edits + (a.length - i) + (b.length - j) <= 1;
+}
+
+/**
+ * Align caption words with what whisper heard using a longest-common-subsequence
+ * over normalized words (tolerates split/merged words and small misspellings of names),
+ * so one misheard word never derails the rest of the comparison.
+ */
+export function matchSpeech(captions: { text: string; start: number }[], heard: { text: string; start: number }[]) {
+  const cap = captions.map((w) => ({ n: normSpoken(w.text), start: w.start })).filter((w) => w.n.length >= 3);
+  const hw = heard.flatMap((w) => w.text.split(/[\s-]+/).map((t) => ({ n: normSpoken(t), start: w.start }))).filter((w) => w.n.length > 0);
+  const n = cap.length, m = hw.length;
+  const dp = Array.from({ length: n + 1 }, () => new Int32Array(m + 1));
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--)
+      dp[i][j] = near(cap[i].n, hw[j].n) ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const offsets: number[] = [];
+  for (let i = 0, j = 0; i < n && j < m; ) {
+    if (near(cap[i].n, hw[j].n) && dp[i][j] === dp[i + 1][j + 1] + 1) {
+      offsets.push(Math.abs(hw[j].start - cap[i].start));
+      i++;
+      j++;
+    } else if (dp[i + 1][j] >= dp[i][j + 1]) i++;
+    else j++;
+  }
+  return { matched: offsets.length, considered: n, offsets };
 }
 
 export function qcPassed(checks: QcCheck[]) {
