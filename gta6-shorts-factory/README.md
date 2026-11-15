@@ -21,6 +21,18 @@ npm run test-short      # builds "3 GTA 6 Details You Probably Missed" end to en
 npm start               # dashboard at http://127.0.0.1:4317
 ```
 
+**Windows (PowerShell 5.1)** doesn't accept `&&`, so run the steps one per line:
+
+```powershell
+cd gta6-shorts-factory
+npm install
+npm run doctor
+npm start
+```
+
+On Windows, install FFmpeg first (`winget install Gyan.FFmpeg`, then open a new terminal).
+The pipeline was developed and tested on Linux; Windows is expected to work but is not yet verified.
+
 On first use the factory downloads two open models: Kokoro-82M (TTS, Apache-2.0, ~90 MB from
 Hugging Face) and whisper.cpp `base.en` (alignment, MIT, ~150 MB + a short compile). Remotion
 uses an installed Chromium headless shell if it finds one, otherwise it downloads its own.
