@@ -110,10 +110,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero__title {
   font-family: var(--font-display); font-weight: 400; line-height: .95;
   font-size: clamp(3rem, 13vw, 9.5rem); letter-spacing: .02em; margin: .3em 0 .25em;
-  background: var(--silver); -webkit-background-clip: text; background-clip: text; color: transparent;
   filter: drop-shadow(0 6px 30px rgba(0,0,0,.6));
   position: relative;
 }
+.hero__word { display: block; background: var(--silver); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero__title::before { /* el anillo verde del logo */
   content: ""; position: absolute; left: 50%; top: 46%; width: 112%; height: 46%;
   border: 3px solid var(--green); border-radius: 50%;
@@ -123,7 +123,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   z-index: -1; animation: orbit 6s ease-in-out infinite;
 }
 @keyframes orbit { 50% { transform: translate(-50%, -50%) rotate(-8deg) scale(1.03); } }
-.hero__title span {
+.hero__title .hero__sub {
   display: block; font-size: .22em; letter-spacing: 1.1em; margin-right: -1.1em; margin-top: .6em;
   background: none; color: var(--green); -webkit-text-fill-color: var(--green);
   text-shadow: 0 0 18px var(--green-glow);
@@ -329,4 +329,81 @@ body.is-editor .footer { padding-bottom: 80px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
+}
+
+/* ==========================================================================
+   ANIMACIONES DE ENTRADA
+   (solo con la clase .anim en <html>; sin JS o con "reducir movimiento" todo se ve directamente)
+   ========================================================================== */
+:root { --ease: cubic-bezier(.2, .75, .15, 1); }
+
+/* --- Intro de la portada --- */
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(26px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: none; } }
+@keyframes titleIn  { from { opacity: 0; letter-spacing: .35em; filter: blur(14px) drop-shadow(0 6px 30px rgba(0,0,0,.6)); }
+                      to   { opacity: 1; letter-spacing: .02em; filter: blur(0) drop-shadow(0 6px 30px rgba(0,0,0,.6)); } }
+@keyframes subIn    { from { opacity: 0; letter-spacing: 2.2em; } to { opacity: 1; letter-spacing: 1.1em; } }
+@keyframes ringIn   { from { opacity: 0; transform: translate(-50%, -50%) rotate(-55deg) scale(.4); }
+                      to   { opacity: 1; transform: translate(-50%, -50%) rotate(-12deg) scale(1); } }
+@keyframes glowIn   { from { opacity: 0; } to { opacity: .55; } }
+@keyframes cornerIn { from { opacity: 0; transform: translate(var(--cx), var(--cy)); } to { opacity: .8; transform: none; } }
+@keyframes crossIn  { from { opacity: 0; transform: translateX(-50%) rotate(-90deg) scale(.3); } to { opacity: .7; transform: translateX(-50%); } }
+
+.anim .nav { animation: fadeDown .8s var(--ease) .1s both; }
+.anim .hero__glow--a { animation: glowIn 2s ease .1s both, drift 12s ease-in-out 2s infinite alternate; }
+.anim .hero__glow--b { animation: glowIn 2s ease .4s both, drift 14s ease-in-out 2s infinite alternate-reverse; }
+.anim .hero .eyebrow { animation: fadeUp .9s var(--ease) .35s both; }
+.anim .hero__title { animation: titleIn 1.4s var(--ease) .5s both; }
+.anim .hero__title::before { animation: ringIn 1.5s var(--ease) 1s both, orbit 6s ease-in-out 2.5s infinite; }
+.anim .hero__title .hero__sub { animation: subIn 1.4s var(--ease) 1.1s both; }
+.anim .hero__lead { animation: fadeUp .9s var(--ease) 1.5s both; }
+.anim .hero__cta { animation: fadeUp .9s var(--ease) 1.7s both; }
+.anim .hero__stats li { animation: fadeUp .9s var(--ease) both; }
+.anim .hero__stats li:nth-child(1) { animation-delay: 1.9s; }
+.anim .hero__stats li:nth-child(2) { animation-delay: 2.0s; }
+.anim .hero__stats li:nth-child(3) { animation-delay: 2.1s; }
+.anim .corner { animation: cornerIn 1.1s var(--ease) .6s both; }
+.anim .corner--tl { --cx: -24px; --cy: -24px; }
+.anim .corner--tr { --cx: 24px;  --cy: -24px; }
+.anim .corner--bl { --cx: -24px; --cy: 24px; }
+.anim .corner--br { --cx: 24px;  --cy: 24px; }
+.anim .cross { animation: crossIn 1s var(--ease) .9s both; }
+
+/* La portada se desvanece y sube un poco al hacer scroll (lo mueve app.js) */
+.hero__inner { will-change: transform, opacity; }
+
+/* --- Aparecer al hacer scroll --- */
+.anim [data-reveal] {
+  opacity: 0; transform: translateY(40px); filter: blur(6px);
+  transition: opacity 1s var(--ease), transform 1s var(--ease), filter 1s var(--ease);
+  transition-delay: var(--d, 0s);
+}
+.anim [data-reveal="left"] { transform: translateX(-50px); }
+.anim [data-reveal="zoom"] { transform: scale(.94); }
+.anim [data-reveal].is-in { opacity: 1; transform: none; filter: none; }
+
+/* Línea verde que se dibuja bajo el título de cada sección */
+.section__head { position: relative; }
+.section__head::after {
+  content: ""; position: absolute; left: 0; bottom: -1px; height: 2px; width: 140px;
+  background: var(--green); box-shadow: 0 0 14px var(--green);
+  transform-origin: left; transition: transform 1.2s var(--ease) .35s;
+}
+.anim .section__head:not(.is-in)::after { transform: scaleX(0); }
+
+/* Tarjetas: entran una detrás de otra cuando la galería llega a la pantalla */
+@keyframes cardIn { from { opacity: 0; transform: translateY(46px) scale(.95); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+.card { animation: cardIn .9s var(--ease) both; }
+.anim .grid:not(.is-in) .card { animation-play-state: paused; }
+
+/* Esquinas del bloque de contacto */
+.anim .contact .corner { animation: none; opacity: 0; transition: opacity .8s, transform 1s var(--ease); transition-delay: .4s; }
+.anim .contact .corner--tl { transform: translate(-16px, -16px); }
+.anim .contact .corner--tr { transform: translate(16px, -16px); }
+.anim .contact .corner--bl { transform: translate(-16px, 16px); }
+.anim .contact .corner--br { transform: translate(16px, 16px); }
+.anim .contact.is-in .corner { opacity: .8; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__inner { transform: none !important; opacity: 1 !important; }
 }

@@ -68,7 +68,7 @@
     const cfg = SHAPES[cat];
     const isVideo = !item.imagen;
     const meta = item.cliente || item.fecha || "";
-    const btn = el("button", { class: "card", style: `--ratio:${cfg.ratio}; animation-delay:${Math.min(index, 8) * 50}ms`, "aria-label": `Ver ${item.titulo || cfg.badge}` },
+    const btn = el("button", { class: "card", style: `--ratio:${cfg.ratio}; animation-delay:${Math.min(index, 8) * 90}ms`, "aria-label": `Ver ${item.titulo || cfg.badge}` },
       el("div", { class: "card__media" },
         mediaFor(item, cat),
         el("span", { class: "card__badge" }, cfg.badge),
@@ -328,7 +328,9 @@
         e.preventDefault(); depth = 0; zone.classList.remove("is-over");
         uploadFiles([...e.dataTransfer.files], active[group]);
       });
+      zone.setAttribute("data-reveal", "");
       $(gridSel).before(zone);
+      if (revealIO) revealIO.observe(zone);
     });
     // Evita que el navegador abra el archivo si se suelta fuera de una sección
     addEventListener("dragover", e => { if (hasFiles(e)) e.preventDefault(); });
@@ -397,6 +399,36 @@
     $("#heroStats").replaceChildren(...stats.map(([v, l]) => el("li", {}, el("b", {}, String(v)), el("small", {}, l))));
   }
 
+  // ---------- Animaciones al hacer scroll ----------
+  let revealIO = null;
+  function setupReveal() {
+    if (!document.documentElement.classList.contains("anim")) return;
+    revealIO = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        en.target.classList.add("is-in");
+        revealIO.unobserve(en.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
+    document.querySelectorAll("[data-reveal], .grid").forEach(n => revealIO.observe(n));
+
+    // La portada sube y se desvanece suavemente al bajar
+    const inner = $(".hero__inner");
+    let ticking = false;
+    addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = scrollY, h = innerHeight;
+        if (y < h * 1.2) {
+          inner.style.transform = y > 0 ? `translateY(${y * 0.35}px)` : "";
+          inner.style.opacity = String(Math.max(0, 1 - y / (h * 0.75)));
+        }
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
   // ---------- Nav ----------
   function setupNav() {
     const nav = $("#nav"), toggle = $("#navToggle"), links = $("#navLinks");
@@ -419,6 +451,7 @@
   }
 
   setupNav();
+  setupReveal();
   setupTabs("gfx");
   setupTabs("vfx");
   renderAll();

@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) document.documentElement.classList.add("anim");
+  </script>
 </head>
 <body>
   <!-- ===== NAV ===== -->
@@ -40,7 +43,7 @@
 
       <div class="hero__inner">
         <p class="eyebrow">Diseño gráfico · Edición de vídeo</p>
-        <h1 class="hero__title">VYRO<span>VISUALS</span></h1>
+        <h1 class="hero__title"><span class="hero__word">VYRO</span><span class="hero__sub">VISUALS</span></h1>
         <p class="hero__lead">GFX para deportes y gaming, miniaturas que se clican, edits con VFX y animaciones con movimiento de verdad.</p>
         <div class="hero__cta">
           <a href="#gfx" class="btn">Ver portfolio</a>
@@ -52,14 +55,14 @@
 
     <!-- ===== GFX ===== -->
     <section class="section" id="gfx">
-      <div class="section__head">
+      <div class="section__head" data-reveal="left">
         <span class="section__num">01</span>
         <div>
           <h2 class="section__title">GFX</h2>
           <p class="section__sub">Posts, pósters y miniaturas.</p>
         </div>
       </div>
-      <div class="tabs" role="tablist" data-group="gfx">
+      <div class="tabs" role="tablist" data-group="gfx" data-reveal style="--d:.15s">
         <button role="tab" class="tab is-active" data-cat="deportes">Deportes</button>
         <button role="tab" class="tab" data-cat="gaming">Gaming</button>
         <button role="tab" class="tab" data-cat="miniaturas">Miniaturas</button>
@@ -69,14 +72,14 @@
 
     <!-- ===== VFX ===== -->
     <section class="section" id="vfx">
-      <div class="section__head">
+      <div class="section__head" data-reveal="left">
         <span class="section__num">02</span>
         <div>
           <h2 class="section__title">VFX</h2>
           <p class="section__sub">Edición de vídeo y efectos visuales.</p>
         </div>
       </div>
-      <div class="tabs" role="tablist" data-group="vfx">
+      <div class="tabs" role="tablist" data-group="vfx" data-reveal style="--d:.15s">
         <button role="tab" class="tab is-active" data-cat="largos">Vídeos largos</button>
         <button role="tab" class="tab" data-cat="shorts">Shorts</button>
       </div>
@@ -85,7 +88,7 @@
 
     <!-- ===== ANIMACIONES ===== -->
     <section class="section" id="animaciones">
-      <div class="section__head">
+      <div class="section__head" data-reveal="left">
         <span class="section__num">03</span>
         <div>
           <h2 class="section__title">Animaciones</h2>
@@ -96,17 +99,17 @@
     </section>
 
     <!-- ===== CONTACTO ===== -->
-    <section class="section contact" id="contacto">
+    <section class="section contact" id="contacto" data-reveal="zoom">
       <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
       <span class="corner corner--bl"></span><span class="corner corner--br"></span>
-      <p class="eyebrow">¿Hablamos?</p>
-      <h2 class="contact__title">Lleva tu contenido<br>al siguiente <span>nivel</span>.</h2>
-      <p class="contact__lead">Escríbeme para encargos de GFX, miniaturas, edición o animación.</p>
-      <div class="contact__links" id="contactLinks"></div>
+      <p class="eyebrow" data-reveal style="--d:.2s">¿Hablamos?</p>
+      <h2 class="contact__title" data-reveal style="--d:.3s">Lleva tu contenido<br>al siguiente <span>nivel</span>.</h2>
+      <p class="contact__lead" data-reveal style="--d:.45s">Escríbeme para encargos de GFX, miniaturas, edición o animación.</p>
+      <div class="contact__links" id="contactLinks" data-reveal style="--d:.6s"></div>
     </section>
   </main>
 
-  <footer class="footer">
+  <footer class="footer" data-reveal>
     <span>© <span id="year"></span> Vyro Visuals</span>
     <a href="#inicio">Volver arriba ↑</a>
   </footer>
