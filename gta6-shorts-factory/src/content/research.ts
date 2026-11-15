@@ -126,7 +126,7 @@ export async function factCheck(facts: Fact[], opts: { online?: boolean } = {}):
         out
           ? "Rockstar's official page says GTA VI is OUT NOW."
           : m
-            ? `Rockstar's official page says: coming ${m[1]} (checked ${result.checkedAt.slice(0, 10)}).`
+            ? `Rockstar's official page says: Coming ${m[1].replace(/^\w/, (c) => c.toUpperCase())} (checked ${result.checkedAt.slice(0, 10)}).`
             : "Could not read the release status from Rockstar's page.",
       );
     } else result.notes.push("Rockstar's official page could not be reached for a release-status check.");

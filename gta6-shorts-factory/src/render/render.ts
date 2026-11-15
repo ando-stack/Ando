@@ -156,6 +156,8 @@ export async function renderVideo(opts: {
       muted: true,
       crf: getConfig().video.crf,
       pixelFormat: "yuv420p",
+      // BT.709 + TV range: the standard YouTube expects (JPEG frames would otherwise yield full-range yuvj420p).
+      colorSpace: "bt709",
       x264Preset: "medium",
       concurrency: Math.max(1, Math.min(8, os.cpus().length)),
       browserExecutable: browser,
@@ -166,12 +168,14 @@ export async function renderVideo(opts: {
   } finally {
     server.close();
   }
+  // The picture defines the length: pad audio with silence if needed, then cut at the last video frame.
+  const vdur = Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", silent]).toString().trim());
   execFileSync("ffmpeg", [
     "-hide_banner", "-y", "-loglevel", "error",
     "-i", silent, "-i", opts.audio,
     "-map", "0:v:0", "-map", "1:a:0",
-    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
-    "-shortest", "-movflags", "+faststart",
+    "-c:v", "copy", "-af", "apad", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
+    "-t", vdur.toFixed(3), "-movflags", "+faststart",
     "-metadata", `title=${opts.title}`,
     opts.out,
   ]);
