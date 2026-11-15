@@ -1,0 +1,764 @@
+{
+  "version": 1,
+  "notes": "Curated, source-backed claims. CONFIRMED_FACT entries are checked against primary sources (Rockstar Games). THEORY/SPECULATION entries must keep their hedge in narration. Re-verify anything with recheckAfter in the past before use. Retrieved dates are when the source was read.",
+  "facts": [
+    {
+      "id": "release-date",
+      "category": "news",
+      "label": "CONFIRMED_FACT",
+      "claim": "Rockstar's official GTA VI page says the game is coming November 19, 2026.",
+      "line": "And it all lands November 19th, 2026.",
+      "emphasis": [
+        "November",
+        "19th"
+      ],
+      "visual": {
+        "kind": "icon",
+        "icon": "calendar",
+        "text": "NOV 19, 2026"
+      },
+      "keywords": [
+        "release",
+        "date",
+        "launch",
+        "november"
+      ],
+      "topic": "release-date",
+      "recheckAfter": "2026-11-19",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI",
+          "title": "Grand Theft Auto VI - Rockstar Games",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Coming November 19, 2026",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "platforms",
+      "category": "news",
+      "label": "CONFIRMED_FACT",
+      "claim": "The official GTA VI page lists PlayStation 5 and Xbox Series X|S; no PC version is listed.",
+      "line": "Officially, it's PS5 and Xbox Series X and S only. No PC version has been announced.",
+      "emphasis": [
+        "PS5",
+        "Xbox",
+        "PC"
+      ],
+      "visual": {
+        "kind": "icon",
+        "icon": "console",
+        "text": "PS5 • XBOX SERIES X|S"
+      },
+      "keywords": [
+        "platform",
+        "pc",
+        "ps5",
+        "xbox",
+        "console"
+      ],
+      "topic": "platforms",
+      "recheckAfter": "2026-11-19",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI",
+          "title": "Grand Theft Auto VI - Rockstar Games",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "PlayStation 5 ... Xbox Series X",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "preload",
+      "category": "news",
+      "label": "CONFIRMED_FACT",
+      "claim": "Rockstar Newswire announced that GTA VI pre-loading began November 10, 2026.",
+      "line": "Pre-loading opened on November 10th, so the download can start before launch.",
+      "emphasis": [
+        "Pre-loading",
+        "November",
+        "10th"
+      ],
+      "visual": {
+        "kind": "icon",
+        "icon": "console",
+        "text": "PRE-LOAD: NOV 10"
+      },
+      "keywords": [
+        "preload",
+        "download",
+        "launch"
+      ],
+      "topic": "preload",
+      "recheckAfter": "2026-11-19",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/newswire/article/k4ak9okk485712",
+          "title": "Grand Theft Auto VI Pre-Load Begins on November 10",
+          "publisher": "Rockstar Newswire",
+          "publishedAt": "2026-11-03",
+          "retrievedAt": "2026-11-15",
+          "quote": "Grand Theft Auto VI Pre-Load Begins on November 10",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "jason-rent-free",
+      "category": "secrets",
+      "label": "CONFIRMED_FACT",
+      "claim": "Brian Heder lets Jason live rent-free at one of his properties, as long as he helps with local shakedowns.",
+      "line": "Jason lives rent-free at one of Brian Heder's properties. The catch? He has to help with local shakedowns.",
+      "emphasis": [
+        "rent-free",
+        "shakedowns"
+      ],
+      "visual": {
+        "kind": "character",
+        "name": "Jason Duval",
+        "role": "Rent-free... with conditions"
+      },
+      "keywords": [
+        "jason",
+        "brian",
+        "boat",
+        "rent",
+        "keys"
+      ],
+      "topic": "jason-brian",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Brian’s letting Jason live rent-free at one of his properties — so long as he helps with local shakedowns",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "brian-boatyard",
+      "category": "characters",
+      "label": "CONFIRMED_FACT",
+      "claim": "Brian Heder is a classic drug runner from the golden age of smuggling in the Keys, still moving product through his boat yard with his third wife, Lori.",
+      "line": "Brian Heder is an old-school Keys smuggler, still moving product through his boat yard with his third wife, Lori.",
+      "emphasis": [
+        "smuggler",
+        "third",
+        "Lori"
+      ],
+      "visual": {
+        "kind": "icon",
+        "icon": "boat",
+        "text": "BRIAN HEDER'S BOAT YARD"
+      },
+      "keywords": [
+        "brian",
+        "boat",
+        "smuggling",
+        "keys",
+        "lori"
+      ],
+      "topic": "brian",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Brian's a classic drug runner from the golden age of smuggling in the Keys. Still moving product through his boat yard with his third wife, Lori",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "cal-coast-guard",
+      "category": "secrets",
+      "label": "CONFIRMED_FACT",
+      "claim": "Cal Hampton, Jason's friend, feels safest at home snooping on Coast Guard comms with a few beers.",
+      "line": "Jason's friend Cal feels safest at home, snooping on Coast Guard radio with a few beers.",
+      "emphasis": [
+        "Coast",
+        "Guard",
+        "snooping"
+      ],
+      "visual": {
+        "kind": "icon",
+        "icon": "radio",
+        "text": "CAL HAMPTON: TUNED IN"
+      },
+      "keywords": [
+        "cal",
+        "coast guard",
+        "radio",
+        "friend"
+      ],
+      "topic": "cal",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Cal feels safest hanging at home, snooping on Coast Guard comms with a few beers and some private browser tabs open.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "cal-quote",
+      "category": "characters",
+      "label": "CONFIRMED_FACT",
+      "claim": "Cal Hampton's official tagline is 'What if everything on the internet was true?'",
+      "line": "His official tagline? What if everything on the internet was true?",
+      "emphasis": [
+        "internet",
+        "true"
+      ],
+      "visual": {
+        "kind": "quote",
+        "text": "What if everything on the internet was true?",
+        "attribution": "Cal Hampton"
+      },
+      "keywords": [
+        "cal",
+        "quote",
+        "internet"
+      ],
+      "topic": "cal",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Cal Hampton What if everything on the internet was true?",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "lucia-father",
+      "category": "secrets",
+      "label": "CONFIRMED_FACT",
+      "claim": "Lucia's father taught her to fight as soon as she could walk; fighting for her family landed her in the Leonida Penitentiary, and sheer luck got her out.",
+      "line": "Lucia's dad taught her to fight as soon as she could walk. Fighting for her family landed her in Leonida Penitentiary.",
+      "emphasis": [
+        "fight",
+        "walk",
+        "Penitentiary"
+      ],
+      "visual": {
+        "kind": "character",
+        "name": "Lucia Caminos",
+        "role": "Fresh out of Leonida Penitentiary"
+      },
+      "keywords": [
+        "lucia",
+        "prison",
+        "penitentiary",
+        "father",
+        "fight"
+      ],
+      "topic": "lucia",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Lucia’s father taught her to fight as soon as she could walk. ... Fighting for her family landed her in the Leonida Penitentiary. Sheer luck got her out.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "lucia-lesson",
+      "category": "characters",
+      "label": "CONFIRMED_FACT",
+      "claim": "Lucia's official tagline is 'Lucia's learned her lesson — only smart moves from here.'",
+      "line": "Rockstar's own tagline for her: only smart moves from here.",
+      "emphasis": [
+        "smart",
+        "moves"
+      ],
+      "visual": {
+        "kind": "quote",
+        "text": "Only smart moves from here.",
+        "attribution": "Lucia Caminos"
+      },
+      "keywords": [
+        "lucia",
+        "quote"
+      ],
+      "topic": "lucia",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Lucia’s learned her lesson — only smart moves from here.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "jason-army",
+      "category": "characters",
+      "label": "CONFIRMED_FACT",
+      "claim": "Jason grew up around grifters and crooks, did a stint in the Army, then ended up in the Keys working for local drug runners.",
+      "line": "Jason grew up around grifters and crooks, did a stint in the Army, then ended up working for drug runners in the Keys.",
+      "emphasis": [
+        "grifters",
+        "Army",
+        "Keys"
+      ],
+      "visual": {
+        "kind": "character",
+        "name": "Jason Duval",
+        "role": "Ex-Army. Grifter upbringing."
+      },
+      "keywords": [
+        "jason",
+        "army",
+        "keys",
+        "backstory"
+      ],
+      "topic": "jason",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Jason grew up around grifters and crooks. After a stint in the Army trying to shake off his troubled teens, he found himself in the Keys",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "jason-easy-life",
+      "category": "characters",
+      "label": "CONFIRMED_FACT",
+      "claim": "Jason's official tagline: 'Jason wants an easy life, but things just keep getting harder.'",
+      "line": "Rockstar sums him up in one line: Jason wants an easy life, but things just keep getting harder.",
+      "emphasis": [
+        "easy",
+        "harder"
+      ],
+      "visual": {
+        "kind": "quote",
+        "text": "Jason wants an easy life, but things just keep getting harder.",
+        "attribution": "Rockstar Games"
+      },
+      "keywords": [
+        "jason",
+        "quote"
+      ],
+      "topic": "jason",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Jason wants an easy life, but things just keep getting harder.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "real-dimez",
+      "category": "secrets",
+      "label": "CONFIRMED_FACT",
+      "claim": "Real Dimez (Bae-Luxe and Roxy) had an early hit single with local rapper DWNPLY and, five years later, signed to Only Raw Records.",
+      "line": "The Real Dimez blew up with an early hit alongside local rapper DWNPLY. Five years later, they signed to Only Raw Records.",
+      "emphasis": [
+        "DWNPLY",
+        "Only",
+        "Raw"
+      ],
+      "visual": {
+        "kind": "icon",
+        "icon": "music",
+        "text": "REAL DIMEZ × ONLY RAW"
+      },
+      "keywords": [
+        "real dimez",
+        "music",
+        "rap",
+        "only raw",
+        "bae-luxe",
+        "roxy"
+      ],
+      "topic": "real-dimez",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "An early hit single with local rapper DWNPLY took Real Dimez to new heights. Now, after five years and a whole lot of trouble, they’re signed to Only Raw Records",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "boobie-empire",
+      "category": "characters",
+      "label": "CONFIRMED_FACT",
+      "claim": "Boobie Ike turned his street days into a legitimate empire of real estate, a strip club and a recording studio, and partners with Dre'Quan on Only Raw Records.",
+      "line": "Boobie Ike turned his street days into real estate, a strip club, and a recording studio.",
+      "emphasis": [
+        "real",
+        "estate",
+        "studio"
+      ],
+      "visual": {
+        "kind": "character",
+        "name": "Boobie Ike",
+        "role": "Vice City legend"
+      },
+      "keywords": [
+        "boobie",
+        "vice city",
+        "only raw",
+        "studio"
+      ],
+      "topic": "boobie",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "One of the few to transform his time in the streets into a legitimate empire spanning real estate, a strip club, and a recording studio",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "boobie-jack",
+      "category": "secrets",
+      "label": "CONFIRMED_FACT",
+      "claim": "Boobie Ike's official tagline: 'It's all about heart — the Jack of Hearts.'",
+      "line": "Boobie's official tagline is a card reference: it's all about heart, the Jack of Hearts.",
+      "emphasis": [
+        "Jack",
+        "Hearts"
+      ],
+      "visual": {
+        "kind": "quote",
+        "text": "It's all about heart — the Jack of Hearts.",
+        "attribution": "Boobie Ike"
+      },
+      "keywords": [
+        "boobie",
+        "jack of hearts",
+        "quote"
+      ],
+      "topic": "boobie",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "It's all about heart — the Jack of Hearts.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "raul-pro",
+      "category": "characters",
+      "label": "CONFIRMED_FACT",
+      "claim": "Raul Bautista is a seasoned bank robber always on the hunt for talent ready to take big risks; his bio opens with 'Experience counts.'",
+      "line": "Raul Bautista is a seasoned bank robber, always hunting for talent willing to take big risks.",
+      "emphasis": [
+        "bank",
+        "robber",
+        "risks"
+      ],
+      "visual": {
+        "kind": "character",
+        "name": "Raul Bautista",
+        "role": "Seasoned bank robber"
+      },
+      "keywords": [
+        "raul",
+        "bank",
+        "heist",
+        "robber"
+      ],
+      "topic": "raul",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Experience counts. Confidence, charm, and cunning — Raul’s a seasoned bank robber always on the hunt for talent ready to take the risks that bring the biggest rewards.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "brian-mudslide",
+      "category": "secrets",
+      "label": "CONFIRMED_FACT",
+      "claim": "Brian Heder's official tagline: 'Nothing better than a Mudslide at sunset.'",
+      "line": "Brian's official tagline? Nothing better than a Mudslide at sunset.",
+      "emphasis": [
+        "Mudslide",
+        "sunset"
+      ],
+      "visual": {
+        "kind": "quote",
+        "text": "Nothing better than a Mudslide at sunset.",
+        "attribution": "Brian Heder"
+      },
+      "keywords": [
+        "brian",
+        "quote",
+        "mudslide"
+      ],
+      "topic": "brian",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Brian Heder Nothing better than a Mudslide at sunset.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "regions-six",
+      "category": "facts",
+      "label": "CONFIRMED_FACT",
+      "claim": "Rockstar's site lists six Leonida destinations: Vice City, Leonida Keys, Grassrivers, Port Gellhorn, Ambrosia and Mount Kalaga.",
+      "line": "Rockstar's site names six places to explore: Vice City, the Leonida Keys, Grassrivers, Port Gellhorn, Ambrosia, and Mount Kalaga.",
+      "emphasis": [
+        "six",
+        "Grassrivers",
+        "Kalaga"
+      ],
+      "visual": {
+        "kind": "map",
+        "region": "Leonida",
+        "regions": [
+          "Vice City",
+          "Leonida Keys",
+          "Grassrivers",
+          "Port Gellhorn",
+          "Ambrosia",
+          "Mount Kalaga"
+        ]
+      },
+      "keywords": [
+        "map",
+        "regions",
+        "leonida",
+        "vice city",
+        "keys",
+        "grassrivers",
+        "port gellhorn",
+        "ambrosia",
+        "kalaga"
+      ],
+      "topic": "map-regions",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Explore Vice City ... Explore Leonida Keys ... Explore Grassrivers ... Explore Port Gellhorn ... Explore Ambrosia ... Explore Mount Kalaga",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "vice-city-tagline",
+      "category": "facts",
+      "label": "CONFIRMED_FACT",
+      "claim": "Rockstar describes Vice City as 'Vice City, USA. The darkest side of the sunniest place in America.'",
+      "line": "Rockstar's own description of Vice City: the darkest side of the sunniest place in America.",
+      "emphasis": [
+        "darkest",
+        "sunniest"
+      ],
+      "visual": {
+        "kind": "quote",
+        "text": "The darkest side of the sunniest place in America.",
+        "attribution": "Rockstar Games"
+      },
+      "keywords": [
+        "vice city",
+        "tagline"
+      ],
+      "topic": "vice-city",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI",
+          "title": "Grand Theft Auto VI - Rockstar Games",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Vice City, USA. The darkest side of the sunniest place in America.",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "leonida-state",
+      "category": "facts",
+      "label": "CONFIRMED_FACT",
+      "claim": "GTA VI's story is a criminal conspiracy stretching across the state of Leonida.",
+      "line": "The story is a criminal conspiracy that stretches across the entire state of Leonida.",
+      "emphasis": [
+        "conspiracy",
+        "Leonida"
+      ],
+      "visual": {
+        "kind": "map",
+        "region": "Leonida"
+      },
+      "keywords": [
+        "leonida",
+        "story",
+        "state",
+        "conspiracy"
+      ],
+      "topic": "leonida",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI",
+          "title": "Grand Theft Auto VI - Rockstar Games",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "a criminal conspiracy stretching across the state of Leonida",
+          "primary": true
+        }
+      ]
+    },
+    {
+      "id": "theory-florida",
+      "category": "theories",
+      "label": "THEORY",
+      "claim": "Leonida is widely interpreted as Rockstar's satirical version of Florida (Vice City having long been read as a Miami parody). Rockstar has not said this.",
+      "line": "Most fans read Leonida as Rockstar's take on Florida, though Rockstar has never said that outright.",
+      "hedge": "Most fans read",
+      "emphasis": [
+        "Florida"
+      ],
+      "visual": {
+        "kind": "map",
+        "region": "Leonida"
+      },
+      "keywords": [
+        "florida",
+        "leonida",
+        "miami",
+        "theory"
+      ],
+      "topic": "theory-florida",
+      "sources": []
+    },
+    {
+      "id": "theory-grassrivers",
+      "category": "theories",
+      "label": "THEORY",
+      "claim": "Fans widely believe Grassrivers is modeled on the Florida Everglades. Rockstar has not confirmed this.",
+      "line": "Grassrivers is widely believed to be Rockstar's version of the Everglades. That part isn't confirmed.",
+      "hedge": "widely believed",
+      "emphasis": [
+        "Grassrivers",
+        "Everglades"
+      ],
+      "visual": {
+        "kind": "map",
+        "region": "Grassrivers"
+      },
+      "keywords": [
+        "grassrivers",
+        "everglades",
+        "swamp",
+        "theory"
+      ],
+      "topic": "theory-grassrivers",
+      "sources": []
+    },
+    {
+      "id": "spec-cal-heists",
+      "category": "theories",
+      "label": "SPECULATION",
+      "claim": "Speculation: Cal's Coast Guard monitoring could matter for boat-based jobs. Nothing official supports this.",
+      "line": "Here's the speculation: a guy who monitors Coast Guard radio could be very useful for boat jobs. Nothing official yet.",
+      "hedge": "speculation",
+      "emphasis": [
+        "speculation",
+        "Coast",
+        "Guard"
+      ],
+      "visual": {
+        "kind": "icon",
+        "icon": "question",
+        "text": "SPECULATION"
+      },
+      "keywords": [
+        "cal",
+        "coast guard",
+        "boat",
+        "missions",
+        "speculation"
+      ],
+      "topic": "spec-cal",
+      "sources": []
+    },
+    {
+      "id": "two-leads",
+      "category": "comparisons",
+      "label": "CONFIRMED_FACT",
+      "claim": "GTA VI has two named protagonists on the official site: Jason Duval and Lucia Caminos.",
+      "line": "This time the story is split between two leads, Jason Duval and Lucia Caminos.",
+      "emphasis": [
+        "two",
+        "Jason",
+        "Lucia"
+      ],
+      "visual": {
+        "kind": "versus",
+        "left": "JASON",
+        "right": "LUCIA",
+        "leftLabel": "Jason Duval",
+        "rightLabel": "Lucia Caminos"
+      },
+      "keywords": [
+        "protagonists",
+        "jason",
+        "lucia",
+        "duo"
+      ],
+      "topic": "protagonists",
+      "sources": [
+        {
+          "url": "https://www.rockstargames.com/VI/only-in-leonida",
+          "title": "Only in Leonida - Grand Theft Auto VI",
+          "publisher": "Rockstar Games",
+          "retrievedAt": "2026-11-15",
+          "quote": "Jason Duval ... Lucia Caminos",
+          "primary": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "channel": {
+    "name": "Leonida Files",
+    "handle": "@LeonidaFiles",
+    "language": "en-US"
+  },
+  "video": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "minSeconds": 20,
+    "maxSeconds": 35,
+    "targetSeconds": 30,
+    "crf": 18
+  },
+  "script": {
+    "minWords": 45,
+    "maxWords": 80,
+    "qualityThreshold": 75,
+    "maxImproveRounds": 6,
+    "writer": "auto"
+  },
+  "voice": {
+    "provider": "kokoro",
+    "kokoro": { "voice": "am_michael", "speed": 1.08, "dtype": "q8" },
+    "google": { "voice": "en-US-Chirp3-HD-Charon", "languageCode": "en-US", "speakingRate": 1.08, "pitch": -2.0 },
+    "sentencePauseMs": 120,
+    "segmentPauseMs": 260,
+    "targetLufs": -16
+  },
+  "captions": {
+    "style": "pop",
+    "fontFamily": "Inter",
+    "fontWeight": 900,
+    "fontSize": 92,
+    "textColor": "#FFFFFF",
+    "highlightColor": "#FFD60A",
+    "strokeColor": "#000000",
+    "strokeWidth": 14,
+    "maxWordsPerPage": 3,
+    "maxCharsPerPage": 18,
+    "positionY": 0.62,
+    "uppercase": true
+  },
+  "brand": {
+    "primary": "#FF2E88",
+    "secondary": "#1FD1F9",
+    "accent": "#FFD60A",
+    "dark": "#0B0614",
+    "gradient": ["#FF6A3D", "#FF2E88", "#7B2FF7"]
+  },
+  "music": {
+    "enabled": true,
+    "source": "auto",
+    "volumeDb": -20,
+    "duckDb": -9,
+    "bpm": 92
+  },
+  "sfx": {
+    "enabled": true,
+    "volumeDb": -12
+  },
+  "audio": {
+    "targetLufs": -14,
+    "truePeak": -1.5
+  },
+  "assets": {
+    "libraryDirs": ["assets/library"],
+    "musicDir": "assets/music",
+    "sfxDir": "assets/sfx",
+    "imageProvider": "none"
+  },
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "maxSearches": 5
+  },
+  "paths": {
+    "projects": "projects",
+    "exports": "exports"
+  },
+  "costs": {
+    "requireApproval": true
+  }
+}

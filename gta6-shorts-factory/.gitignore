@@ -1,0 +1,11 @@
+node_modules/
+.tools/
+projects/
+exports/
+data/*.db*
+data/secrets.json
+config/settings.json
+assets/library/*
+!assets/library/README.md
+.remotion-bundle/
+*.log

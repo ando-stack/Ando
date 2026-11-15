@@ -1,0 +1,43 @@
+{
+  "name": "gta6-shorts-factory",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local, automated YouTube Shorts factory for GTA VI content",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning --import tsx src/server/index.ts",
+    "cli": "node --disable-warning=ExperimentalWarning --import tsx src/cli.ts",
+    "doctor": "npm run -s cli doctor",
+    "test-short": "npm run -s cli test-short",
+    "studio": "remotion studio remotion/index.ts",
+    "typecheck": "tsc -p .",
+    "test": "node --disable-warning=ExperimentalWarning --import tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "@fontsource/anton": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@remotion/bundler": "^4.0.543",
+    "@remotion/cli": "^4.0.543",
+    "@remotion/install-whisper-cpp": "^4.0.543",
+    "@remotion/layout-utils": "^4.0.543",
+    "@remotion/renderer": "^4.0.543",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "dictionary-en": "^4.0.0",
+    "express": "^5.3.0",
+    "google-auth-library": "^11.3.4",
+    "kokoro-js": "^1.2.1",
+    "nspell": "^2.1.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.543",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.7"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}
