@@ -23,7 +23,8 @@ export const Headline: React.FC<{ text: string; brand: Brand; size?: number; hig
     if (last && last.join(" ").length + w.length + 1 <= 11) last.push(w);
     else lines.push([w]);
   }
-  const fit = Math.min(size, 900 / Math.max(...lines.map((l) => l.join(" ").length * 0.47)));
+  // Fit the widest line, and keep the block within ~4 lines of height so it never reaches the captions.
+  const fit = Math.min(size, 900 / Math.max(...lines.map((l) => l.join(" ").length * 0.47)), (4 * size) / Math.max(4, lines.length));
   let k = 0;
   return (
     <div style={{ position: "absolute", top: y, left: SAFE.left, right: 1080 - SAFE.right, textAlign: "center" }}>
@@ -118,16 +119,14 @@ const MAP_PINS: Record<string, [number, number]> = {
 
 export const MapView: React.FC<{ region: string; regions?: string[]; brand: Brand }> = ({ region, regions, brand }) => {
   const { frame, fps, t } = useT();
-  const list = regions?.length ? regions : MAP_PINS[region] ? [region] : [];
-  const focus = MAP_PINS[region];
-  const zoom = focus && list.length === 1 ? interpolate(frame, [0, 40], [1, 1.35], { extrapolateRight: "clamp" }) : 1;
-  const ox = focus && list.length === 1 ? (450 - focus[0]) * (zoom - 1) : 0;
-  const oy = focus && list.length === 1 ? (480 - focus[1]) * (zoom - 1) : 0;
+  // Always show the whole state; a single featured region is highlighted, the rest are dimmed for context.
+  const list = regions?.length ? regions : Object.keys(MAP_PINS);
+  const featured = !regions?.length && MAP_PINS[region] ? region : null;
   const draw = interpolate(frame, [0, 25], [2600, 0], { extrapolateRight: "clamp" });
   return (
-    <div style={{ position: "absolute", left: 90, top: SAFE.top + 40, width: 900, height: 900 }}>
-      <svg width={900} height={900} viewBox="0 0 900 900">
-        <g transform={`translate(${ox} ${oy}) scale(${zoom})`} style={{ transformOrigin: "450px 480px" }}>
+    <div style={{ position: "absolute", left: 90, top: SAFE.top + 60, width: 900, height: 800 }}>
+      <svg width={900} height={760} viewBox="0 0 900 900" style={{ overflow: "hidden" }}>
+        <g>
           <path
             d="M120 90 L 760 70 L 780 160 L 700 230 C 690 330, 720 430, 700 520 C 690 610, 640 690, 590 740 C 560 770, 520 760, 500 720 C 470 640, 430 560, 380 500 C 330 440, 300 360, 260 300 C 220 240, 160 200, 110 180 Z"
             fill="rgba(31,209,249,0.08)"
@@ -142,13 +141,16 @@ export const MapView: React.FC<{ region: string; regions?: string[]; brand: Bran
           {list.map((name, i) => {
             const p = MAP_PINS[name];
             if (!p) return null;
-            const s = pop(frame, fps, 14 + i * 6);
-            const hot = name === region || list.length > 1;
+            const hot = featured ? name === featured : true;
+            // The featured region lands first; context pins follow.
+            const order = featured ? (hot ? 0 : 1 + list.filter((n) => n !== featured).indexOf(name)) : i;
+            const s = pop(frame, fps, 10 + order * 5);
+            const fs = featured ? (hot ? 60 : 30) : 40;
             return (
               <g key={name} transform={`translate(${p[0]} ${p[1]}) scale(${s})`}>
-                <circle r={18 + Math.sin(t * 4 + i) * 4} fill={brand.primary} opacity={0.35} />
-                <circle r={10} fill={hot ? brand.accent : "#fff"} />
-                <text x={22} y={10} fontFamily="Anton" fontSize={list.length > 1 ? 40 : 58} fill="#fff" stroke="#000" strokeWidth={6} paintOrder="stroke">
+                <circle r={(hot ? 22 : 12) + Math.sin(t * 4 + i) * 4} fill={brand.primary} opacity={hot ? 0.45 : 0.2} />
+                <circle r={hot ? 12 : 7} fill={hot ? brand.accent : "#ffffff99"} />
+                <text x={p[0] > 600 ? -22 : 22} y={fs / 3} textAnchor={p[0] > 600 ? "end" : "start"} fontFamily="Anton" fontSize={fs} fill={hot ? "#fff" : "#ffffff88"} stroke="#000" strokeWidth={6} paintOrder="stroke">
                   {name.toUpperCase()}
                 </text>
               </g>
@@ -156,7 +158,7 @@ export const MapView: React.FC<{ region: string; regions?: string[]; brand: Bran
           })}
         </g>
       </svg>
-      <div style={{ position: "absolute", left: 0, bottom: -10, fontFamily: BODY_FONT, fontWeight: 700, fontSize: 24, color: "#ffffffaa", letterSpacing: 2 }}>
+      <div style={{ position: "absolute", left: 0, top: 770, fontFamily: BODY_FONT, fontWeight: 700, fontSize: 24, color: "#ffffffaa", letterSpacing: 2 }}>
         ILLUSTRATIVE MAP — NOT TO SCALE
       </div>
     </div>

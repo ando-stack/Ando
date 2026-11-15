@@ -74,13 +74,17 @@ export interface Fact {
   recheckAfter?: string;
   /** If the label is THEORY/SPECULATION, a phrase hedging it in narration is required. */
   hedge?: string;
+  /** Concept group (data/concepts.json) this invented beat belongs to. */
+  group?: string;
 }
 
 export interface Idea {
   id: string;
   title: string;
   category: Category;
-  format: "listicle" | "deep-dive" | "theory" | "versus" | "news";
+  format: "listicle" | "deep-dive" | "theory" | "versus" | "news" | "concept" | "what-if";
+  /** Preferred closing question (concept groups). */
+  payoff?: string;
   hook: string;
   angle: string;
   factIds: string[];

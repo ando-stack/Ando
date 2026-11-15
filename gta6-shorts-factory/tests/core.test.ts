@@ -169,3 +169,26 @@ test("speech matching survives misheard names and split words", async () => {
   const garbage = matchSpeech(cap, "completely different words about weather and cooking".split(" ").map((t, i) => ({ text: t, start: i })));
   assert.ok(garbage.matched / garbage.considered < 0.3);
 });
+
+test("concept mode: invented beats are hedged, labelled, and never presented as fact", async () => {
+  const { loadConceptGroups } = await import("../src/content/factbank.ts");
+  const groups = loadConceptGroups();
+  assert.ok(groups.length >= 5);
+  const facts = loadFacts();
+  for (const g of groups)
+    for (const b of g.beats) {
+      const f = facts.find((x) => x.id === b.id)!;
+      assert.ok(f, b.id);
+      assert.notEqual(f.label, "CONFIRMED_FACT", `${b.id} is invented but labelled as fact`);
+      assert.ok(f.line.toLowerCase().includes(f.hedge!.toLowerCase()), `${b.id} lacks its hedge`);
+      assert.equal(f.sources.length, 0);
+    }
+  const ideas = offlineIdeas({ count: 60 }).filter((i) => i.format === "concept" || i.format === "what-if");
+  assert.ok(ideas.length >= 5);
+  for (const i of ideas) {
+    const s = writeScriptOffline(i);
+    assert.ok(s.score.total >= getConfig().script.qualityThreshold, `${i.title}: ${s.score.total}`);
+    for (const seg of s.segments) for (const id of seg.factIds) assert.equal(seg.label, facts.find((f) => f.id === id)!.label);
+    if (i.format === "concept") assert.match(s.segments[1].text, /concept|imagination/i, "concept videos open with a not-official disclaimer");
+  }
+});

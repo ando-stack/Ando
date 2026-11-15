@@ -25,20 +25,22 @@ function hookVisual(idea: Idea, facts: Fact[]): ScriptSegment["visual"] {
   if (idea.format === "listicle") return { kind: "title", text: idea.title };
   if (idea.format === "deep-dive") return { kind: "character", name: whoFor(facts), role: "Official profile" };
   if (idea.format === "theory") return { kind: "icon", icon: "eye", text: "THEORY" };
+  if (idea.format === "what-if") return { kind: "icon", icon: "question", text: "WHAT IF?" };
   return { kind: "title", text: idea.title };
 }
 
 export function buildSegments(idea: Idea, facts: Fact[], v: Variant): ScriptSegment[] {
   const segs: ScriptSegment[] = [];
   segs.push({ id: "s1", role: "hook", text: v.hook, label: "NONE", factIds: [], emphasis: words(v.hook).filter((w) => /\d|GTA|missed|hidden|hiding|nobody|secret|theory/i.test(w)), visual: hookVisual(idea, facts) });
-  segs.push({ id: "s2", role: "context", text: v.context, label: "NONE", factIds: [], emphasis: ["Rockstar's", "official"], visual: { kind: "title", text: "STRAIGHT FROM ROCKSTAR" } });
+  segs.push({ id: "s2", role: "context", text: v.context, label: "NONE", factIds: [], emphasis: idea.format === "concept" ? ["concept", "imagination"] : ["Rockstar's", "official"], visual: { kind: "title", text: idea.format === "concept" ? "FAN CONCEPT, NOT OFFICIAL" : "STRAIGHT FROM ROCKSTAR" } });
   facts.forEach((f, i) => {
-    const prefix = v.ordinals && idea.format === "listicle" ? ORDINALS[i] + " " : "";
+    const numbered = idea.format === "listicle" || (idea.format === "concept" && facts.length >= 3 && /^(\d|three)/i.test(idea.title));
+    const prefix = v.ordinals && numbered ? ORDINALS[i] + " " : "";
     segs.push({
       id: `s${segs.length + 1}`,
       role: "main",
       text: prefix + f.line,
-      onScreen: idea.format === "listicle" ? ORDINAL_SCREEN[i] : undefined,
+      onScreen: numbered ? ORDINAL_SCREEN[i] : undefined,
       label: f.label,
       factIds: [f.id],
       emphasis: f.emphasis,
@@ -59,19 +61,21 @@ export function buildSegments(idea: Idea, facts: Fact[], v: Variant): ScriptSegm
   return segs;
 }
 
-function variants(idea: Idea, facts: Fact[]): Variant[] {
+function variants(idea: Idea, facts: Fact[], projectId = ""): Variant[] {
   const vars = { n: facts.length, who: whoFor(facts) };
-  const usedHooks = usedPhrases("hook");
-  const usedPayoffs = usedPhrases("payoff");
-  const hooks = [idea.hook, ...HOOKS[idea.format].map((h) => fill(h, vars))].filter((h, i, a) => a.indexOf(h) === i);
+  const usedHooks = usedPhrases("hook", projectId);
+  const usedPayoffs = usedPhrases("payoff", projectId);
+  // Concept/what-if groups come with a hook written for that exact idea: keep it unless it was already used.
+  const ownHook = (idea.format === "concept" || idea.format === "what-if") && !usedHooks.has(idea.hook);
+  const hooks = ownHook ? [idea.hook] : [idea.hook, ...HOOKS[idea.format].map((h) => fill(h, vars))].filter((h, i, a) => a.indexOf(h) === i);
   // Fresh phrases first so the search prefers them, but keep used ones as a fallback.
   const order = (arr: string[], used: Set<string>) => [...arr.filter((x) => !used.has(x)), ...arr.filter((x) => used.has(x))];
   const out: Variant[] = [];
   for (const hook of order(hooks, usedHooks))
     for (const context of CONTEXTS[idea.format])
-      for (const payoff of order(PAYOFFS[idea.format].map((p) => fill(p, vars)), usedPayoffs))
+      for (const payoff of order([...(idea.payoff ? [idea.payoff] : []), ...PAYOFFS[idea.format].map((p) => fill(p, vars))].filter((p, i, a) => a.indexOf(p) === i), usedPayoffs))
         for (const withRelease of [true, false])
-          for (const ordinals of idea.format === "listicle" ? [true, false] : [false])
+          for (const ordinals of idea.format === "listicle" || idea.format === "concept" ? [true, false] : [false])
             out.push({ hook, context, payoff, withRelease, ordinals });
   return out;
 }
@@ -88,7 +92,7 @@ export function writeScriptOffline(idea: Idea, projectId?: string): Script {
     if (!f) throw new Error(`Idea references unknown fact "${id}"`);
     return f;
   });
-  const all = variants(idea, facts);
+  const all = variants(idea, facts, projectId);
   const factsForScoring = [...facts, ...(factById("release-date") ? [factById("release-date")!] : [])];
   const evaluate = (v: Variant) => {
     const segs = buildSegments(idea, facts, v);

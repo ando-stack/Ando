@@ -18,6 +18,14 @@ const clip = (s: string, n: number) => (s.length <= n ? s : s.slice(0, n - 1).re
 /** Build honest, specific titles from the actual content (no "you won't believe", no fake urgency). */
 function titles(idea: Idea, script: Script): string[] {
   const out = new Set<string>([idea.title]);
+  // Invented content gets titles that say so — never "official" or "details you missed" wording.
+  if (idea.format === "concept" || idea.format === "what-if") {
+    const core = idea.title.replace(/^Concept:\s*/i, "").replace(/\s*\(Concept\)$/i, "").replace(/\bGTA 6('s)?\s+/i, "").replace(/\s+in GTA 6$/i, "");
+    out.add(`GTA 6 Fan Concept: ${clip(core, 70)}`);
+    out.add(idea.format === "what-if" ? `GTA 6 What-If: ${clip(core.replace(/^What If /i, ""), 70)}` : `Imagining GTA 6: ${clip(core, 70)}`);
+    out.add(`${clip(core, 70)} | GTA 6 Idea (Not Official)`);
+    return [...out].map((t) => clip(t, 90)).slice(0, 3);
+  }
   const mains = script.segments.filter((s) => s.role === "main");
   const firstFact = mains[0]?.factIds[0] ? factById(mains[0].factIds[0]) : undefined;
   const names = [...new Set(mains.flatMap((m) => m.factIds.map((id) => factById(id)?.keywords[0]).filter(Boolean) as string[]))]
@@ -46,16 +54,20 @@ export function buildMetadata(idea: Idea, script: Script, research: ResearchResu
     for (const s of r?.sources ?? []) if (!sources.some((x) => x.url === s.url)) sources.push({ url: s.url, title: s.title, retrievedAt: s.retrievedAt });
   }
 
-  const aiAssets = plan.scenes.some((s) => s.asset.aiGenerated) || labels.includes("AI_CONCEPT");
+  // The YouTube "altered or synthetic content" toggle is about realistic visuals; invented ideas shown as
+  // stylized, labelled graphics don't need it, AI-generated imagery does.
+  const aiAssets = plan.scenes.some((s) => s.asset.aiGenerated);
+  const invented = labels.some((l) => l === "AI_CONCEPT" || l === "SPECULATION" || l === "THEORY");
   const aiDisclosure: Metadata["aiDisclosure"] = {
     recommended: true,
     youtubeAlteredContentToggle: aiAssets,
     reason: aiAssets
       ? "The video contains AI-generated visuals of game concepts that could be mistaken for real footage. Turn on YouTube's 'Altered or synthetic content' setting."
       : "Narration uses a synthetic (text-to-speech) voice and visuals are original stylized motion graphics, not realistic footage. YouTube's altered-content toggle is not required for this, but a short note in the description is good practice.",
-    descriptionLine: aiAssets
-      ? "Contains AI-generated concept visuals. Not real gameplay."
-      : "Narrated with an AI voice. Visuals are original motion graphics, not gameplay footage.",
+    descriptionLine: [
+      aiAssets ? "Contains AI-generated concept visuals. Not real gameplay." : "Narrated with an AI voice. Visuals are original motion graphics, not gameplay footage.",
+      invented ? "Concepts, theories and speculation in this video are invented or unconfirmed and labelled as such on screen." : "",
+    ].filter(Boolean).join(" "),
   };
 
   const hook = script.segments.find((s) => s.role === "hook")?.text ?? idea.hook;
@@ -66,7 +78,9 @@ export function buildMetadata(idea: Idea, script: Script, research: ResearchResu
   const releaseNote = research.notes.find((n) => /official page/i.test(n));
 
   const description = [
-    `${hook} Everything here comes from Rockstar's own pages, and anything that isn't confirmed is clearly labelled.`,
+    idea.format === "concept"
+      ? `${hook} This is a fan concept: an invented idea, not anything Rockstar has announced.`
+      : `${hook} Everything here comes from Rockstar's own pages, and anything that isn't confirmed is clearly labelled.`,
     "",
     bullets,
     "",

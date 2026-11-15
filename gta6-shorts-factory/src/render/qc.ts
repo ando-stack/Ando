@@ -38,7 +38,7 @@ async function getSpeller() {
   const dict = { aff: fs.readFileSync(path.join(dictDir, "index.aff")), dic: fs.readFileSync(path.join(dictDir, "index.dic")) };
   const sp = nspell(dict);
   // Project vocabulary: names and terms from the fact bank + pronunciation dictionary.
-  const vocab = new Set<string>(["GTA", "VI", "Rockstar", "Rockstar's", "Leonida", "PS5", "Xbox", "DWNPLY", "Dimez", "bios", "pre-load", "Pre-loading", "rent-free"]);
+  const vocab = new Set<string>(["GTA", "VI", "Rockstar", "Rockstar's", "Leonida", "PS5", "Xbox", "DWNPLY", "Dimez", "bios", "pre-load", "Pre-loading", "rent-free", "airboat", "airboats"]);
   for (const f of loadFacts()) for (const t of [...f.keywords, f.line, f.claim].join(" ").split(/[^A-Za-z'-]+/)) if (/^[A-Z]/.test(t)) vocab.add(t);
   for (const e of loadPronunciations()) for (const t of e.term.split(/\s+/)) vocab.add(t);
   for (const v of vocab) sp.add(v);

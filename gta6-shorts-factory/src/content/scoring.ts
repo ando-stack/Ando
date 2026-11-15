@@ -50,7 +50,7 @@ export function previousScripts(excludeProject?: string): string[] {
 }
 
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
-const CURIOSITY = /\b(you|missed|hidden|hiding|secret|nobody|most|actually|quietly|never|really|half|underrated|theory|hinting|almost)\b/i;
+const CURIOSITY = /\b(you|missed|hidden|hiding|secret|nobody|most|actually|quietly|never|really|half|underrated|theory|hinting|almost|imagine|what if|concept|should)\b/i;
 const CLICKBAIT = /\b(leaked|100%|guaranteed|proof|shocking|you won't believe|confirmed leak|exposed)\b/i;
 const ABSOLUTE = /\b(confirmed|definitely|officially|proves?|fact)\b/i;
 

@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "notes": "Invented content: fan concepts (AI_CONCEPT) and speculation (SPECULATION). None of this is from Rockstar. Every line must contain its hedge phrase (Imagine / Picture / In this concept / speculation) so the narration never presents it as fact, and every video shows the matching label on screen. 'anchor' is an optional CONFIRMED_FACT from fact-bank.json shown first ('here's the official part').",
+  "groups": [
+    {
+      "id": "concept-kalaga-heist",
+      "title": "Concept: A GTA 6 Heist That Ends on Mount Kalaga",
+      "category": "ai-concepts",
+      "format": "concept",
+      "hook": "Imagine this GTA 6 heist.",
+      "payoff": "Would you play this mission?",
+      "keywords": ["heist", "kalaga", "concept", "mission"],
+      "beats": [
+        { "id": "concept-kalaga-1", "label": "AI_CONCEPT", "hedge": "Imagine", "line": "Imagine a bank job in Vice City where the getaway goes all the way to Mount Kalaga.", "emphasis": ["bank", "Kalaga"], "visual": { "kind": "map", "region": "Mount Kalaga" } },
+        { "id": "concept-kalaga-2", "label": "AI_CONCEPT", "hedge": "Picture", "line": "Picture Lucia driving a lifted truck up the mountain trails while Jason listens to the police scanner.", "emphasis": ["Lucia", "truck", "scanner"], "visual": { "kind": "character", "name": "Lucia Caminos", "role": "Getaway driver (concept)" } },
+        { "id": "concept-kalaga-3", "label": "AI_CONCEPT", "hedge": "in this concept", "line": "And in this concept, the final escape is an airboat run through the swamps of Grassrivers.", "emphasis": ["airboat", "Grassrivers"], "visual": { "kind": "map", "region": "Grassrivers" } }
+      ]
+    },
+    {
+      "id": "concept-hurricane",
+      "title": "Concept: What a Hurricane Could Do to GTA 6",
+      "category": "ai-concepts",
+      "format": "concept",
+      "hook": "Imagine a hurricane hitting Vice City.",
+      "payoff": "Should Rockstar add storms like this?",
+      "keywords": ["hurricane", "weather", "vice city", "concept"],
+      "beats": [
+        { "id": "concept-hurricane-1", "label": "AI_CONCEPT", "hedge": "Imagine", "line": "Imagine a hurricane warning going off right in the middle of a mission.", "emphasis": ["hurricane", "warning"], "visual": { "kind": "icon", "icon": "eye", "text": "HURRICANE WARNING" } },
+        { "id": "concept-hurricane-2", "label": "AI_CONCEPT", "hedge": "Picture", "line": "Picture flooded streets, boats replacing cars, and every police helicopter grounded by the wind.", "emphasis": ["flooded", "boats", "grounded"], "visual": { "kind": "icon", "icon": "boat", "text": "FLOODED STREETS" } },
+        { "id": "concept-hurricane-3", "label": "AI_CONCEPT", "hedge": "In this concept", "line": "In this concept, all that chaos becomes the perfect cover for the biggest score of the game.", "emphasis": ["chaos", "cover", "score"], "visual": { "kind": "icon", "icon": "money", "text": "THE PERFECT COVER" } }
+      ]
+    },
+    {
+      "id": "concept-side-hustles",
+      "title": "3 Side Hustles We'd Love in GTA 6 (Concept)",
+      "category": "ai-concepts",
+      "format": "concept",
+      "hook": "Three GTA 6 side hustles that should exist.",
+      "payoff": "Which one would you grind first?",
+      "keywords": ["side hustle", "business", "concept"],
+      "beats": [
+        { "id": "concept-hustle-1", "label": "AI_CONCEPT", "hedge": "Imagine", "line": "Imagine running Boobie's recording studio and producing hits for the Real Dimez.", "emphasis": ["studio", "hits"], "visual": { "kind": "icon", "icon": "music", "text": "STUDIO SESSIONS" } },
+        { "id": "concept-hustle-2", "label": "AI_CONCEPT", "hedge": "Picture", "line": "Picture fixing up boats at Brian's yard for quick cash between missions.", "emphasis": ["boats", "cash"], "visual": { "kind": "icon", "icon": "boat", "text": "BOAT YARD JOBS" } },
+        { "id": "concept-hustle-3", "label": "AI_CONCEPT", "hedge": "In this concept", "line": "In this concept, Cal's radio scanner tips you off before the Coast Guard shows up.", "emphasis": ["scanner", "Coast", "Guard"], "visual": { "kind": "icon", "icon": "radio", "text": "CAL'S SCANNER" } }
+      ]
+    },
+    {
+      "id": "whatif-shakedowns",
+      "title": "What If GTA 6 Starts With Jason's Shakedowns?",
+      "category": "theories",
+      "format": "what-if",
+      "hook": "What if this GTA 6 detail is a mission setup?",
+      "payoff": "Would that be a good opening?",
+      "anchor": "jason-rent-free",
+      "keywords": ["jason", "brian", "shakedowns", "speculation"],
+      "beats": [
+        { "id": "whatif-shakedowns-1", "label": "SPECULATION", "hedge": "pure speculation", "line": "What if those shakedowns turn out to be Jason's very first missions? That part is pure speculation.", "emphasis": ["first", "missions"], "visual": { "kind": "icon", "icon": "question", "text": "FIRST MISSIONS?" } }
+      ]
+    },
+    {
+      "id": "whatif-only-raw",
+      "title": "What If Only Raw Records Gets Its Own Radio Station?",
+      "category": "theories",
+      "format": "what-if",
+      "hook": "What if this GTA 6 label gets a radio station?",
+      "payoff": "Would you listen to it?",
+      "anchor": "real-dimez",
+      "keywords": ["real dimez", "only raw", "radio", "speculation"],
+      "beats": [
+        { "id": "whatif-only-raw-1", "label": "SPECULATION", "hedge": "Just speculation", "line": "What if Only Raw Records ends up with its own radio station in the game? Just speculation for now.", "emphasis": ["radio", "station"], "visual": { "kind": "icon", "icon": "radio", "text": "ONLY RAW FM?" } }
+      ]
+    },
+    {
+      "id": "whatif-raul",
+      "title": "What If Raul Is the Key to GTA 6's Big Heists?",
+      "category": "theories",
+      "format": "what-if",
+      "hook": "What if this GTA 6 character runs the big heists?",
+      "payoff": "Do you buy it?",
+      "anchor": "raul-pro",
+      "keywords": ["raul", "heist", "speculation"],
+      "beats": [
+        { "id": "whatif-raul-1", "label": "SPECULATION", "hedge": "speculation", "line": "What if Raul is the one who pulls Jason and Lucia into the big jobs? It's speculation, but it fits.", "emphasis": ["Raul", "big", "jobs"], "visual": { "kind": "character", "name": "Raul Bautista", "role": "The recruiter? (speculation)" } }
+      ]
+    },
+    {
+      "id": "whatif-lucia-escape",
+      "title": "Concept: Lucia's Prison Escape as GTA 6's Opening",
+      "category": "ai-concepts",
+      "format": "what-if",
+      "hook": "Imagine GTA 6 opening with this mission.",
+      "payoff": "Would that be a great first mission?",
+      "anchor": "lucia-father",
+      "keywords": ["lucia", "prison", "escape", "concept"],
+      "beats": [
+        { "id": "whatif-lucia-1", "label": "AI_CONCEPT", "hedge": "Imagine", "line": "Imagine a flashback mission that shows exactly how she got out.", "emphasis": ["flashback", "got", "out"], "visual": { "kind": "icon", "icon": "lock", "text": "THE ESCAPE (CONCEPT)" } }
+      ]
+    }
+  ]
+}

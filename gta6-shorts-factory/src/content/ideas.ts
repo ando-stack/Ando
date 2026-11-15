@@ -3,7 +3,7 @@ import { getConfig } from "../core/config.ts";
 import { getDb, now } from "../core/db.ts";
 import { usedTopicKeys } from "../core/project.ts";
 import type { Category, Fact, Idea } from "../core/types.ts";
-import { isStale, loadFacts } from "./factbank.ts";
+import { factById, isStale, loadConceptGroups, loadFacts } from "./factbank.ts";
 import { HOOKS, fill, usedPhrases } from "./phrases.ts";
 
 export const CHARACTERS: Record<string, string> = {
@@ -132,7 +132,7 @@ export function offlineIdeas(opts: { category?: Category | "any"; count?: number
   }
 
   // Theories: confirmed anchor + clearly-labelled theory/speculation.
-  for (const t of facts.filter((f) => f.label === "THEORY" || f.label === "SPECULATION")) {
+  for (const t of facts.filter((f) => (f.label === "THEORY" || f.label === "SPECULATION") && !f.group)) {
     const anchor = confirmed.find((c) => c.keywords.some((k) => t.keywords.includes(k)));
     if (!anchor) continue;
     out.push({
@@ -145,6 +145,27 @@ export function offlineIdeas(opts: { category?: Category | "any"; count?: number
       factIds: [anchor.id, t.id],
       labels: ["CONFIRMED_FACT", t.label],
       topicKey: "theory:" + t.id,
+      writer: "offline",
+      createdAt: now(),
+    });
+  }
+
+  // Concepts and what-ifs: invented ideas, always labelled AI-GENERATED CONCEPT / SPECULATION.
+  for (const g of loadConceptGroups()) {
+    const anchor = g.anchor ? factById(g.anchor) : undefined;
+    if (g.anchor && (!anchor || isStale(anchor))) continue;
+    const ids = [...(anchor ? [anchor.id] : []), ...g.beats.map((b) => b.id)];
+    out.push({
+      id: ideaId(),
+      title: g.title,
+      category: g.category,
+      format: g.format,
+      hook: g.hook,
+      payoff: g.payoff,
+      angle: anchor ? `Official: ${anchor.claim} → invented what-if, clearly labelled.` : "Invented fan concept, clearly labelled as not official.",
+      factIds: ids,
+      labels: [...new Set([...(anchor ? (["CONFIRMED_FACT"] as const) : []), ...g.beats.map((b) => b.label)])],
+      topicKey: "concept:" + g.id,
       writer: "offline",
       createdAt: now(),
     });

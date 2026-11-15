@@ -30,6 +30,15 @@ export const HOOKS: Record<Idea["format"], string[]> = {
     "GTA 6 is breaking one big GTA 5 habit.",
     "Here's how GTA 6 is different from GTA 5.",
   ],
+  concept: [
+    "Imagine this in GTA 6.",
+    "Here's a GTA 6 idea Rockstar should steal.",
+    "This GTA 6 concept would go crazy.",
+  ],
+  "what-if": [
+    "What if this GTA 6 detail means more?",
+    "One official GTA 6 detail, one wild what-if.",
+  ],
   news: [
     "Here's exactly where GTA 6 stands right now.",
     "GTA 6 is almost here. Here's what's official.",
@@ -53,6 +62,11 @@ export const CONTEXTS: Record<Idea["format"], string[]> = {
     "Start with what Rockstar has actually confirmed.",
   ],
   versus: ["Here's what's official so far."],
+  concept: [
+    "Quick note: this is a fan concept, not something Rockstar announced.",
+    "To be clear, this is pure imagination, not leaked info.",
+  ],
+  "what-if": ["First, the official part.", "Here's what Rockstar actually says."],
   news: ["Here's what Rockstar has officially confirmed.", "Straight from Rockstar's own pages."],
 };
 
@@ -73,14 +87,17 @@ export const PAYOFFS: Record<Idea["format"], string[]> = {
     "Would that change how you play?",
   ],
   versus: ["Which approach do you prefer?"],
+  concept: ["Would you play this?", "Should Rockstar make it real?"],
+  "what-if": ["Do you buy it?", "Would that be a good twist?"],
   news: ["Are you playing on day one?", "Are you ready for launch?"],
 };
 
 export const ORDINALS = ["Number one.", "Number two.", "Number three.", "Number four."];
 export const ORDINAL_SCREEN = ["01", "02", "03", "04"];
 
-export function usedPhrases(kind: string): Set<string> {
-  const rows = getDb().prepare(`SELECT text FROM phrases WHERE kind = ?`).all(kind) as { text: string }[];
+/** Phrases used by other videos (a project re-running its own script doesn't count against itself). */
+export function usedPhrases(kind: string, excludeProject = ""): Set<string> {
+  const rows = getDb().prepare(`SELECT text FROM phrases WHERE kind = ? AND project_id != ?`).all(kind, excludeProject) as { text: string }[];
   return new Set(rows.map((r) => r.text));
 }
 
