@@ -17,7 +17,8 @@ Tiempo estimado: 15 minutos. Necesitas cuentas gratuitas en huggingface.co y net
 
 1. En huggingface.co › **New › Space**.
    - Nombre: por ejemplo `classforge-api`.
-   - SDK: **Docker** › plantilla **Blank**.
+   - SDK: **Docker** › plantilla **Blank**, con hardware **CPU basic (free)**. Docker es gratis con ese hardware.
+     Si prefieres **Gradio**, también vale: usa `python classforge/scripts/preparar_space.py --gradio` en el paso 2 (genera `main.py` y `packages.txt` en lugar del `Dockerfile`).
    - Visibilidad: **Public** (necesario para que la web pueda llamarlo; los trabajos siguen protegidos por el código de acceso y por el identificador de cada navegador).
 2. Prepara los archivos en tu ordenador, desde la carpeta del repositorio:
    ```bash
