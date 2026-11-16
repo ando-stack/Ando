@@ -10,7 +10,11 @@ Navegador (Next.js)  ──►  FastAPI  ──►  1 Ingesta ─► 2 Interpret
                                                                                                   código de la IA) revisión con IA)
 ```
 
-## Puesta en marcha
+## Publicarlo en internet
+
+Para usarlo desde otro ordenador (web en **Netlify** + servidor en **Hugging Face Spaces**, con código de acceso), sigue **[DESPLIEGUE.md](DESPLIEGUE.md)**.
+
+## Puesta en marcha en local
 
 Requisitos: Python 3.11+, Node 20+ y (recomendado) LibreOffice para convertir a PDF y recalcular fórmulas.
 

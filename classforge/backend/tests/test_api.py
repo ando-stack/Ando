@@ -264,3 +264,15 @@ def test_ai_errors_are_reported(client, tmp_path):
     assert job["progress"][1]["status"] == "error"
     # No se puede generar sin análisis
     assert client.post(f"/api/jobs/{jid}/generate", headers=h, json={}).status_code == 409
+
+
+def test_access_password(client, tmp_path):
+    settings.access_password = "clase-1B"
+    try:
+        t = tok()
+        assert client.get("/api/health").json()["access_required"] is True
+        assert client.get("/api/jobs", headers={"X-Client-Token": t}).status_code == 403
+        assert client.get("/api/jobs", headers={"X-Client-Token": t, "X-Access-Key": "mal"}).status_code == 403
+        assert client.get("/api/jobs", headers={"X-Client-Token": t, "X-Access-Key": "clase-1B"}).status_code == 200
+    finally:
+        settings.access_password = None

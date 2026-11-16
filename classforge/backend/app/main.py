@@ -34,8 +34,9 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="ClassForge AI", version="1.0.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST", "DELETE"],
-                   allow_headers=["X-Client-Token", "Content-Type"], expose_headers=["Content-Disposition"])
+app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_origin_regex=settings.cors_origin_regex,
+                   allow_methods=["GET", "POST", "DELETE"], allow_headers=["X-Client-Token", "X-Access-Key", "Content-Type"],
+                   expose_headers=["Content-Disposition"])
 
 FORMAT_PREFS = Literal["auto", "docx", "xlsx", "pptx", "pdf", "csv"]
 BUSY = {"analyzing", "generating"}
@@ -113,6 +114,7 @@ def health() -> dict:
     return {
         "ok": True,
         "ai_configured": settings.ai_configured,
+        "access_required": bool(settings.access_password),
         "model": settings.model,
         "formula_engine": bool(soffice()),
         "pdf_conversion": bool(soffice()),

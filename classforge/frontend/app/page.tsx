@@ -2,6 +2,7 @@
 
 import { Anvil, History, Moon, Plus, RotateCcw, Sun } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import AccessGate from "@/components/AccessGate";
 import AnalysisPanel from "@/components/AnalysisPanel";
 import { HistoryDrawer, PreviewModal } from "@/components/Overlays";
 import ResultsPanel from "@/components/ResultsPanel";
@@ -24,6 +25,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState(false);
   const [preview, setPreview] = useState<{ id: string; name: string } | null>(null);
+  const [needKey, setNeedKey] = useState(false);
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const update = useCallback((p: Partial<Prefs>) => {
@@ -35,8 +37,13 @@ export default function Home() {
     const p = loadPrefs();
     setPrefs(p);
     setLoaded(true);
-    api.health().then(setHealth).catch((e) => setHealthErr(e.message));
-    if (p.currentJob) api.getJob(p.currentJob).then(setJob).catch(() => update({ currentJob: null }));
+    api.health().then(async (h) => {
+      setHealth(h);
+      if (h.access_required) {
+        try { await api.checkAccess(); } catch (e) { if (e instanceof ApiError && e.status === 403) { setNeedKey(true); return; } }
+      }
+      if (p.currentJob) api.getJob(p.currentJob).then(setJob).catch(() => update({ currentJob: null }));
+    }).catch((e) => setHealthErr(e.message));
   }, [update]);
 
   useEffect(() => {
@@ -56,9 +63,14 @@ export default function Home() {
     return () => { if (pollRef.current) clearTimeout(pollRef.current); };
   }, [job, update]);
 
+  const fail = (e: unknown) => {
+    if (e instanceof ApiError && e.status === 403) setNeedKey(true);
+    else setError((e as Error).message);
+  };
+
   const run = async (fn: () => Promise<Job>) => {
     setError(null);
-    try { setJob(await fn()); } catch (e) { setError((e as Error).message); }
+    try { setJob(await fn()); } catch (e) { fail(e); }
   };
 
   const submit = async (files: File[], notes: string) => {
@@ -69,7 +81,7 @@ export default function Home() {
       setJob(j);
       update({ currentJob: j.id });
       if (j.progress[0].status === "done" && health?.ai_configured) await run(() => api.analyze(j.id));
-    } catch (e) { setError((e as Error).message); } finally { setUploading(false); }
+    } catch (e) { fail(e); } finally { setUploading(false); }
   };
 
   const openJob = async (id: string) => {
@@ -188,6 +200,7 @@ export default function Home() {
         Los archivos se borran del servidor tras {health?.limits.retention_hours ?? 24} h. Revisa siempre el trabajo antes de entregarlo: es tu responsabilidad.
       </footer>
 
+      {needKey && <AccessGate onOk={() => { setNeedKey(false); setError(null); }} />}
       {history && <HistoryDrawer currentId={job?.id ?? null} onOpen={openJob} onClose={() => setHistory(false)} onDeleted={(id) => { if (job?.id === id) newJob(); }} />}
       {preview && job && <PreviewModal jobId={job.id} fileId={preview.id} name={preview.name} onClose={() => setPreview(null)} />}
     </div>

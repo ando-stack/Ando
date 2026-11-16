@@ -46,6 +46,10 @@ class Settings:
     max_image_pages: int = field(default_factory=lambda: _int("CLASSFORGE_MAX_IMAGE_PAGES", 8))
 
     cors_origins: list[str] = field(default_factory=lambda: [o.strip() for o in os.environ.get("CLASSFORGE_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",") if o.strip()])
+    # Código de acceso compartido (p.ej. para una clase). Si está vacío, no se pide.
+    access_password: str | None = field(default_factory=lambda: os.environ.get("CLASSFORGE_ACCESS_PASSWORD") or None)
+    # Expresión regular opcional de orígenes permitidos (p.ej. previsualizaciones de Netlify).
+    cors_origin_regex: str | None = field(default_factory=lambda: os.environ.get("CLASSFORGE_CORS_ORIGIN_REGEX") or None)
     soffice_path: str | None = field(default_factory=lambda: os.environ.get("CLASSFORGE_SOFFICE") or None)
 
     @property

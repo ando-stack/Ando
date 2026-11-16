@@ -43,7 +43,7 @@ export interface Job {
 }
 export interface JobSummary { id: string; title: string; status: JobStatus; created_at: string; student_name: string; files: number; versions: number; subject: string | null; expires_at_ts: number }
 export interface Health {
-  ok: boolean; ai_configured: boolean; model: string; formula_engine: boolean; pdf_conversion: boolean;
+  ok: boolean; ai_configured: boolean; access_required: boolean; model: string; formula_engine: boolean; pdf_conversion: boolean;
   limits: { max_file_mb: number; max_total_mb: number; max_files: number; retention_hours: number; jobs_per_day: number };
   formats: { input: string[]; output: string[] };
 }
@@ -53,6 +53,20 @@ export class ApiError extends Error {
 }
 
 const TOKEN_KEY = "cf_client_token";
+const ACCESS_KEY = "cf_access_key";
+
+export function getAccessKey(): string {
+  try { return localStorage.getItem(ACCESS_KEY) || ""; } catch { return ""; }
+}
+export function setAccessKey(k: string): void {
+  try { if (k) localStorage.setItem(ACCESS_KEY, k); else localStorage.removeItem(ACCESS_KEY); } catch { /* sin almacenamiento */ }
+}
+function authHeaders(): Record<string, string> {
+  const h: Record<string, string> = { "X-Client-Token": clientToken() };
+  const k = getAccessKey();
+  if (k) h["X-Access-Key"] = k;
+  return h;
+}
 
 export function clientToken(): string {
   let t = "";
@@ -69,7 +83,7 @@ export function clientToken(): string {
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, { ...init, headers: { "X-Client-Token": clientToken(), ...(init.headers || {}) } });
+    res = await fetch(`${API_URL}${path}`, { ...init, headers: { ...authHeaders(), ...(init.headers || {}) } });
   } catch {
     throw new ApiError(0, "No se puede conectar con el servidor de ClassForge. ¿Está arrancado el backend?");
   }
@@ -97,6 +111,7 @@ export const api = {
     fd.append("extra_notes", extraNotes);
     return request<Job>("/api/jobs", { method: "POST", body: fd });
   },
+  checkAccess: () => request<JobSummary[]>("/api/jobs"),
   listJobs: () => request<JobSummary[]>("/api/jobs"),
   getJob: (id: string) => request<Job>(`/api/jobs/${encodeURIComponent(id)}`),
   deleteJob: (id: string) => request<void>(`/api/jobs/${encodeURIComponent(id)}`, { method: "DELETE" }),
@@ -112,7 +127,7 @@ export const api = {
 export async function downloadFile(path: string, fallbackName: string): Promise<void> {
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, { headers: { "X-Client-Token": clientToken() } });
+    res = await fetch(`${API_URL}${path}`, { headers: authHeaders() });
   } catch {
     throw new ApiError(0, "No se pudo conectar para descargar el archivo.");
   }

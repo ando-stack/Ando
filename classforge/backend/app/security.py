@@ -25,9 +25,22 @@ def hash_token(token: str) -> str:
     return hashlib.sha256(("classforge:" + token).encode()).hexdigest()
 
 
-def client_token(x_client_token: str | None = Header(default=None)) -> str:
+def check_access(request: Request, key: str | None) -> None:
+    """Si hay CLASSFORGE_ACCESS_PASSWORD, exige el código en ``X-Access-Key``.
+    Los intentos fallidos están limitados por IP para impedir adivinarlo."""
+    expected = settings.access_password
+    if not expected:
+        return
+    if key and hmac.compare_digest(key.encode(), expected.encode()):
+        return
+    limiter.check(f"badkey:{client_ip(request)}", 20, 3600)
+    raise HTTPException(403, "Código de acceso incorrecto o ausente.")
+
+
+def client_token(request: Request, x_client_token: str | None = Header(default=None), x_access_key: str | None = Header(default=None)) -> str:
     """Cada navegador genera un token aleatorio (localStorage) y lo envía en
     ``X-Client-Token``. Solo guardamos su hash; sin él no se puede acceder a un trabajo."""
+    check_access(request, x_access_key)
     if not x_client_token or not CLIENT_TOKEN_RE.match(x_client_token):
         raise HTTPException(401, "Falta o es inválido el identificador de cliente (X-Client-Token).")
     return x_client_token
@@ -65,6 +78,10 @@ limiter = RateLimiter()
 
 
 def client_ip(request: Request) -> str:
+    # Detrás de un proxy (Hugging Face, Render…) la IP real llega en X-Forwarded-For.
+    fwd = request.headers.get("x-forwarded-for")
+    if fwd:
+        return fwd.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
 
 
