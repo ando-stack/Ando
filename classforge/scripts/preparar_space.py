@@ -28,6 +28,10 @@ else:
     shutil.copy(src / "Dockerfile", out / "Dockerfile")
     header = "sdk: docker\napp_port: 7860"
 shutil.copytree(src / "app", out / "app", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+if gradio:
+    # La subida web no admite carpetas: se empaqueta app/ en app.zip (main.py lo descomprime al arrancar).
+    shutil.make_archive(str(out / "app"), "zip", root_dir=out, base_dir="app")
+    shutil.rmtree(out / "app")
 (out / "README.md").write_text(f"""---
 title: ClassForge AI API
 emoji: 🛠️
