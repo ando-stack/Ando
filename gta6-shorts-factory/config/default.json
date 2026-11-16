@@ -11,7 +11,8 @@
     "minSeconds": 20,
     "maxSeconds": 35,
     "targetSeconds": 30,
-    "crf": 18
+    "crf": 18,
+    "showSourceOnScreen": false
   },
   "script": {
     "minWords": 45,

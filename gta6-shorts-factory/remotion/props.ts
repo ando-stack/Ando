@@ -35,6 +35,8 @@ export interface ShortProps {
   /** Optional narration for Studio preview; renders are muxed with the final mix by FFmpeg. */
   audioSrc?: string;
   showPlaceholderLabel: boolean;
+  /** Show "SOURCE: domain" under claim labels (sources are always in the description). */
+  showSource?: boolean;
   [key: string]: unknown;
 }
 

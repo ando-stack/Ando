@@ -126,6 +126,7 @@ export function buildProps(title: string, plan: ScenePlan, subtitles: Subtitles,
     channel: { name: cfg.channel.name, handle: cfg.channel.handle },
     assetBase,
     showPlaceholderLabel: plan.placeholderVisuals,
+    showSource: Boolean((cfg.video as { showSourceOnScreen?: boolean }).showSourceOnScreen),
   };
 }
 

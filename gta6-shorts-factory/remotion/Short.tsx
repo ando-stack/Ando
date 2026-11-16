@@ -48,7 +48,7 @@ function enterTransform(tr: Scene["transition"], f: number): { transform: string
   }
 }
 
-const SceneLayer: React.FC<{ scene: Scene; brand: Brand; assetBase: string; frames: number }> = ({ scene, brand, assetBase, frames }) => {
+const SceneLayer: React.FC<{ scene: Scene; brand: Brand; assetBase: string; frames: number; showSource?: boolean }> = ({ scene, brand, assetBase, frames, showSource }) => {
   const f = useCurrentFrame();
   const p = Math.min(1, f / Math.max(1, frames - OVERLAP));
   const enter = enterTransform(scene.transition, f);
@@ -70,7 +70,7 @@ const SceneLayer: React.FC<{ scene: Scene; brand: Brand; assetBase: string; fram
         <VisualView visual={scene.visual} brand={brand} />
       </AbsoluteFill>
       {scene.onScreen && scene.visual.kind !== "keyline" ? <Ordinal text={scene.onScreen} brand={brand} /> : null}
-      <LabelBadge label={scene.label} source={scene.label === "CONFIRMED_FACT" ? scene.source : undefined} aiAsset={scene.asset.aiGenerated} />
+      <LabelBadge label={scene.label} source={showSource && scene.label === "CONFIRMED_FACT" ? scene.source : undefined} aiAsset={scene.asset.aiGenerated} />
       <CutFx type={scene.transition} brand={brand} />
       {scene.asset.credit ? (
         <div style={{ position: "absolute", left: 80, top: 1440, fontFamily: "Inter", fontWeight: 700, fontSize: 22, color: "#ffffff99" }}>{scene.asset.credit}</div>
@@ -92,7 +92,7 @@ export const Short: React.FC<ShortProps> = (props) => {
         const frames = Math.max(1, until - from);
         return (
           <Sequence key={s.id} from={from} durationInFrames={frames} name={`${s.id} ${s.visual.kind}`}>
-            <SceneLayer scene={s} brand={brand} assetBase={props.assetBase} frames={frames} />
+            <SceneLayer scene={s} brand={brand} assetBase={props.assetBase} frames={frames} showSource={props.showSource} />
           </Sequence>
         );
       })}

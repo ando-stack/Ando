@@ -214,6 +214,7 @@ const pages = {
         <label>Max words<input type="number" data-k="script.maxWords" data-num value="${c.script.maxWords}"/></label>
         <label>Quality threshold<input type="number" data-k="script.qualityThreshold" data-num value="${c.script.qualityThreshold}"/></label>
         <label>Channel handle<input data-k="channel.handle" value="${esc(c.channel.handle)}"/></label>
+        <label>Show "Source:" on screen<select data-k="video.showSourceOnScreen" data-bool><option value="false" ${c.video.showSourceOnScreen ? "" : "selected"}>No</option><option value="true" ${c.video.showSourceOnScreen ? "selected" : ""}>Yes</option></select></label>
       </div></div>
       <div class="panel mt"><h2>Brand & captions</h2><div class="form">
         <label>Primary<input type="color" data-k="brand.primary" value="${c.brand.primary}"/></label>
