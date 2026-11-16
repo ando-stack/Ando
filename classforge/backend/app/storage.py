@@ -15,6 +15,7 @@ import secrets
 import shutil
 import threading
 import time
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -166,12 +167,14 @@ def cleanup_expired(max_age_hours: int | None = None) -> int:
     return removed
 
 
-SAFE_NAME_RE = re.compile(r"[^A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ._ -]+")
+SAFE_NAME_RE = re.compile(r"[^A-Za-z0-9._ -]+")
 
 
 def safe_filename(name: str, default: str = "archivo") -> str:
-    """Nombre de archivo seguro y legible (sin rutas, sin caracteres raros)."""
+    """Nombre de archivo seguro y legible: sin rutas y sin tildes ni caracteres raros
+    (Práctica 2.docx → Practica_2.docx), para que funcione en cualquier sistema y plataforma de entrega."""
     name = os.path.basename((name or "").replace("\\", "/"))
+    name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     name = SAFE_NAME_RE.sub("_", name).strip(" ._")
     name = re.sub(r"\s+", "_", name)
     name = re.sub(r"_+", "_", name)

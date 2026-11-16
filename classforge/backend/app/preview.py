@@ -113,9 +113,18 @@ def preview_xlsx(path: Path, recalculated: Path | None = None, max_rows: int = 2
         vws = vals[ws.title] if vals is not None and ws.title in vals.sheetnames else None
         mr, mc = min(ws.max_row, max_rows), min(ws.max_column, max_cols)
         rows = ["<tr><td class='rh'></td>" + "".join(f"<td class='rh'>{get_column_letter(c)}</td>" for c in range(1, mc + 1)) + "</tr>"]
+        spans, covered = {}, set()
+        for m in ws.merged_cells.ranges:
+            spans[(m.min_row, m.min_col)] = (m.max_row - m.min_row + 1, min(m.max_col, mc) - m.min_col + 1)
+            for rr in range(m.min_row, m.max_row + 1):
+                for cc in range(m.min_col, m.max_col + 1):
+                    if (rr, cc) != (m.min_row, m.min_col):
+                        covered.add((rr, cc))
         for r in range(1, mr + 1):
             cells = [f"<td class='rh'>{r}</td>"]
             for c in range(1, mc + 1):
+                if (r, c) in covered:
+                    continue
                 cell = ws.cell(r, c)
                 v = cell.value
                 styles = []
@@ -139,7 +148,11 @@ def preview_xlsx(path: Path, recalculated: Path | None = None, max_rows: int = 2
                 else:
                     txt = "" if v is None else E(_fmt(v, cell.number_format))
                 st = f" style='{';'.join(styles)}'" if styles else ""
-                cells.append(f"<td{cls}{st}{title}>{txt}</td>")
+                span = ""
+                if (r, c) in spans:
+                    rs, cs = spans[(r, c)]
+                    span = (f" rowspan='{rs}'" if rs > 1 else "") + (f" colspan='{cs}'" if cs > 1 else "")
+                cells.append(f"<td{cls}{st}{title}{span}>{txt}</td>")
             rows.append("<tr>" + "".join(cells) + "</tr>")
         extra = []
         if ws._charts:

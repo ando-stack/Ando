@@ -219,3 +219,48 @@ def test_cleanup_expired(client, tmp_path):
     storage.update_job(jid, lambda j: j.update(created_ts=0))
     assert storage.cleanup_expired() >= 1
     assert storage.load_job(jid) is None
+
+
+class RepairingAI(FakeAI):
+    """El primer plan trae una operación inválida; el sistema debe pedir la corrección."""
+
+    def structured(self, *, system, content, schema, max_tokens=64000):
+        res = super().structured(system=system, content=content, schema=schema, max_tokens=max_tokens)
+        text = content[-1]["text"]
+        if schema is Plan and "NO SUPERÓ LA VALIDACIÓN" not in text:
+            bad = res.model_copy(deep=True)
+            bad.deliverables[0].ops[0].op = "docx.inventada"
+            return bad
+        return res
+
+
+def test_invalid_plan_is_repaired(client, tmp_path):
+    ai = RepairingAI()
+    ai_client.set_ai(ai)
+    t = tok()
+    h = {"X-Client-Token": t}
+    jid = upload(client, t, tmp_path).json()["id"]
+    client.post(f"/api/jobs/{jid}/analyze", headers=h)
+    client.post(f"/api/jobs/{jid}/generate", headers=h, json={})
+    job = client.get(f"/api/jobs/{jid}", headers=h).json()
+    plan_calls = [c for c in ai.calls if c[0] == "Plan"]
+    assert len(plan_calls) == 2 and "docx.inventada" in plan_calls[1][1]
+    assert job["status"] == "completed", job["versions"][0]["validation"]["problems"]
+
+
+class FailingAI(FakeAI):
+    def structured(self, **kw):
+        raise ai_client.AIError("La API de Claude está saturada (límite de uso). Inténtalo en unos minutos.")
+
+
+def test_ai_errors_are_reported(client, tmp_path):
+    ai_client.set_ai(FailingAI())
+    t = tok()
+    h = {"X-Client-Token": t}
+    jid = upload(client, t, tmp_path).json()["id"]
+    client.post(f"/api/jobs/{jid}/analyze", headers=h)
+    job = client.get(f"/api/jobs/{jid}", headers=h).json()
+    assert job["status"] == "failed" and "saturada" in job["error"]
+    assert job["progress"][1]["status"] == "error"
+    # No se puede generar sin análisis
+    assert client.post(f"/api/jobs/{jid}/generate", headers=h, json={}).status_code == 409

@@ -104,7 +104,7 @@ def test_formula_and_filename_safety():
     assert check_formula("=cmd|' /C calc'!A0") is not None
     assert check_formula("='[otro.xlsx]Hoja1'!A1") is not None
     assert safe_filename("../../etc/passwd") == "passwd"
-    assert safe_filename("Práctica 2: Excel?.xlsx") == "Práctica_2_Excel_.xlsx"
+    assert safe_filename("Práctica 2: Excel?.xlsx") == "Practica_2_Excel_.xlsx"
     assert safe_filename("") == "archivo"
 
 
