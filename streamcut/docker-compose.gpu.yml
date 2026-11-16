@@ -1,0 +1,8 @@
+# Aceleración GPU (NVIDIA + nvidia-container-toolkit). Whisper usa CUDA automáticamente.
+services:
+  worker:
+    environment: { STREAMCUT_WHISPER_DEVICE: cuda, STREAMCUT_HWACCEL_ENCODER: h264_nvenc }
+    deploy:
+      resources:
+        reservations:
+          devices: [{ driver: nvidia, count: all, capabilities: [gpu, video, compute] }]

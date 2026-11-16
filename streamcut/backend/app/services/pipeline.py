@@ -329,6 +329,7 @@ def run_analysis(job_id: uuid.UUID) -> None:
                             record_event(db, workspace_id=asset.workspace_id, type="scene_change",
                                          label="Cambio de escena", source_asset_id=asset.id, t_start=t, t_end=t,
                                          confidence=0.8, notify=False)
+                        db.commit()  # no retener el bloqueo de escritura (SQLite) durante el resto del análisis
                         result["modalities"]["visual"] = "ok"
                         result["webcam_region"] = webcam
                         result["faces"] = faces[:400]
@@ -347,6 +348,7 @@ def run_analysis(job_id: uuid.UUID) -> None:
                         result["modalities"]["chat"] = "sin registro de chat"
 
                     # 5) Candidatos
+                    db.commit()
                     ctx.progress(0.9, "Generando y puntuando candidatos", force=True)
                     kept = list(db.scalars(select(HighlightCandidate).where(
                         HighlightCandidate.source_asset_id == asset.id,

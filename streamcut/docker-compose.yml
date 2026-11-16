@@ -1,0 +1,61 @@
+# STREAMCUT AI — despliegue completo.
+#   docker compose up -d --build            (CPU)
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build   (GPU NVIDIA)
+name: streamcut
+
+x-backend: &backend
+  build: ./backend
+  env_file: .env
+  environment:
+    STREAMCUT_DATABASE_URL: postgresql+psycopg://streamcut:streamcut@db:5432/streamcut
+    STREAMCUT_REDIS_URL: redis://redis:6379/0
+    STREAMCUT_BROKER: redis
+    STREAMCUT_RUN_MODE: api
+    STREAMCUT_DATA_DIR: /data
+  volumes:
+    - media:/data
+  depends_on:
+    db: { condition: service_healthy }
+    redis: { condition: service_healthy }
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: streamcut, POSTGRES_PASSWORD: streamcut, POSTGRES_DB: streamcut }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U streamcut"], interval: 5s, retries: 20 }
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, retries: 20 }
+    restart: unless-stopped
+
+  api:
+    <<: *backend
+    ports: ["127.0.0.1:8000:8000"]
+
+  worker:
+    <<: *backend
+    command: ["dramatiq", "app.workers.tasks", "--processes", "1", "--threads", "2",
+              "--queues", "ingest", "analysis", "render", "live", "maintenance"]
+    depends_on: [api]
+
+  monitor:
+    <<: *backend
+    command: ["python", "-m", "app.live.monitor"]
+    # Servidor RTMP local para tu OBS (fuente autorizada). Abre más puertos si usas varios canales.
+    ports: ["1935-1940:1935-1940"]
+    depends_on: [api]
+
+  web:
+    build: { context: ./frontend, args: { STREAMCUT_BACKEND_URL: "http://api:8000" } }
+    environment: { STREAMCUT_BACKEND_URL: "http://api:8000" }
+    ports: ["3000:3000"]
+    depends_on: [api]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  media:

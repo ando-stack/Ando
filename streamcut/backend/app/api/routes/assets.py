@@ -129,7 +129,7 @@ def create_upload(body: UploadIn, p: Principal = Depends(current_principal), db:
                     upload_tmp_key=f"tmp/uploads/{aid}.part", streamer_name=body.streamer_name, game=body.game)
     db.add(a)
     db.commit()
-    return {"id": str(aid), "offset": 0, "size": body.size, "chunk_size": min(s.upload_chunk_max_bytes, 16 * 1024**2)}
+    return {"id": str(aid), "offset": 0, "size": body.size, "chunk_size": min(s.upload_chunk_max_bytes, 8 * 1024**2)}
 
 
 def _uploading(db: Session, p: Principal, upload_id: uuid.UUID) -> SourceAsset:

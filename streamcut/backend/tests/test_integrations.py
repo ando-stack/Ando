@@ -3,6 +3,8 @@ aquí no hay credenciales reales; el código es el mismo que se usa en producci�
 
 from __future__ import annotations
 
+import uuid
+
 import httpx
 import pytest
 import respx
@@ -58,7 +60,7 @@ def test_twitch_resolve_and_live_status(auth_client, twitch_mock):
     r = auth_client.post(f"/api/channels/{ch['id']}/refresh").json()
     assert r["status"] == "offline" and r["session"] is None
     with SessionLocal() as db:
-        s = db.scalar(select(StreamSession).where(StreamSession.channel_id == ch["id"]))
+        s = db.scalar(select(StreamSession).where(StreamSession.channel_id == uuid.UUID(ch["id"])))
         assert s.status == "ended" and s.ended_at is not None
 
 

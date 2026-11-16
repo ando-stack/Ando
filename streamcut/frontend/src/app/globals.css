@@ -49,16 +49,14 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; font-
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
 
-@layer components {
-  .card { @apply rounded-[var(--radius-card)] border border-line bg-panel; }
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 h-9 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none select-none whitespace-nowrap; }
-  .btn-primary { @apply btn bg-accent text-white hover:bg-accent-strong shadow-[0_0_0_1px_rgb(167_139_250/.25),0_8px_24px_-8px_rgb(139_92_246/.6)]; }
-  .btn-secondary { @apply btn bg-panel-3 text-fg hover:bg-line border border-line; }
-  .btn-ghost { @apply btn text-muted hover:text-fg hover:bg-panel-3; }
-  .btn-danger { @apply btn bg-danger/15 text-danger hover:bg-danger/25 border border-danger/30; }
-  .btn-icon { @apply btn h-8 w-8 px-0 text-muted hover:text-fg hover:bg-panel-3; }
-  .input { @apply h-9 w-full rounded-lg border border-line bg-panel-2 px-3 text-sm text-fg placeholder:text-faint outline-none transition-colors focus:border-accent/70 focus:bg-panel-3; }
-  .label { @apply text-xs font-medium text-muted; }
-  .chip { @apply inline-flex items-center gap-1 rounded-full border border-line bg-panel-2 px-2 py-0.5 text-[11px] font-medium text-muted; }
-  .kbd { @apply rounded border border-line bg-panel-3 px-1.5 py-0.5 font-mono text-[10px] text-muted; }
-}
+@utility card { @apply rounded-[var(--radius-card)] border border-line bg-panel; }
+@utility btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 h-9 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none select-none whitespace-nowrap; }
+@utility btn-primary { @apply btn bg-accent text-white hover:bg-accent-strong shadow-[0_0_0_1px_rgb(167_139_250/.25),0_8px_24px_-8px_rgb(139_92_246/.6)]; }
+@utility btn-secondary { @apply btn bg-panel-3 text-fg hover:bg-line border border-line; }
+@utility btn-ghost { @apply btn text-muted hover:text-fg hover:bg-panel-3; }
+@utility btn-danger { @apply btn bg-danger/15 text-danger hover:bg-danger/25 border border-danger/30; }
+@utility btn-icon { @apply btn h-8 w-8 px-0 text-muted hover:text-fg hover:bg-panel-3; }
+@utility input { @apply h-9 w-full rounded-lg border border-line bg-panel-2 px-3 text-sm text-fg placeholder:text-faint outline-none transition-colors focus:border-accent/70 focus:bg-panel-3; }
+@utility label { @apply text-xs font-medium text-muted; }
+@utility chip { @apply inline-flex items-center gap-1 rounded-full border border-line bg-panel-2 px-2 py-0.5 text-[11px] font-medium text-muted; }
+@utility kbd { @apply rounded border border-line bg-panel-3 px-1.5 py-0.5 font-mono text-[10px] text-muted; }

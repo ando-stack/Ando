@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import Date, cast, func, select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import Principal, current_principal
@@ -94,10 +94,12 @@ def timeseries(days: int = Query(30, ge=1, le=365), p: Principal = Depends(curre
     ws = p.workspace_id
 
     def series(model, extra=()):
-        day = cast(model.created_at, Date)
-        rows = db.execute(select(day, func.count(model.id)).where(model.workspace_id == ws, model.created_at >= since,
-                                                                  *extra).group_by(day).order_by(day))
-        return {str(d): n for d, n in rows}
+        # Agrupación por día en Python: portable entre PostgreSQL y SQLite
+        out: dict[str, int] = {}
+        for ts in db.scalars(select(model.created_at).where(model.workspace_id == ws, model.created_at >= since, *extra)):
+            d = str(ts.date())
+            out[d] = out.get(d, 0) + 1
+        return out
 
     clips = series(Clip, (Clip.deleted_at.is_(None),))
     cands = series(HighlightCandidate, (HighlightCandidate.status != "duplicate",))
