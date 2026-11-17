@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
 .venv/
-trabajos/
-clips/
+/trabajos/
+/clips/
 dump.rdb
