@@ -16,6 +16,7 @@ from app.db.models import (
     Export,
     IngestionJob,
     ProcessingLog,
+    Publication,
     utcnow,
 )
 from app.db.session import SessionLocal
@@ -24,8 +25,8 @@ from .bus import publish
 
 log = logging.getLogger(__name__)
 
-JOB_MODELS = {"ingestion": IngestionJob, "analysis": AnalysisJob, "export": Export}
-Job = IngestionJob | AnalysisJob | Export
+JOB_MODELS = {"ingestion": IngestionJob, "analysis": AnalysisJob, "export": Export, "publication": Publication}
+Job = IngestionJob | AnalysisJob | Export | Publication
 
 
 def job_dict(kind: str, job: Job) -> dict[str, Any]:
@@ -37,9 +38,12 @@ def job_dict(kind: str, job: Job) -> dict[str, Any]:
     if isinstance(job, AnalysisJob):
         d["result"] = job.result
         d["analysis_kind"] = job.kind
-    if isinstance(job, Export):
+    if isinstance(job, (Export, Publication)):
         d["clip_id"] = str(job.clip_id)
         d["clip_version_id"] = str(job.clip_version_id)
+    if isinstance(job, Publication):
+        d.update(platform=job.platform, title=job.title, privacy=job.privacy, external_id=job.external_id,
+                 external_url=job.external_url)
     return d
 
 

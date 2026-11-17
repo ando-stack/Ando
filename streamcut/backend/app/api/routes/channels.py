@@ -157,7 +157,8 @@ def update_channel(channel_id: uuid.UUID, body: ChannelUpdate, p: Principal = De
         c.default_template_id = t.id
     if body.autopilot is not None:
         allowed = {"enabled", "categories", "sensitivity", "min_score", "max_clips_per_stream", "duration_mode",
-                   "format", "template_slug", "subtitles", "auto_edit", "auto_save", "create_platform_clips"}
+                   "format", "template_slug", "subtitles", "auto_edit", "auto_save", "create_platform_clips",
+                   "clip_cooldown_s", "clip_delay_s"}
         bad = set(body.autopilot) - allowed
         if bad:
             raise HTTPException(422, f"Opciones desconocidas: {', '.join(sorted(bad))}")

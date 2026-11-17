@@ -6,6 +6,7 @@ import secrets
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel, Field
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,6 +16,7 @@ from app.core.config import get_settings
 from app.core.security import decrypt, encrypt, read_state, sign_state
 from app.db.models import Channel, ChannelConnection
 from app.db.session import get_db
+from app.integrations.publishing import InstagramClient, PublishError, TikTokClient
 from app.integrations.twitch import DEFAULT_SCOPES, TwitchError, get_twitch
 from app.integrations.youtube import YouTubeError, get_youtube
 from app.services.channels import refresh_capabilities
@@ -49,7 +51,11 @@ def start(platform: str, download_scopes: bool = False, p: Principal = Depends(c
             return {"url": get_twitch().authorize_url(_redirect_uri("twitch"), state, scopes)}
         if platform == "youtube":
             return {"url": get_youtube().authorize_url(_redirect_uri("youtube"), state)}
-    except (TwitchError, YouTubeError) as exc:
+        if platform == "tiktok":
+            return {"url": TikTokClient().authorize_url(_redirect_uri("tiktok"), state)}
+        if platform == "instagram":
+            return {"url": InstagramClient().authorize_url(_redirect_uri("instagram"), state)}
+    except (TwitchError, YouTubeError, PublishError) as exc:
         raise HTTPException(409, str(exc)) from exc
     raise HTTPException(404, "Plataforma no compatible")
 
@@ -80,9 +86,22 @@ def callback(platform: str, request: Request, code: str | None = None, state: st
             login, uid = me.get("snippet", {}).get("title"), me.get("id")
             scopes = (d.get("scope") or "").split()
             access, refresh, exp = d["access_token"], d.get("refresh_token"), d["expires_at"]
+        elif platform == "tiktok":
+            tt = TikTokClient()
+            d = tt.exchange_code(code, _redirect_uri("tiktok"))
+            access, refresh, exp = d["access_token"], d.get("refresh_token"), d.get("expires_at")
+            user = tt.user(access)
+            uid, login = d.get("open_id"), user.get("display_name") or user.get("username")
+            scopes = (d.get("scope") or "").replace(",", " ").split()
+        elif platform == "instagram":
+            ig = InstagramClient()
+            d = ig.exchange_code(code, _redirect_uri("instagram"))
+            access, refresh, exp = d["access_token"], None, d.get("expires_at")
+            me = ig.me(access)
+            uid, login, scopes = str(me.get("user_id") or me.get("id")), me.get("username"), ["content_publish"]
         else:
             raise HTTPException(404, "Plataforma no compatible")
-    except (TwitchError, YouTubeError) as exc:
+    except (TwitchError, YouTubeError, PublishError) as exc:
         audit(db, p, "oauth.failed", platform, None, request, error=str(exc))
         return RedirectResponse(f"{front}/settings?oauth=error&platform={platform}")
     conn = db.scalar(select(ChannelConnection).where(ChannelConnection.workspace_id == p.workspace_id,
@@ -124,3 +143,44 @@ def disconnect(connection_id: uuid.UUID, request: Request, p: Principal = Depend
     _refresh_caps(db, p.workspace_id, platform)
     audit(db, p, "oauth.disconnected", platform, connection_id, request)
     return {"ok": True}
+
+
+class InstagramTokenIn(BaseModel):
+    token: str = Field(min_length=20, max_length=1000)
+
+
+@router.post("/instagram/token")
+def instagram_token(body: InstagramTokenIn, request: Request, p: Principal = Depends(current_principal),
+                    db: Session = Depends(get_db)):
+    """Alternativa sin redirección HTTPS: pegar el token generado en el panel de Meta para desarrolladores."""
+    ig = InstagramClient()
+    token = body.token.strip()
+    try:
+        me = ig.me(token)
+        exp = None
+        try:
+            d = ig.refresh(token)  # alarga la validez a 60 días si el token ya es de larga duración
+            token, exp = d["access_token"], d.get("expires_at")
+        except PublishError:
+            pass
+    except PublishError as exc:
+        raise HTTPException(422, f"Token de Instagram no válido: {exc}") from exc
+    uid = str(me.get("user_id") or me.get("id"))
+    conn = db.scalar(select(ChannelConnection).where(ChannelConnection.workspace_id == p.workspace_id,
+                                                     ChannelConnection.platform == "instagram",
+                                                     ChannelConnection.kind == "oauth_user",
+                                                     ChannelConnection.external_user_id == uid))
+    if conn is None:
+        conn = ChannelConnection(workspace_id=p.workspace_id, platform="instagram", kind="oauth_user")
+        db.add(conn)
+    conn.external_user_id, conn.external_login, conn.scopes = uid, me.get("username"), ["content_publish"]
+    conn.access_token_enc, conn.expires_at, conn.status, conn.last_error = encrypt(token), exp, "active", None
+    db.commit()
+    audit(db, p, "oauth.connected", "instagram", conn.id, request, method="token")
+    return conn_out(conn)
+
+
+@router.get("/publish-targets")
+def publish_targets(p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
+    from app.services.publishing import targets
+    return targets(db, p.workspace_id)

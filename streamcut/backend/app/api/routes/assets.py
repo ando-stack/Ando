@@ -336,7 +336,7 @@ def reject_candidate(candidate_id: uuid.UUID, p: Principal = Depends(current_pri
 # -- Trabajos --------------------------------------------------------------------------
 
 @router.get("/jobs")
-def list_jobs(kind: Literal["ingestion", "analysis", "export"] | None = None, status: str | None = None,
+def list_jobs(kind: Literal["ingestion", "analysis", "export", "publication"] | None = None, status: str | None = None,
               limit: int = Query(100, le=500), p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
     out = []
     for k, model in JOB_MODELS.items():
@@ -359,7 +359,7 @@ def list_jobs(kind: Literal["ingestion", "analysis", "export"] | None = None, st
 
 
 @router.post("/jobs/{kind}/{job_id}/cancel")
-def cancel_job(kind: Literal["ingestion", "analysis", "export"], job_id: uuid.UUID,
+def cancel_job(kind: Literal["ingestion", "analysis", "export", "publication"], job_id: uuid.UUID,
                p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
     job = request_cancel(db, kind, job_id, p.workspace_id)
     if job is None:
@@ -368,7 +368,7 @@ def cancel_job(kind: Literal["ingestion", "analysis", "export"], job_id: uuid.UU
 
 
 @router.post("/jobs/{kind}/{job_id}/retry")
-def retry_job(kind: Literal["ingestion", "analysis", "export"], job_id: uuid.UUID,
+def retry_job(kind: Literal["ingestion", "analysis", "export", "publication"], job_id: uuid.UUID,
               p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
     model = JOB_MODELS[kind]
     job = db.scalar(select(model).where(model.id == job_id, model.workspace_id == p.workspace_id))
@@ -379,5 +379,7 @@ def retry_job(kind: Literal["ingestion", "analysis", "export"], job_id: uuid.UUI
     job.status, job.cancel_requested, job.error, job.progress = "queued", False, None, 0.0
     job.max_attempts = max(job.max_attempts, job.attempts + 1)
     db.commit()
-    {"ingestion": enqueue_ingestion, "analysis": enqueue_analysis, "export": enqueue_export}[kind](job.id)
+    from app.workers.dispatch import enqueue_publication
+    {"ingestion": enqueue_ingestion, "analysis": enqueue_analysis, "export": enqueue_export,
+     "publication": enqueue_publication}[kind](job.id)
     return job_dict(kind, job)

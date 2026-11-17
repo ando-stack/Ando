@@ -305,12 +305,76 @@ function ChannelClips({ channelId }: { channelId: string }) {
   );
 }
 
+function ChannelsStrip({ channels, activeId, onOpen }: { channels: Channel[]; activeId: string | null; onOpen: (c: Channel) => void }) {
+  const qc = useQueryClient();
+  const toast = useApp((s) => s.toast);
+  const stats = useApp((s) => s.liveStats);
+  const toggle = useMutation({
+    mutationFn: ({ c, on }: { c: Channel; on: boolean }) => post<Channel>(`/live/${c.id}/${on ? "start" : "stop"}`),
+    onSuccess: (c) => { qc.setQueryData(["channel", c.id], c); qc.invalidateQueries({ queryKey: ["channels"] }); },
+    onError: (e: ApiError) => toast(e.message, "error"),
+  });
+  const startAll = useMutation({
+    mutationFn: async () => {
+      let n = 0;
+      for (const c of channels.filter((x) => x.status !== "offline" && !x.session?.monitoring)) {
+        try { await post(`/live/${c.id}/start`); n++; } catch { /* canal sin directo */ }
+      }
+      return n;
+    },
+    onSuccess: (n) => { qc.invalidateQueries({ queryKey: ["channels"] }); toast(n ? `Monitorizando ${n} canal(es) más` : "No hay más canales en directo para monitorizar", n ? "ok" : "info"); },
+  });
+  if (!channels.length) return null;
+  const monitoring = channels.filter((c) => c.session?.monitoring).length;
+  return (
+    <Card className="mb-5 p-3">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-1">
+        <div className="text-sm font-semibold">Canales <span className="ml-1 text-xs font-normal text-muted">{monitoring} monitorizando a la vez</span></div>
+        <button className="btn-secondary h-8 text-xs" onClick={() => startAll.mutate()} disabled={startAll.isPending}>
+          {startAll.isPending ? <Spinner /> : <Play className="h-3.5 w-3.5" />}Monitorizar todos los que estén en directo
+        </button>
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {channels.map((c) => {
+          const on = !!c.session?.monitoring;
+          const st = stats[c.id];
+          return (
+            <div key={c.id} className={cn("flex min-w-56 shrink-0 items-center gap-2.5 rounded-lg border px-2.5 py-2",
+              c.id === activeId ? "border-accent/60 bg-accent-bg" : "border-line bg-panel-2")}>
+              <button className="flex min-w-0 flex-1 items-center gap-2.5 text-left" onClick={() => onOpen(c)}>
+                {c.avatar_url
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={c.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                  : <div className="grid h-8 w-8 place-items-center rounded-full bg-panel-3 text-[10px] font-semibold uppercase text-muted">{c.display_name.slice(0, 2)}</div>}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 text-sm">
+                    <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", c.status === "online" ? "bg-live animate-pulse-live" : "bg-faint")} />
+                    <span className="truncate font-medium">{c.display_name}</span>
+                  </div>
+                  <div className="truncate text-[11px] text-muted">
+                    {on ? `Monitorizando · ${c.clips_count} clips${st ? ` · ${st.chat_messages} msg` : ""}` : c.status === "online" ? "En directo" : c.status === "offline" ? "Offline" : "Estado desconocido"}
+                  </div>
+                </div>
+              </button>
+              <button className={cn("btn-icon", on ? "text-ok hover:text-danger" : "hover:text-ok")} title={on ? "Detener monitorización" : "Iniciar monitorización"}
+                aria-label={on ? `Detener ${c.display_name}` : `Monitorizar ${c.display_name}`} disabled={toggle.isPending}
+                onClick={() => toggle.mutate({ c, on: !on })}>
+                {on ? <Square className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 function LiveMonitor() {
   const router = useRouter();
   const params = useSearchParams();
   const qc = useQueryClient();
   const channelId = params.get("c");
-  const channels = useQuery({ queryKey: ["channels"], queryFn: () => get<Channel[]>("/channels") });
+  const channels = useQuery({ queryKey: ["channels"], queryFn: () => get<Channel[]>("/channels"), refetchInterval: 15_000 });
   const channel = useQuery({
     queryKey: ["channel", channelId],
     queryFn: () => get<Channel>(`/channels/${channelId}`),
@@ -353,6 +417,7 @@ function LiveMonitor() {
         )}
       </div>
       <Card className="mb-5 p-3"><ConnectBar onConnected={select} /></Card>
+      <ChannelsStrip channels={channels.data ?? []} activeId={channelId} onOpen={select} />
 
       {!channelId ? (
         <div className="space-y-4">

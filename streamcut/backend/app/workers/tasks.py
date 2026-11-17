@@ -4,6 +4,7 @@
 - analysis: transcripción y detección (CPU/GPU intensivo)
 - render:   renderizado de clips
 - live:     creación de clips desde el buffer del directo (prioridad alta, baja latencia)
+- publish: publicación en YouTube, TikTok e Instagram
 - maintenance: retención y limpieza
 """
 
@@ -45,6 +46,12 @@ def render_export(export_id: str) -> None:
 def live_make_clip(session_id: str, payload: dict) -> None:
     from app.live.clipper import make_live_clip
     make_live_clip(uuid.UUID(session_id), payload)
+
+
+@dramatiq.actor(queue_name="publish", max_retries=0, time_limit=2 * 3600 * 1000)
+def publish_clip(publication_id: str) -> None:
+    from app.services.publishing import run_publication
+    run_publication(uuid.UUID(publication_id))
 
 
 @dramatiq.actor(queue_name="maintenance", max_retries=0, time_limit=60 * 60 * 1000)

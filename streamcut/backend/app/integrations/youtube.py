@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 API = "https://www.googleapis.com/youtube/v3"
 GOOGLE_AUTH = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN = "https://oauth2.googleapis.com/token"
-SCOPES = ["https://www.googleapis.com/auth/youtube.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/youtube.readonly", "https://www.googleapis.com/auth/youtube.upload"]
 
 
 class YouTubeError(Exception):

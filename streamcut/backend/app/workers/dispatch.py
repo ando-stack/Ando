@@ -28,3 +28,8 @@ def enqueue_live_clip(session_id: uuid.UUID, payload: dict) -> None:
 def enqueue_maintenance() -> None:
     from .tasks import maintenance
     maintenance.send()
+
+
+def enqueue_publication(publication_id: uuid.UUID) -> None:
+    from .tasks import publish_clip
+    publish_clip.send(str(publication_id))

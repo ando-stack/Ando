@@ -80,6 +80,11 @@ class Settings(BaseSettings):
     youtube_api_key: str = ""
     google_client_id: str = ""
     google_client_secret: str = ""
+    # Publicación en redes sociales
+    tiktok_client_key: str = ""
+    tiktok_client_secret: str = ""
+    instagram_app_id: str = ""
+    instagram_app_secret: str = ""
 
     demo_mode: bool = False
 

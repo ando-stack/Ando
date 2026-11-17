@@ -1,13 +1,14 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, ExternalLink, Heart, Loader2, Pencil, Play, RotateCcw, Trash2 } from "lucide-react";
+import { Download, ExternalLink, Heart, Loader2, Pencil, Play, RotateCcw, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { del, patch, post } from "@/lib/api";
 import { CATEGORY_LABELS, cn, fmtDate, fmtDuration, STATUS_LABELS } from "@/lib/format";
 import { useApp } from "@/lib/store";
 import type { Clip } from "@/lib/types";
+import { PublishDialog } from "./PublishDialog";
 import { Badge, Modal, PlatformTag, ScoreRing } from "./ui";
 
 const STATUS_TONE: Record<string, "neutral" | "accent" | "ok" | "warn" | "danger" | "info"> = {
@@ -50,6 +51,7 @@ export function ClipCard({ clip, selectable, selected, onSelect, showRestore }: 
   const qc = useQueryClient();
   const toast = useApp((s) => s.toast);
   const [playing, setPlaying] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const refresh = () => { qc.invalidateQueries({ queryKey: ["clips"] }); qc.invalidateQueries({ queryKey: ["clip", clip.id] }); };
   const fav = useMutation({ mutationFn: () => patch(`/clips/${clip.id}`, { is_favorite: !clip.is_favorite }), onSuccess: refresh });
   const remove = useMutation({
@@ -106,6 +108,10 @@ export function ClipCard({ clip, selectable, selected, onSelect, showRestore }: 
             ) : clip.platform_clip_url ? (
               <a className="btn-icon" title="Ver en la plataforma" aria-label="Ver en la plataforma" href={clip.platform_clip_url} target="_blank" rel="noreferrer noopener"><ExternalLink className="h-4 w-4" /></a>
             ) : null}
+            {!showRestore && clip.download_url && (
+              <button className="btn-icon hover:text-accent-soft" title="Publicar en YouTube, TikTok o Instagram" aria-label="Publicar"
+                onClick={() => setPublishing(true)}><Send className="h-4 w-4" /></button>
+            )}
           </div>
           <div className="flex items-center">
             <button className={cn("btn-icon", clip.is_favorite && "text-danger hover:text-danger")} title="Favorito" aria-label="Favorito"
@@ -121,6 +127,7 @@ export function ClipCard({ clip, selectable, selected, onSelect, showRestore }: 
         </div>
       </div>
       {playing && <ClipPlayer clip={clip} open={playing} onClose={() => setPlaying(false)} />}
+      {publishing && <PublishDialog clip={clip} open={publishing} onClose={() => setPublishing(false)} />}
     </div>
   );
 }

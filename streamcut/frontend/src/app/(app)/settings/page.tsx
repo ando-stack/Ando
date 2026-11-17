@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, KeyRound, Link2, Plug, Save, Unplug } from "lucide-react";
+import { CheckCircle2, KeyRound, Link2, Plug, Save, Send, Unplug } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { Badge, Card, CardHeader, Field, PageHeader, Select, Spinner, Toggle } from "@/components/ui";
@@ -83,6 +83,64 @@ function Integrations() {
           ))}
         </div>
       )}
+    </Card>
+  );
+}
+
+interface Target { platform: string; label: string; configured: boolean; connected: boolean; account: string | null; ready: boolean; reason: string | null }
+
+function SocialAccounts() {
+  const qc = useQueryClient();
+  const toast = useApp((s) => s.toast);
+  const targets = useQuery({ queryKey: ["publish-targets"], queryFn: () => get<Target[]>("/oauth/publish-targets") });
+  const [igToken, setIgToken] = useState("");
+  const connect = async (platform: string) => {
+    try {
+      const r = await get<{ url: string }>(`/oauth/${platform}/start`);
+      window.location.href = r.url;
+    } catch (e) { toast(e instanceof ApiError ? e.message : "Error", "error"); }
+  };
+  const saveIg = useMutation({
+    mutationFn: () => post("/oauth/instagram/token", { token: igToken }),
+    onSuccess: () => { setIgToken(""); toast("Cuenta de Instagram conectada", "ok"); qc.invalidateQueries({ queryKey: ["publish-targets"] }); qc.invalidateQueries({ queryKey: ["connections"] }); },
+    onError: (e: ApiError) => toast(e.message, "error"),
+  });
+  const env: Record<string, string> = {
+    youtube: "STREAMCUT_GOOGLE_CLIENT_ID / _SECRET", tiktok: "STREAMCUT_TIKTOK_CLIENT_KEY / _SECRET",
+    instagram: "STREAMCUT_INSTAGRAM_APP_ID / _SECRET",
+  };
+  return (
+    <Card>
+      <CardHeader title="Publicación en redes sociales" icon={<Send className="h-4 w-4" />}
+        subtitle="Cuentas donde se publican los clips editados con el botón «Publicar»" />
+      <div className="divide-y divide-line">
+        {targets.data?.map((t) => (
+          <div key={t.platform} className="flex flex-wrap items-center gap-3 px-4 py-3">
+            {t.ready ? <CheckCircle2 className="h-4 w-4 text-ok" /> : <KeyRound className="h-4 w-4 text-warn" />}
+            <div className="min-w-0 flex-1 text-sm">
+              <div>{t.label} {t.account && <span className="text-muted">· {t.account}</span>}</div>
+              <p className="text-xs text-muted">
+                {t.ready ? "Lista para publicar." : t.configured || t.connected ? t.reason :
+                  <>Falta <code className="kbd">{env[t.platform]}</code> en el archivo .env (ver README).</>}
+              </p>
+            </div>
+            <button className="btn-secondary h-8 text-xs" disabled={!t.configured} onClick={() => connect(t.platform)}>
+              <Link2 className="h-3.5 w-3.5" />{t.connected ? "Reconectar" : "Conectar"}
+            </button>
+          </div>
+        ))}
+      </div>
+      <form className="flex flex-wrap items-end gap-2 border-t border-line p-4" onSubmit={(e) => { e.preventDefault(); if (igToken.trim()) saveIg.mutate(); }}>
+        <div className="min-w-64 flex-1">
+          <Field label="O pega un token de Instagram" hint="Generado en developers.facebook.com → tu app → API de Instagram → «Generar token». Útil porque Instagram exige HTTPS para el botón Conectar.">
+            <input className="input" type="password" value={igToken} onChange={(e) => setIgToken(e.target.value)} autoComplete="off" />
+          </Field>
+        </div>
+        <button className="btn-secondary" disabled={!igToken.trim() || saveIg.isPending}>{saveIg.isPending && <Spinner />}Guardar token</button>
+      </form>
+      <p className="border-t border-line px-4 py-3 text-xs text-faint">
+        Mientras tus apps de desarrollador no estén verificadas o auditadas, YouTube y TikTok publican los vídeos en privado.
+      </p>
     </Card>
   );
 }
@@ -180,6 +238,7 @@ function SettingsPage() {
     <div className="space-y-4">
       <PageHeader title="Configuración" description="Integraciones, motor de detección, clips automáticos, retención y sistema." />
       <Integrations />
+      <SocialAccounts />
       {q.data ? <Detection data={q.data.data} labels={q.data.weight_labels} onSave={(p) => save.mutate(p)} saving={save.isPending} /> : <Spinner />}
       <SystemInfo />
     </div>

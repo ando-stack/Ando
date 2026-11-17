@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Clapperboard, X } from "lucide-react";
 import { useState } from "react";
 import { ClipCard } from "@/components/ClipCard";
-import { Empty, PageHeader, Spinner } from "@/components/ui";
+import { Empty, PageHeader, Select, Spinner } from "@/components/ui";
 import { get, patch, qs } from "@/lib/api";
 import { cn } from "@/lib/format";
 import type { Clip } from "@/lib/types";
@@ -38,20 +38,28 @@ function ReviewCard({ clip }: { clip: Clip }) {
 
 export default function ClipsPage() {
   const [tab, setTab] = useState("pending");
+  const [channel, setChannel] = useState("");
   const status = TABS.find((t) => t.key === tab)!.status;
+  const facets = useQuery({ queryKey: ["clips", "facets"], queryFn: () => get<{ channels: { id: string; name: string }[] }>("/clips/facets") });
   const clips = useQuery({
-    queryKey: ["clips", "review", tab],
-    queryFn: () => get<{ total: number; items: Clip[] }>(`/clips${qs({ status, sort: tab === "pending" ? "score" : "recent", limit: 60 })}`),
+    queryKey: ["clips", "review", tab, channel],
+    queryFn: () => get<{ total: number; items: Clip[] }>(`/clips${qs({ status, channel_id: channel, sort: tab === "pending" ? "score" : "recent", limit: 60 })}`),
     refetchInterval: tab === "processing" ? 5000 : false,
   });
   return (
     <div>
-      <PageHeader title="Clips" description="Revisa los clips generados por la IA: apruébalos, recházalos o ábrelos en el editor. La puntuación es una estimación de interés, no una probabilidad de viralidad." />
-      <div className="mb-5 flex flex-wrap gap-1 border-b border-line">
-        {TABS.map((t) => (
-          <button key={t.key} onClick={() => setTab(t.key)}
-            className={cn("-mb-px border-b-2 px-3.5 py-2 text-sm", tab === t.key ? "border-accent text-fg" : "border-transparent text-muted hover:text-fg")}>{t.label}</button>
-        ))}
+      <PageHeader title="Clips" description="Revisa los clips generados por la IA: apruébalos, recházalos, ábrelos en el editor o publícalos. La puntuación es una estimación de interés, no una probabilidad de viralidad." />
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-line">
+        <div className="flex flex-wrap gap-1">
+          {TABS.map((t) => (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              className={cn("-mb-px border-b-2 px-3.5 py-2 text-sm", tab === t.key ? "border-accent text-fg" : "border-transparent text-muted hover:text-fg")}>{t.label}</button>
+          ))}
+        </div>
+        <div className="mb-2 w-60">
+          <Select ariaLabel="Streamer" value={channel} onChange={setChannel}
+            options={[{ value: "", label: "Todos los streamers" }, ...(facets.data?.channels ?? []).map((c) => ({ value: c.id, label: c.name }))]} />
+        </div>
       </div>
       {clips.isLoading ? <Spinner /> : clips.data?.items.length === 0 ? (
         <Empty icon={<Clapperboard className="h-5 w-5" />} title="No hay clips en esta vista">Importa un vídeo o monitoriza un directo con fuente autorizada para generar clips.</Empty>

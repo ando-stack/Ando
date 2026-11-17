@@ -1,7 +1,8 @@
 "use client";
 
 import { Loader2, X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/format";
 
 export function Logo({ compact = false }: { compact?: boolean }) {
@@ -138,8 +139,11 @@ export function Modal({ open, onClose, title, children, wide }: {
     ref.current?.focus();
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
-  if (!open) return null;
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!open || !mounted) return null;
+  // Portal al <body>: así la ventana nunca queda atrapada dentro de una tarjeta con animación o overflow
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-fade-in" onMouseDown={onClose}>
       <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true"
         className={cn("card max-h-[92dvh] w-full overflow-auto outline-none shadow-2xl", wide ? "max-w-5xl" : "max-w-lg")}
@@ -152,7 +156,8 @@ export function Modal({ open, onClose, title, children, wide }: {
         )}
         <div className="p-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

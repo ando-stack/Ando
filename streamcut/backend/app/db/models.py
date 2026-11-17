@@ -558,6 +558,35 @@ class Export(_JobMixin, Base):
     duration_s: Mapped[float | None] = mapped_column(Float)  # tiempo de renderizado
 
 
+PUBLISH_PLATFORMS = ("youtube", "tiktok", "instagram")
+
+
+class Publication(_JobMixin, Base):
+    """Publicación de una versión renderizada de un clip en una red social."""
+
+    __tablename__ = "publications"
+    __table_args__ = (
+        _check("status", JOB_STATUS),
+        CheckConstraint("platform IN ('youtube', 'tiktok', 'instagram')", name="ck_publication_platform"),
+        Index("ix_publications_clip", "clip_id", "created_at"),
+    )
+    id: Mapped[uuid.UUID] = pk()
+    workspace_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("workspaces.id", ondelete="CASCADE"),
+                                                    nullable=False, index=True)
+    clip_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("clips.id", ondelete="CASCADE"), nullable=False)
+    clip_version_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("clip_versions.id", ondelete="CASCADE"),
+                                                       nullable=False)
+    connection_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("channel_connections.id", ondelete="SET NULL"))
+    platform: Mapped[str] = mapped_column(String(16), nullable=False)
+    title: Mapped[str] = mapped_column(String(300), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
+    privacy: Mapped[str] = mapped_column(String(32), default="public", nullable=False)
+    external_id: Mapped[str | None] = mapped_column(String(200))
+    external_url: Mapped[str | None] = mapped_column(String(1000))
+    response: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+
+
 class ProcessingLog(Base):
     __tablename__ = "processing_logs"
     __table_args__ = (Index("ix_logs_ws_created", "workspace_id", "created_at"),)

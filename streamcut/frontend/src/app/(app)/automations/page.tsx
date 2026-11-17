@@ -23,6 +23,12 @@ function AutopilotForm({ value, onChange, templates }: { value: AP; onChange: (v
         <Field label="Clips máximos por directo"><input className="input" type="number" min={1} max={200} value={value.max_clips_per_stream ?? 20} onChange={(e) => set("max_clips_per_stream", +e.target.value)} /></Field>
         <Field label="Duración"><Select value={value.duration_mode ?? "auto"} onChange={(v) => set("duration_mode", v)} options={[{ value: "auto", label: "Automática" }, ...["15", "30", "45", "60"].map((x) => ({ value: x, label: `${x} s` }))]} /></Field>
         <Field label="Formato"><Select value={value.format ?? "9:16"} onChange={(v) => set("format", v)} options={["9:16", "16:9", "1:1"].map((f) => ({ value: f, label: f }))} /></Field>
+        <Field label={`Tiempo mínimo entre clips: ${value.clip_cooldown_s ?? 30} s`}>
+          <input type="range" min={10} max={180} step={5} value={value.clip_cooldown_s ?? 30} onChange={(e) => set("clip_cooldown_s", +e.target.value)} className="w-full accent-[var(--color-accent)]" />
+        </Field>
+        <Field label={`Espera antes de crear el clip: ${value.clip_delay_s ?? 8} s`} hint="Tras la reacción del chat, para que el clip incluya el momento completo">
+          <input type="range" min={0} max={20} step={1} value={value.clip_delay_s ?? 8} onChange={(e) => set("clip_delay_s", +e.target.value)} className="w-full accent-[var(--color-accent)]" />
+        </Field>
         <Field label="Plantilla"><Select value={value.template_slug ?? "gaming-viral"} onChange={(v) => set("template_slug", v)} options={templates.map((t) => ({ value: t.slug, label: t.name }))} /></Field>
       </div>
       <div className="flex flex-wrap gap-5">

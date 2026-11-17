@@ -70,7 +70,7 @@ class ChatSpikeDetector:
     """
 
     def __init__(self, window_s: float = 10.0, baseline_s: float = 300.0, min_rate: float = 1.0,
-                 z_threshold: float = 3.0, cooldown_s: float = 45.0, min_emotes: int = 8,
+                 z_threshold: float = 3.0, cooldown_s: float = 30.0, min_emotes: int = 8,
                  emote_ratio: float = 0.5):
         self.window_s = window_s
         self.baseline_s = baseline_s

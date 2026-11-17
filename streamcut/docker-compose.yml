@@ -39,7 +39,7 @@ services:
   worker:
     <<: *backend
     command: ["dramatiq", "app.workers.tasks", "--processes", "1", "--threads", "2",
-              "--queues", "ingest", "analysis", "render", "live", "maintenance"]
+              "--queues", "ingest", "analysis", "render", "live", "publish", "maintenance"]
     depends_on: [api]
 
   monitor:

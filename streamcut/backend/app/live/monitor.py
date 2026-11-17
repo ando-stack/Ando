@@ -80,6 +80,7 @@ class SessionRunner:
     started: float = field(default_factory=time.time)
     status: str = "starting"
     note: str | None = None
+    clip_delay: float = 8.0
 
 
 class Monitor:
@@ -211,7 +212,9 @@ class Monitor:
         with SessionLocal() as db:
             ap = {**get_settings_data(db, ch.workspace_id)["autopilot"], **(ch.autopilot or {})}
         sens = max(0.5, min(2.0, float(ap.get("sensitivity", 1.0))))
-        r.chat = ChatSpikeDetector(z_threshold=3.0 / sens, cooldown_s=45.0 / sens,
+        r.clip_delay = max(0.0, min(30.0, float(ap.get("clip_delay_s", 8))))
+        r.chat = ChatSpikeDetector(z_threshold=3.0 / sens,
+                                   cooldown_s=max(10.0, min(600.0, float(ap.get("clip_cooldown_s", 30)))),
                                    min_emotes=max(4, round(8 / sens)))
         self.runners[sess.id] = r
         if ch.platform == "twitch":
@@ -267,10 +270,20 @@ class Monitor:
             elif r.mode == "PLATFORM_CLIPS":
                 ok = await asyncio.to_thread(self._autopilot_allows_platform_clip, r)
                 if ok:
-                    from .clipper import create_platform_clip
-                    clip = await asyncio.to_thread(create_platform_clip, r.session_id, "chat_spike", peak_wall, spike)
-                    if clip:
-                        r.platform_clips += 1
+                    # No bloquea la detección: espera unos segundos para que el clip incluya el momento y la reacción
+                    r.tasks.append(asyncio.create_task(self._delayed_platform_clip(r, peak_wall, spike)))
+
+    async def _delayed_platform_clip(self, r: SessionRunner, peak_wall: float, spike: dict) -> None:
+        from .clipper import create_platform_clip
+        if r.clip_delay > 0:
+            try:
+                await asyncio.wait_for(r.stop.wait(), r.clip_delay)
+                return  # la monitorización se detuvo mientras esperaba
+            except asyncio.TimeoutError:
+                pass
+        clip = await asyncio.to_thread(create_platform_clip, r.session_id, "chat_spike", peak_wall, spike)
+        if clip:
+            r.platform_clips += 1
 
     def _autopilot_allows_platform_clip(self, r: SessionRunner) -> bool:
         with SessionLocal() as db:

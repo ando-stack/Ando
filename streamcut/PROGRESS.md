@@ -39,6 +39,13 @@ Leyenda: ✅ implementado y verificado con pruebas · 🟡 implementado, verific
 | Recuperarlos tras cerrar y volver a abrir | ✅ (prueba de reinicio) |
 | Clipping automático en directo con fuente autorizada | ✅ (RTMP desde OBS/FFmpeg) |
 
+## Añadido después de la primera versión
+
+- ✅ Varios canales monitorizados a la vez desde la pantalla Directos (barra de canales, «Monitorizar todos los que estén en directo»).
+- ✅ Clips de Twitch por spam de reacciones en el chat (W, KEKW, POG, JAJAJA…), tiempo mínimo entre clips (30 s por defecto) y espera configurable antes de crear el clip para incluir el momento completo (`has_delay` de Twitch).
+- ✅ Filtro por streamer en Clips.
+- 🟡 Publicación en YouTube Shorts, TikTok e Instagram Reels (botón «Publicar», cola `publish`, estado y enlace de cada publicación). Probado con las respuestas oficiales simuladas; falta probarlo con apps y cuentas reales.
+
 ## Limitaciones conocidas (por diseño o externas)
 
 - **Ver un directo no da acceso a su vídeo.** Sin fuente autorizada, un canal queda en VIEW_ONLY o PLATFORM_CLIPS; la interfaz lo indica y no simula análisis.
@@ -55,5 +62,5 @@ Leyenda: ✅ implementado y verificado con pruebas · 🟡 implementado, verific
 - ⏳ Probar con credenciales reales de Twitch y YouTube (OAuth, EventSub, clips oficiales).
 - ⏳ Modelo de lenguaje opcional para la puntuación semántica (la interfaz `score_segments` está preparada).
 - ⏳ Diarización de hablantes (pyannote) opcional.
-- ⏳ Publicación directa en redes sociales (el estado «Publicado» existe y se marca a mano).
+- ⏳ Probar la publicación con apps reales y solicitar las auditorías de YouTube y TikTok para publicar en público.
 - ⏳ Gestión de varios usuarios por workspace (hoy: un propietario por workspace, con aislamiento completo).

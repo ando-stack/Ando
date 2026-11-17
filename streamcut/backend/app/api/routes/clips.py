@@ -30,6 +30,7 @@ from app.db.models import (
     Export,
     HighlightCandidate,
     MediaAsset,
+    Publication,
     SourceAsset,
     Tag,
     collection_clips,
@@ -63,6 +64,13 @@ class EditOpIn(BaseModel):
     payload: dict[str, Any] = Field(default_factory=dict)
     spec: dict[str, Any]
     base_seq: int
+
+
+class PublishIn(BaseModel):
+    platforms: list[Literal["youtube", "tiktok", "instagram"]] = Field(min_length=1, max_length=3)
+    title: str = Field(min_length=1, max_length=100)
+    description: str | None = Field(None, max_length=2000)
+    privacy: Literal["public", "unlisted", "private", "friends"] = "public"
 
 
 class SaveIn(BaseModel):
@@ -505,3 +513,44 @@ def remove_from_collection(clip_id: uuid.UUID, collection_id: uuid.UUID, p: Prin
     db.commit()
     db.refresh(c)
     return clip_out(db, c)
+
+
+# -- Publicación en redes sociales ------------------------------------------------------
+
+@router.get("/{clip_id}/publications")
+def publications(clip_id: uuid.UUID, p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
+    c = _clip(db, p, clip_id, include_deleted=True)
+    rows = db.scalars(select(Publication).where(Publication.clip_id == c.id).order_by(Publication.created_at.desc()))
+    return [job_dict("publication", x) for x in rows]
+
+
+@router.post("/{clip_id}/publish")
+def publish_clip(clip_id: uuid.UUID, body: PublishIn, request: Request, p: Principal = Depends(current_principal),
+                 db: Session = Depends(get_db)):
+    from app.services.publishing import connection, targets
+    from app.workers.dispatch import enqueue_publication
+    c = _clip(db, p, clip_id)
+    v = db.get(ClipVersion, c.current_version_id) if c.current_version_id else None
+    if v is None or v.render_asset_id is None or v.status != "ready":
+        raise HTTPException(409, "El clip todavía no tiene un MP4 editado y renderizado para publicar")
+    ready = {t["platform"]: t for t in targets(db, p.workspace_id)}
+    missing = [ready[x]["label"] + ": " + (ready[x]["reason"] or "") for x in body.platforms if not ready[x]["ready"]]
+    if missing:
+        raise HTTPException(409, "No se puede publicar en " + "; ".join(missing))
+    media = db.get(MediaAsset, v.render_asset_id)
+    if "youtube" in body.platforms and media.duration and media.duration > 180:
+        raise HTTPException(422, "YouTube Shorts admite vídeos de hasta 3 minutos")
+    out = []
+    for platform in body.platforms:
+        conn = connection(db, p.workspace_id, platform)
+        pub = Publication(workspace_id=p.workspace_id, clip_id=c.id, clip_version_id=v.id, connection_id=conn.id,
+                          platform=platform, title=body.title.strip(), description=body.description,
+                          privacy=body.privacy, priority=3)
+        db.add(pub)
+        db.flush()
+        out.append(pub)
+    db.commit()
+    for pub in out:
+        enqueue_publication(pub.id)
+    audit(db, p, "clip.publish", "clip", c.id, request, platforms=body.platforms)
+    return [job_dict("publication", x) for x in out]

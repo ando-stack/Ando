@@ -165,8 +165,11 @@ class TwitchClient:
         return self._json(self._request("GET", "/videos", params={"user_id": user_id, "first": first,
                                                                   "type": "archive"})).get("data", [])
 
-    def create_clip(self, user_token: str, broadcaster_id: str) -> dict:
-        r = self._request("POST", "/clips", token=user_token, params={"broadcaster_id": broadcaster_id})
+    def create_clip(self, user_token: str, broadcaster_id: str, has_delay: bool = True) -> dict:
+        # has_delay=true: Twitch compensa el retraso entre la emisión y lo que ven los espectadores,
+        # que es a lo que reacciona el chat.
+        r = self._request("POST", "/clips", token=user_token,
+                          params={"broadcaster_id": broadcaster_id, "has_delay": str(has_delay).lower()})
         if r.status_code == 403:
             raise TwitchError("El canal no permite crear clips o falta el permiso clips:edit", 403)
         if r.status_code == 404:

@@ -68,6 +68,24 @@ STREAMCUT no trae credenciales. Sin ellas el reproductor y el chat de Twitch fun
 - Opcional: cliente OAuth web (redirect `…/api/oauth/youtube/callback`) → `STREAMCUT_GOOGLE_CLIENT_ID/SECRET`.
 - Cuota: la detección de directos usa la lista de subidas (≈2 unidades por consulta) en lugar de `search.list` (100).
 
+## Publicar clips en YouTube Shorts, TikTok e Instagram Reels
+
+Cada clip editado tiene un botón **Publicar** (icono de avión de papel). Antes hay que crear una app de desarrollador en cada red (gratis) y conectar tu cuenta en **Configuración → Publicación en redes sociales**.
+
+**YouTube Shorts**: en el mismo proyecto de Google Cloud de la clave de YouTube:
+1. *APIs y servicios → Pantalla de consentimiento de OAuth*: tipo **Externo**, añade tu email como **usuario de prueba**.
+2. *Credenciales → Crear credenciales → ID de cliente de OAuth* → **Aplicación web**, URI de redirección `http://localhost:3000/api/oauth/youtube/callback`.
+3. Copia el ID y el secreto en `STREAMCUT_GOOGLE_CLIENT_ID` / `STREAMCUT_GOOGLE_CLIENT_SECRET` y pulsa **Conectar** en YouTube Shorts.
+- Un vídeo vertical de hasta 3 minutos se publica como Short (se añade `#Shorts`). **Los proyectos de Google sin verificar suben los vídeos como privados** hasta pasar la auditoría de la API de YouTube; puedes cambiarlos a públicos desde YouTube Studio.
+
+**TikTok**: en <https://developers.tiktok.com> crea una app, añade los productos **Login Kit** y **Content Posting API** (con «Direct Post»), los scopes `user.info.basic`, `video.upload`, `video.publish` y la redirección `http://localhost:3000/api/oauth/tiktok/callback`. Copia *Client key* y *Client secret* en `STREAMCUT_TIKTOK_CLIENT_KEY/_SECRET`.
+- **Hasta que TikTok audite tu app, solo puede publicar en privado** (y tu cuenta debe estar en privado). Si TikTok no acepta `http://localhost` como redirección, usa una URL HTTPS pública que apunte a tu STREAMCUT (por ejemplo un túnel) en `STREAMCUT_PUBLIC_BASE_URL`.
+
+**Instagram Reels**: necesitas una cuenta de Instagram **profesional** (Creador o Empresa). En <https://developers.facebook.com> crea una app de tipo *Empresa* y añade el producto **API de Instagram con inicio de sesión de Instagram**. Copia el *ID* y la *clave secreta de la app de Instagram* en `STREAMCUT_INSTAGRAM_APP_ID/_SECRET`.
+- Instagram exige redirecciones **HTTPS**, así que en local lo más sencillo es: en el panel de la app → *Generar tokens de acceso* → añade tu cuenta → **Generar token**, y pégalo en Configuración → «O pega un token de Instagram». STREAMCUT lo renueva solo (dura 60 días).
+
+Los clips oficiales de Twitch (de canales ajenos) no se pueden publicar: STREAMCUT solo guarda su enlace, no el vídeo. Publica solo contenido sobre el que tengas derechos.
+
 ## Análisis completo de tus directos (fuente autorizada)
 
 En **Canales → (tu canal) → Fuente audiovisual autorizada**:
