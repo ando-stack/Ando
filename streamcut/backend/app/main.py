@@ -69,11 +69,17 @@ async def lifespan(app: FastAPI):
         log.error("No se pudieron preparar las plantillas: %s (¿ejecutaste 'alembic upgrade head'?)", exc)
     embedded = _start_embedded_workers() if s.run_mode == "all-in-one" else []
     yield
+    # Parada rápida (Ctrl+C): el monitor primero y sin esperar a que terminen trabajos largos;
+    # los trabajos interrumpidos quedan registrados y se pueden reintentar.
     for item in embedded:
-        if hasattr(item, "stop"):
-            item.stop()
         if hasattr(item, "shutdown"):
             item.shutdown()
+    for item in embedded:
+        if hasattr(item, "stop"):
+            try:
+                item.stop(timeout=2000)
+            except Exception as exc:  # pragma: no cover
+                log.warning("Parada de workers: %s", exc)
 
 
 def create_app() -> FastAPI:

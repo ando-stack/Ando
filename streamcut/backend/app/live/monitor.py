@@ -89,9 +89,11 @@ class Monitor:
         self._last_poll = 0.0
         self._last_maint = 0.0
         self._stopping = asyncio.Event()
+        self._loop: asyncio.AbstractEventLoop | None = None
 
     # -- ciclo principal ---------------------------------------------------------
     async def run(self) -> None:
+        self._loop = asyncio.get_running_loop()
         log.info("Monitor iniciado (%s)", self.id)
         try:
             from .eventsub import EventSubManager
@@ -116,7 +118,12 @@ class Monitor:
         await asyncio.gather(*self.tasks, return_exceptions=True)
 
     def shutdown(self) -> None:
-        self._stopping.set()
+        # Puede llamarse desde otro hilo (modo all-in-one): hay que despertar a su propio bucle.
+        loop = self._loop
+        if loop is not None and loop.is_running():
+            loop.call_soon_threadsafe(self._stopping.set)
+        else:
+            self._stopping.set()
 
     async def _on_eventsub(self, channel_user_id: str, kind: str) -> None:
         log.info("EventSub %s para %s", kind, channel_user_id)
