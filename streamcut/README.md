@@ -35,7 +35,9 @@ Con GPU NVIDIA: `docker compose -f docker-compose.yml -f docker-compose.gpu.yml 
    ```
    Cierra y abre la terminal para que `ffmpeg` esté en el PATH.
 2. Doble clic en `scripts\windows\instalar.bat`. Crea `.env` en **modo de un solo proceso** (SQLite + cola en memoria: no hace falta PostgreSQL ni Redis), instala dependencias, aplica las migraciones y compila el frontend.
-3. Doble clic en `scripts\windows\iniciar.bat` → se abre <http://localhost:3000>.
+3. Doble clic en **`STREAMCUT.bat`** (en la carpeta `streamcut`). Abre el servidor y la web en dos ventanas (no las cierres) y, cuando está listo, <http://localhost:3000>.
+4. Opcional, para que arranque solo al iniciar Windows: `powershell -ExecutionPolicy Bypass -File scripts\windows\arranque-automatico.ps1` (con `-Quitar` se desactiva). Los canales con AUTO PILOT vuelven a vigilarse solos.
+5. Para actualizar a una versión nueva sin perder tus claves: descarga el ZIP en Descargas y ejecuta `scripts\windows\actualizar.ps1`.
 
 La primera transcripción descarga el modelo Whisper elegido (`base` ≈ 150 MB). Para usar PostgreSQL y Redis en Windows, pon `STREAMCUT_RUN_MODE=api`, `STREAMCUT_BROKER=redis` y la URL de PostgreSQL en `.env`; `iniciar.ps1` arrancará también el worker y el monitor.
 
