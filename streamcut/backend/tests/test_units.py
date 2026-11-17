@@ -178,3 +178,34 @@ def test_cues_from_words_and_spec_mapping():
     with pytest.raises(Exception):
         EditSpec.model_validate({"source_asset_id": "x", "segments": [{"start": 1, "end": 2}],
                                  "subtitles": {"style": {"color": "red"}}})
+
+
+def test_w_spam_triggers_without_rate_change():
+    """Chat siempre rápido (5 msg/s): el spam de «W» dispara el clip aunque la velocidad no cambie."""
+    det = C.ChatSpikeDetector()
+    t0 = 5000.0
+    found = None
+    for sec in range(240):
+        for k in range(5):
+            if 200 <= sec < 210:
+                msg = "W" if k < 4 else "WWWW"
+            else:
+                msg = ["hola", "que tal", "jugando a esto", "w kata", "buenas"][k]
+            det.add(t0 + sec + k / 5, msg)
+        s = det.check(t0 + sec)
+        if s and found is None:
+            found = (sec, s)
+    assert found is not None and 200 <= found[0] <= 210, found
+    assert found[1]["kind"] == "emotes" and found[1]["top"] == "W"
+
+
+def test_normal_chat_with_some_w_does_not_trigger():
+    det = C.ChatSpikeDetector()
+    t0 = 9000.0
+    fired = []
+    for sec in range(300):
+        for k in range(5):
+            det.add(t0 + sec + k / 5, ["W", "hola", "que dices", "jaja", "buenas"][(sec + k) % 5])
+        if det.check(t0 + sec):
+            fired.append(sec)
+    assert fired == []

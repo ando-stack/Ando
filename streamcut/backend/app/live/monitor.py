@@ -211,7 +211,8 @@ class Monitor:
         with SessionLocal() as db:
             ap = {**get_settings_data(db, ch.workspace_id)["autopilot"], **(ch.autopilot or {})}
         sens = max(0.5, min(2.0, float(ap.get("sensitivity", 1.0))))
-        r.chat = ChatSpikeDetector(z_threshold=3.0 / sens, cooldown_s=45.0 / sens)
+        r.chat = ChatSpikeDetector(z_threshold=3.0 / sens, cooldown_s=45.0 / sens,
+                                   min_emotes=max(4, round(8 / sens)))
         self.runners[sess.id] = r
         if ch.platform == "twitch":
             r.tasks.append(asyncio.create_task(twitch_chat(ch.external_id, lambda t, u, m: self._on_chat(r, t, m),
@@ -252,8 +253,12 @@ class Monitor:
             if not spike:
                 continue
             r.events += 1
-            label = (f"Aumento de actividad del chat: {spike['rate']} msg/s "
-                     f"(normal {spike['baseline']}), {spike['laugh']} risas, {spike['hype']} hype")
+            if spike.get("kind") == "emotes":
+                label = (f"Spam de «{spike['top']}» en el chat ({spike['top_count']} de {spike['messages']} "
+                         f"mensajes en 10 s)")
+            else:
+                label = (f"Aumento de actividad del chat: {spike['rate']} msg/s "
+                         f"(normal {spike['baseline']}), {spike['laugh']} risas, {spike['hype']} hype")
             await asyncio.to_thread(self._record, r, "chat_spike", label, spike)
             peak_wall = time.time() - CHAT_DELAY
             if r.ingest is not None and r.ingest.running:

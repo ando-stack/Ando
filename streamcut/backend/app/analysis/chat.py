@@ -50,44 +50,83 @@ def activity_score(s: dict, hop: float) -> np.ndarray:
     return np.clip(z * (0.7 + 0.5 * frac), 0, 1).astype(np.float32)
 
 
+def _token(text: str) -> str:
+    """Emote o palabra representativa de un mensaje de risa/hype (p. ej. "W", "KEKW", "POG")."""
+    m = LAUGH.search(text) or HYPE.search(text)
+    tok = (m.group(0) if m else text.split()[0] if text.split() else "").strip()
+    if re.fullmatch(r"w+", tok, re.IGNORECASE):
+        return "W"
+    if re.fullmatch(r"(ja|je|ha)+j?", tok, re.IGNORECASE):
+        return "JAJAJA"
+    return tok.upper()[:20]
+
+
 class ChatSpikeDetector:
-    """Detector incremental para directos: mensajes/s frente a la línea base de los últimos minutos."""
+    """Detector incremental para directos. Dispara un momento destacado cuando:
+
+    - "rate": el chat va mucho más rápido de lo normal (mensajes/s frente a los últimos minutos), o
+    - "emotes": el chat se llena de golpe de spam de reacción ("W", "KEKW", "POG", "JAJAJA"…) aunque
+      la velocidad apenas cambie (canales con el chat siempre rápido).
+    """
 
     def __init__(self, window_s: float = 10.0, baseline_s: float = 300.0, min_rate: float = 1.0,
-                 z_threshold: float = 3.0, cooldown_s: float = 45.0):
+                 z_threshold: float = 3.0, cooldown_s: float = 45.0, min_emotes: int = 8,
+                 emote_ratio: float = 0.5):
         self.window_s = window_s
         self.baseline_s = baseline_s
         self.min_rate = min_rate
         self.z_threshold = z_threshold
         self.cooldown_s = cooldown_s
+        self.min_emotes = min_emotes
+        self.emote_ratio = emote_ratio
         self.times: list[float] = []
         self.flags: list[tuple[int, int]] = []
+        self.tokens: list[str] = []
         self.rates: list[float] = []
+        self.ratios: list[float] = []
         self.last_spike = -1e9
 
     def add(self, t: float, text: str) -> None:
+        flags = classify(text)
         self.times.append(t)
-        self.flags.append(classify(text))
+        self.flags.append(flags)
+        self.tokens.append(_token(text) if any(flags) else "")
 
     def check(self, now: float) -> dict | None:
         cutoff = now - self.baseline_s
         while self.times and self.times[0] < cutoff:
             self.times.pop(0)
             self.flags.pop(0)
+            self.tokens.pop(0)
         recent = [i for i, t in enumerate(self.times) if t >= now - self.window_s]
         rate = len(recent) / self.window_s
+        emo = [i for i in recent if any(self.flags[i])]
+        ratio = len(emo) / len(recent) if recent else 0.0
         self.rates.append(rate)
-        self.rates = self.rates[-int(self.baseline_s / 2):]
+        self.ratios.append(ratio)
+        keep = int(self.baseline_s / 2)
+        self.rates, self.ratios = self.rates[-keep:], self.ratios[-keep:]
         if len(self.rates) < 10 or now - self.last_spike < self.cooldown_s:
             return None
         base = np.array(self.rates[:-3] or [0.0])
         med = float(np.median(base))
         mad = float(np.median(np.abs(base - med)) * 1.4826) or max(0.3, med * 0.5)
         z = (rate - med) / mad
+        base_ratio = float(np.median(self.ratios[:-3] or [0.0]))
+        kind = None
         if rate >= self.min_rate and z >= self.z_threshold:
-            self.last_spike = now
-            laugh = sum(self.flags[i][0] for i in recent)
-            hype = sum(self.flags[i][1] for i in recent)
-            return {"rate": round(rate, 2), "baseline": round(med, 2), "z": round(float(z), 2),
-                    "laugh": laugh, "hype": hype, "messages": len(recent)}
-        return None
+            kind = "rate"
+        elif len(emo) >= self.min_emotes and ratio >= max(self.emote_ratio, base_ratio + 0.25):
+            kind = "emotes"
+        if kind is None:
+            return None
+        self.last_spike = now
+        laugh = sum(self.flags[i][0] for i in recent)
+        hype = sum(self.flags[i][1] for i in recent)
+        counts: dict[str, int] = {}
+        for i in emo:
+            counts[self.tokens[i]] = counts.get(self.tokens[i], 0) + 1
+        top = max(counts, key=counts.get) if counts else None
+        return {"kind": kind, "rate": round(rate, 2), "baseline": round(med, 2), "z": round(float(z), 2),
+                "laugh": laugh, "hype": hype, "messages": len(recent), "emotes": len(emo),
+                "top": top, "top_count": counts.get(top, 0) if top else 0}
