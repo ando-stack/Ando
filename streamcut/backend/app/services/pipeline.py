@@ -26,6 +26,7 @@ from app.analysis.scoring import Candidate, DetectionParams, Signals, generate_c
 from app.core.config import get_settings
 from app.db.models import (
     AnalysisJob,
+    Channel,
     Clip,
     ClipVersion,
     Export,
@@ -135,7 +136,12 @@ def run_ingestion(job_id: uuid.UUID) -> None:
         if auto:
             from app.workers.dispatch import enqueue_analysis
             with SessionLocal() as db:
-                aj = AnalysisJob(workspace_id=ws, source_asset_id=aid, kind="full")
+                params: dict[str, Any] = {}
+                src = db.get(SourceAsset, aid)
+                if src is not None and src.kind == "platform_clip":
+                    owner = db.scalar(select(Clip.id).where(Clip.source_asset_id == aid))
+                    params = {"no_clips": True, "platform_clip": str(owner) if owner else None}
+                aj = AnalysisJob(workspace_id=ws, source_asset_id=aid, kind="full", params=params)
                 db.add(aj)
                 db.commit()
                 enqueue_analysis(aj.id)
@@ -400,6 +406,11 @@ def run_analysis(job_id: uuid.UUID) -> None:
                         create_clip_from_candidate(db, row, asset, clip_cfg, webcam=webcam, faces=faces)
                         created += 1
                 result["clips_created"] = created
+                if job.params.get("platform_clip"):
+                    pclip = db.get(Clip, uuid.UUID(job.params["platform_clip"]))
+                    if pclip is not None and not pclip.versions:
+                        edit_whole_asset_clip(db, pclip, asset, clip_cfg, webcam=webcam, faces=faces,
+                                              best=rows[0] if rows else None)
         ctx.finish("succeeded", result=result)
         ctx.log("info", f"Análisis completado: {result.get('candidates', 0)} candidatos, {created} clips",
                 **{k: v for k, v in result.items() if k not in ("faces",)})
@@ -454,6 +465,35 @@ def create_clip_from_candidate(db: Session, cand: HighlightCandidate, asset: Sou
                                           "score": clip.score, "channel_id": str(clip.channel_id) if clip.channel_id else None})
     if should_render:
         queue_render(db, clip, version)
+    return clip
+
+
+def edit_whole_asset_clip(db: Session, clip: Clip, asset: SourceAsset, clip_cfg: dict[str, Any], *,
+                          webcam: dict | None = None, faces: list | None = None,
+                          best: HighlightCandidate | None = None) -> Clip:
+    """Edición automática de un clip que ya es el vídeo completo (p. ej. clip oficial de Twitch descargado):
+    vertical con la plantilla del canal, subtítulos por palabra, y render listo para publicar."""
+    tpl = get_template(db, asset.workspace_id, slug=clip_cfg.get("template_slug") or "gaming-viral")
+    channel = db.get(Channel, clip.channel_id) if clip.channel_id else None
+    if channel is not None and channel.default_template_id:
+        tpl = get_template(db, asset.workspace_id, template_id=channel.default_template_id) or tpl
+    end = float(asset.duration or 0)
+    spec = build_spec(tpl.spec if tpl else {}, source_asset_id=str(asset.id), start=0.0, end=end,
+                      words=words_in(db, asset.id, 0.0, end), peak=best.peak_time if best else end / 2,
+                      source_w=asset.width, source_h=asset.height, webcam=webcam, faces=faces,
+                      auto_edit=bool(clip_cfg.get("auto_edit", True)), format_override=clip_cfg.get("format"),
+                      subtitles_override=clip_cfg.get("subtitles"))
+    clip.start, clip.end, clip.format = 0.0, end, spec.format
+    if best is not None:
+        clip.score = clip.score or best.score
+        clip.transcript_text = clip.transcript_text or best.transcript_text
+    version = ClipVersion(clip_id=clip.id, version_no=1, edit_spec=spec.model_dump(mode="json"), status="draft",
+                          note="Edición automática del clip de Twitch")
+    db.add(version)
+    db.flush()
+    clip.current_version_id = version.id
+    db.commit()
+    queue_render(db, clip, version)
     return clip
 
 

@@ -1,10 +1,10 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, ExternalLink, Heart, Loader2, Pencil, Play, RotateCcw, Send, Trash2 } from "lucide-react";
+import { CloudDownload, Download, ExternalLink, Heart, Loader2, Pencil, Play, RotateCcw, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { del, patch, post } from "@/lib/api";
+import { ApiError, del, patch, post } from "@/lib/api";
 import { CATEGORY_LABELS, cn, fmtDate, fmtDuration, STATUS_LABELS } from "@/lib/format";
 import { useApp } from "@/lib/store";
 import type { Clip } from "@/lib/types";
@@ -58,6 +58,11 @@ export function ClipCard({ clip, selectable, selected, onSelect, showRestore }: 
     mutationFn: () => del(`/clips/${clip.id}`),
     onSuccess: () => { refresh(); toast("Clip movido a la papelera", "info"); },
   });
+  const fetchMedia = useMutation({
+    mutationFn: () => post<{ message: string }>(`/clips/${clip.id}/fetch-media`),
+    onSuccess: (r) => { refresh(); toast(r.message, "ok"); },
+    onError: (e: ApiError) => toast(e.message, "error"),
+  });
   const restore = useMutation({ mutationFn: () => post(`/clips/${clip.id}/restore`), onSuccess: () => { refresh(); toast("Clip recuperado", "ok"); } });
 
   return (
@@ -108,6 +113,12 @@ export function ClipCard({ clip, selectable, selected, onSelect, showRestore }: 
             ) : clip.platform_clip_url ? (
               <a className="btn-icon" title="Ver en la plataforma" aria-label="Ver en la plataforma" href={clip.platform_clip_url} target="_blank" rel="noreferrer noopener"><ExternalLink className="h-4 w-4" /></a>
             ) : null}
+            {!showRestore && clip.platform_clip_url && !clip.source_asset_id && (
+              <button className="btn-icon hover:text-accent-soft" title="Descargar el vídeo de Twitch para editarlo y publicarlo"
+                aria-label="Descargar vídeo de Twitch" disabled={fetchMedia.isPending} onClick={() => fetchMedia.mutate()}>
+                {fetchMedia.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudDownload className="h-4 w-4" />}
+              </button>
+            )}
             {!showRestore && clip.download_url && (
               <button className="btn-icon hover:text-accent-soft" title="Publicar en YouTube, TikTok o Instagram" aria-label="Publicar"
                 onClick={() => setPublishing(true)}><Send className="h-4 w-4" /></button>

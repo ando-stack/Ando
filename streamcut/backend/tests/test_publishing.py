@@ -148,3 +148,67 @@ def test_publish_end_to_end_with_worker(auth_client, worker, creds, highlight_vi
     assert pubs[0]["status"] == "succeeded", pubs[0]
     assert pubs[0]["external_url"] == "https://www.instagram.com/reel/AAA/"
     assert auth_client.get(f"/api/clips/{clip['id']}").json()["status"] == "published"
+
+
+def _twitch_platform_clip(scopes):
+    from app.integrations import twitch as tw_mod
+    from app.integrations.twitch import TwitchClient
+    tw_mod.set_twitch(TwitchClient("cid", "sec"))
+    with SessionLocal() as db:
+        from app.db.models import Channel
+        ws = db.scalar(select(Workspace))
+        for old in db.scalars(select(ChannelConnection).where(ChannelConnection.platform == "twitch",
+                                                               ChannelConnection.kind == "oauth_user")):
+            db.delete(old)
+        ch = Channel(workspace_id=ws.id, platform="twitch", external_id=f"canal{uuid.uuid4().hex[:6]}",
+                     display_name="Peereira7", url="https://www.twitch.tv/x", platform_user_id="555")
+        db.add(ch)
+        db.add(ChannelConnection(workspace_id=ws.id, platform="twitch", kind="oauth_user", external_user_id="999",
+                                 external_login="yo", scopes=scopes, access_token_enc=encrypt("user-token")))
+        db.flush()
+        clip = Clip(workspace_id=ws.id, origin="platform", channel_id=ch.id, title="Clip de chat", status="detected",
+                    format="16:9", platform="twitch", platform_clip_id="ClipABC",
+                    platform_clip_url="https://clips.twitch.tv/ClipABC", streamer_name="Peereira7")
+        db.add(clip)
+        db.commit()
+        return clip.id
+
+
+def test_twitch_clip_not_editor_is_explained(auth_client):
+    from app.integrations import twitch as tw_mod
+    cid = _twitch_platform_clip(["clips:edit"])
+    r = auth_client.post(f"/api/clips/{cid}/fetch-media")
+    assert r.status_code == 409 and "descarga de clips" in r.json()["detail"]
+    cid = _twitch_platform_clip(["clips:edit", "editor:manage:clips"])
+    with respx.mock(assert_all_called=False) as m:
+        m.route(host="testserver").pass_through()
+        m.route(host="localhost").pass_through()
+        m.post("https://id.twitch.tv/oauth2/token").respond(json={"access_token": "app", "expires_in": 3600})
+        m.get("https://api.twitch.tv/helix/clips/downloads").respond(403, json={"message": "not editor"})
+        r = auth_client.post(f"/api/clips/{cid}/fetch-media")
+    tw_mod.set_twitch(None)
+    assert r.status_code == 409 and "editora" in r.json()["detail"]
+
+
+def test_twitch_clip_download_is_edited_and_publishable(auth_client, worker, highlight_video, monkeypatch):
+    from app.integrations import twitch as tw_mod
+    from app.live import clipper
+    monkeypatch.setattr(clipper, "validate_public_http_url", lambda u: u)
+    cid = _twitch_platform_clip(["clips:edit", "editor:manage:clips"])
+    data = highlight_video.read_bytes()
+    with respx.mock(assert_all_called=False) as m:
+        m.route(host="testserver").pass_through()
+        m.route(host="localhost").pass_through()
+        m.post("https://id.twitch.tv/oauth2/token").respond(json={"access_token": "app", "expires_in": 3600})
+        m.get("https://api.twitch.tv/helix/clips/downloads").respond(json={"data": [
+            {"clip_id": "ClipABC", "landscape_download_url": "https://media.twitch.example/c.mp4"}]})
+        m.get("https://media.twitch.example/c.mp4").respond(200, content=data)
+        r = auth_client.post(f"/api/clips/{cid}/fetch-media")
+        assert r.status_code == 200, r.text
+    tw_mod.set_twitch(None)
+    worker.drain()
+    clip = auth_client.get(f"/api/clips/{cid}").json()
+    assert clip["source_asset_id"] and clip["video_url"] and clip["download_url"], clip
+    assert clip["format"] == "9:16" and clip["versions"][0]["status"] == "ready"
+    # sigue conservando el enlace oficial de Twitch
+    assert clip["platform_clip_url"] == "https://clips.twitch.tv/ClipABC"

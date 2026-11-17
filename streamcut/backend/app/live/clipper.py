@@ -255,14 +255,52 @@ def create_platform_clip(session_id: uuid.UUID, reason: str, peak_wall: float, d
         # Descarga solo mediante el endpoint oficial y si los permisos lo permiten
         if info and set(conn.scopes or []) & DOWNLOAD_SCOPES:
             try:
-                dl = tw.get_clip_download_urls(token, conn.external_user_id or "", channel.platform_user_id, [clip_id])
-                url = (dl[0] if dl else {}).get("landscape_download_url")
-                if url:
-                    _download_platform_clip(db, clip, url)
-            except (TwitchError, UnsafeURL, httpx.HTTPError) as exc:
-                write_log(channel.workspace_id, "live", session.id, "warning",
-                          f"Clip guardado como referencia (descarga no permitida): {exc}")
+                fetch_platform_clip_media(db, clip)
+            except PlatformMediaError as exc:
+                record_event(db, workspace_id=channel.workspace_id, type="platform_clip_error",
+                             label=f"Clip guardado solo como enlace: {exc}", channel_id=channel.id,
+                             stream_session_id=session.id)
+                db.commit()
         return clip
+
+
+class PlatformMediaError(Exception):
+    pass
+
+
+def fetch_platform_clip_media(db, clip: Clip) -> None:
+    """Descarga el MP4 de un clip oficial de Twitch con el endpoint oficial (solo propietario/editores)
+    y lo deja listo para editarse y publicarse."""
+    tw = get_twitch()
+    if clip.platform != "twitch" or not clip.platform_clip_id:
+        raise PlatformMediaError("no es un clip oficial de Twitch")
+    if clip.source_asset_id:
+        raise PlatformMediaError("este clip ya tiene su vídeo descargado")
+    channel = db.get(Channel, clip.channel_id) if clip.channel_id else None
+    if channel is None or not channel.platform_user_id:
+        raise PlatformMediaError("no se encuentra el canal de Twitch del clip")
+    conn = user_connection(db, clip.workspace_id, "twitch")
+    token = valid_user_token(db, conn) if conn else None
+    if not token:
+        raise PlatformMediaError("conecta tu cuenta de Twitch en Configuración")
+    if not set(conn.scopes or []) & DOWNLOAD_SCOPES:
+        raise PlatformMediaError("pulsa «Conectar Twitch (con descarga de clips)» en Configuración")
+    try:
+        dl = tw.get_clip_download_urls(token, conn.external_user_id or "", channel.platform_user_id,
+                                       [clip.platform_clip_id])
+    except TwitchError as exc:
+        if exc.status in (401, 403):
+            raise PlatformMediaError(
+                f"Twitch solo permite descargar clips al dueño del canal o a sus editores, y tu cuenta "
+                f"({conn.external_login}) no es editora de {channel.display_name}") from exc
+        raise PlatformMediaError(f"Twitch rechazó la descarga: {exc}") from exc
+    url = (dl[0] if dl else {}).get("landscape_download_url") or (dl[0] if dl else {}).get("portrait_download_url")
+    if not url:
+        raise PlatformMediaError("Twitch todavía no tiene el vídeo del clip disponible; prueba en un minuto")
+    try:
+        _download_platform_clip(db, clip, url)
+    except (UnsafeURL, httpx.HTTPError) as exc:
+        raise PlatformMediaError(f"no se pudo descargar el vídeo: {exc}") from exc
 
 
 def _download_platform_clip(db, clip: Clip, url: str) -> None:
@@ -285,7 +323,8 @@ def _download_platform_clip(db, clip: Clip, url: str) -> None:
         db.add(asset)
         db.flush()
         clip.source_asset_id = asset.id
-        job = IngestionJob(workspace_id=clip.workspace_id, source_asset_id=asset.id, auto_analyze=False)
+        # Se analiza (transcripción para subtítulos) y se edita automáticamente al terminar la ingesta
+        job = IngestionJob(workspace_id=clip.workspace_id, source_asset_id=asset.id, auto_analyze=True)
         db.add(job)
         db.commit()
         from app.workers.dispatch import enqueue_ingestion

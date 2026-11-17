@@ -554,3 +554,16 @@ def publish_clip(clip_id: uuid.UUID, body: PublishIn, request: Request, p: Princ
         enqueue_publication(pub.id)
     audit(db, p, "clip.publish", "clip", c.id, request, platforms=body.platforms)
     return [job_dict("publication", x) for x in out]
+
+
+@router.post("/{clip_id}/fetch-media")
+def fetch_media(clip_id: uuid.UUID, p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
+    """Descarga el vídeo de un clip oficial de Twitch (si Twitch lo permite) para editarlo y publicarlo."""
+    from app.live.clipper import PlatformMediaError, fetch_platform_clip_media
+    c = _clip(db, p, clip_id)
+    try:
+        fetch_platform_clip_media(db, c)
+    except PlatformMediaError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    return {"ok": True, "message": "Vídeo descargado. Se está transcribiendo y editando; el botón Publicar "
+                                   "aparecerá en cuanto termine."}
