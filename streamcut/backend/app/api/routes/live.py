@@ -51,6 +51,13 @@ def embed(channel_id: uuid.UUID, parent: str = Query(..., max_length=253), p: Pr
     return {"player": player, "chat": chat, "original": c.url}
 
 
+def _refresh(db: Session, c) -> None:
+    """Consulta a la plataforma el estado real del canal (si hay credenciales)."""
+    from app.services.channels import refresh_capabilities, refresh_status
+    refresh_status(db, [c])
+    refresh_capabilities(db, c)
+
+
 def _live_session(db: Session, channel_id: uuid.UUID) -> StreamSession | None:
     return db.scalar(select(StreamSession).where(StreamSession.channel_id == channel_id,
                                                  StreamSession.status == "live").order_by(StreamSession.started_at.desc()))
@@ -59,6 +66,8 @@ def _live_session(db: Session, channel_id: uuid.UUID) -> StreamSession | None:
 @router.post("/{channel_id}/start")
 def start_monitoring(channel_id: uuid.UUID, p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
     c = _get(db, p, channel_id)
+    _refresh(db, c)
+    c.is_tracked = True  # al monitorizar, el estado se consulta automáticamente cada minuto
     if c.status == "offline":
         raise HTTPException(409, "El canal no está en directo ahora mismo")
     sess = _live_session(db, c.id)
@@ -99,6 +108,7 @@ def platform_clip(channel_id: uuid.UUID, p: Principal = Depends(current_principa
     c = _get(db, p, channel_id)
     if c.platform != "twitch":
         raise HTTPException(422, "Solo Twitch permite crear clips oficiales por API")
+    _refresh(db, c)
     sess = _live_session(db, c.id)
     if c.status == "error":
         raise HTTPException(409, f"No se pudo consultar Twitch: {c.last_error or 'error de API'}. "

@@ -19,7 +19,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from app.analysis.chat import CHAT_DELAY, ChatSpikeDetector
 from app.core.config import get_settings
@@ -147,7 +147,10 @@ class Monitor:
 
     def _poll_channels(self) -> None:
         with SessionLocal() as db:
-            chans = list(db.scalars(select(Channel).where(Channel.is_tracked.is_(True))))
+            monitored = select(StreamSession.channel_id).where(StreamSession.monitoring.is_(True),
+                                                                StreamSession.status == "live")
+            chans = list(db.scalars(select(Channel).where(or_(Channel.is_tracked.is_(True),
+                                                              Channel.id.in_(monitored)))))
             if not chans:
                 return
             refresh_status(db, chans)
@@ -187,6 +190,9 @@ class Monitor:
             runner = self.runners.get(sess.id)
             if runner is None:
                 runner = await self.start_runner(sess, ch)
+            elif runner.ingest is None:
+                # Las capacidades cambian al añadir credenciales o conectar la cuenta: se aplican sin reiniciar
+                runner.mode = (ch.capabilities or {}).get("mode", runner.mode)
             if src is not None and src.rights_confirmed_at and runner.ingest is None:
                 if active_ingests < max_ingests:
                     await self.start_ingest(runner, src)
@@ -202,6 +208,10 @@ class Monitor:
     async def start_runner(self, sess: StreamSession, ch: Channel) -> SessionRunner:
         r = SessionRunner(sess.id, ch.id, ch.workspace_id, ch.platform, ch.external_id,
                           (ch.capabilities or {}).get("mode", "VIEW_ONLY"))
+        with SessionLocal() as db:
+            ap = {**get_settings_data(db, ch.workspace_id)["autopilot"], **(ch.autopilot or {})}
+        sens = max(0.5, min(2.0, float(ap.get("sensitivity", 1.0))))
+        r.chat = ChatSpikeDetector(z_threshold=3.0 / sens, cooldown_s=45.0 / sens)
         self.runners[sess.id] = r
         if ch.platform == "twitch":
             r.tasks.append(asyncio.create_task(twitch_chat(ch.external_id, lambda t, u, m: self._on_chat(r, t, m),

@@ -190,11 +190,30 @@ def create_platform_clip(session_id: uuid.UUID, reason: str, peak_wall: float, d
     with SessionLocal() as db:
         session = db.get(StreamSession, session_id)
         channel = db.get(Channel, session.channel_id) if session else None
-        if channel is None or channel.platform != "twitch" or not channel.platform_user_id:
+        if channel is None or channel.platform != "twitch":
+            return None
+
+        def fail(msg: str) -> None:
+            record_event(db, workspace_id=channel.workspace_id, type="platform_clip_error",
+                         label=f"No se pudo crear el clip en Twitch: {msg}", channel_id=channel.id,
+                         stream_session_id=session.id)
+            db.commit()
+
+        if not channel.platform_user_id and tw.configured:
+            try:
+                users = tw.get_users(logins=[channel.external_id])
+                if users:
+                    channel.platform_user_id = users[0]["id"]
+                    db.commit()
+            except TwitchError:
+                pass
+        if not channel.platform_user_id:
+            fail("no se pudo identificar el canal (revisa las credenciales de Twitch)")
             return None
         conn = user_connection(db, channel.workspace_id, "twitch")
         token = valid_user_token(db, conn) if conn else None
         if not token or "clips:edit" not in (conn.scopes or []):
+            fail("conecta tu cuenta de Twitch en Configuración (permiso clips:edit)")
             return None
         try:
             created = tw.create_clip(token, channel.platform_user_id)
