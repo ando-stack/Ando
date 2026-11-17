@@ -100,8 +100,15 @@ def platform_clip(channel_id: uuid.UUID, p: Principal = Depends(current_principa
     if c.platform != "twitch":
         raise HTTPException(422, "Solo Twitch permite crear clips oficiales por API")
     sess = _live_session(db, c.id)
+    if c.status == "error":
+        raise HTTPException(409, f"No se pudo consultar Twitch: {c.last_error or 'error de API'}. "
+                                 "Revisa STREAMCUT_TWITCH_CLIENT_ID y _SECRET en el archivo .env")
+    if c.status == "unknown":
+        raise HTTPException(409, "No se puede comprobar si el canal está en directo: faltan las "
+                                 "credenciales de Twitch o no son válidas")
     if sess is None or c.status != "online":
-        raise HTTPException(409, "El canal no está en directo")
+        raise HTTPException(409, "Twitch indica que el canal no está en directo ahora mismo. "
+                                 "Pulsa el botón de actualizar estado y vuelve a intentarlo")
     feats = {f["key"]: f for f in (c.capabilities or {}).get("features", [])}
     if feats.get("platform_clips", {}).get("status") != "available":
         raise HTTPException(403, feats.get("platform_clips", {}).get("detail", "Falta autorización"))
