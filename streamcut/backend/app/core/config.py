@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="STREAMCUT_",
         env_file=(BACKEND_DIR.parent / ".env", BACKEND_DIR / ".env"),
+        env_file_encoding="utf-8",
         extra="ignore",
     )
 

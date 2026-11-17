@@ -20,7 +20,7 @@ if (-not (Test-Path ".env")) {
     -replace '^STREAMCUT_RUN_MODE=.*', 'STREAMCUT_RUN_MODE=all-in-one' `
     -replace '^STREAMCUT_BROKER=.*', 'STREAMCUT_BROKER=memory' `
     -replace '^STREAMCUT_DATABASE_URL=.*', 'STREAMCUT_DATABASE_URL=sqlite:///./data/streamcut.db' |
-    Set-Content ".env"
+    Set-Content ".env" -Encoding ascii
   Write-Host "Creado .env (SQLite + modo all-in-one). Edítalo para añadir tus claves de Twitch/YouTube." -ForegroundColor Yellow
 }
 New-Item -ItemType Directory -Force -Path "data" | Out-Null
