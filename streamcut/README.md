@@ -98,8 +98,9 @@ Cada clip editado tiene un botón **Publicar** (icono de avión de papel). Antes
 **TikTok**: en <https://developers.tiktok.com> crea una app, añade los productos **Login Kit** y **Content Posting API** (con «Direct Post»), los scopes `user.info.basic`, `video.upload`, `video.publish` y la redirección `http://localhost:3000/api/oauth/tiktok/callback`. Copia *Client key* y *Client secret* en `STREAMCUT_TIKTOK_CLIENT_KEY/_SECRET`.
 - **Hasta que TikTok audite tu app, solo puede publicar en privado** (y tu cuenta debe estar en privado). Si TikTok no acepta `http://localhost` como redirección, usa una URL HTTPS pública que apunte a tu STREAMCUT (por ejemplo un túnel) en `STREAMCUT_PUBLIC_BASE_URL`.
 
-**Instagram Reels**: necesitas una cuenta de Instagram **profesional** (Creador o Empresa). En <https://developers.facebook.com> crea una app de tipo *Empresa* y añade el producto **API de Instagram con inicio de sesión de Instagram**. Copia el *ID* y la *clave secreta de la app de Instagram* en `STREAMCUT_INSTAGRAM_APP_ID/_SECRET`.
-- Instagram exige redirecciones **HTTPS**, así que en local lo más sencillo es: en el panel de la app → *Generar tokens de acceso* → añade tu cuenta → **Generar token**, y pégalo en Configuración → «O pega un token de Instagram». STREAMCUT lo renueva solo (dura 60 días).
+**Instagram Reels**: necesitas una cuenta de Instagram **profesional** (Creador o Empresa) y una app en <https://developers.facebook.com> con el caso de uso **«Administrar mensajes y contenido en Instagram»**.
+- En las apps nuevas, Meta usa el **inicio de sesión unificado**: conecta un **portfolio empresarial** (gratis), añade tu Instagram al portfolio y crea una **configuración** con *identificador de acceso de usuario del sistema* (no caduca). Copia ese token (empieza por `EAA`) y pégalo en Configuración → «O pega un token de Instagram». STREAMCUT busca solo tu cuenta de Instagram; si no la encuentra, escribe su ID.
+- Si tu app aún permite «Instagram Login», también vale su token (`IG…`) o el botón Conectar con `STREAMCUT_INSTAGRAM_APP_ID/_SECRET` (Instagram exige redirección HTTPS).
 
 Los clips oficiales de Twitch (de canales ajenos) no se pueden publicar: STREAMCUT solo guarda su enlace, no el vídeo. Publica solo contenido sobre el que tengas derechos.
 
