@@ -167,8 +167,8 @@ export function Toggle({ checked, onChange, label, disabled }: {
   return (
     <label className={cn("inline-flex cursor-pointer items-center gap-2.5 text-sm", disabled && "opacity-50 pointer-events-none")}>
       <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)}
-        className={cn("relative h-5 w-9 rounded-full transition-colors", checked ? "bg-accent" : "bg-panel-3 border border-line")}>
-        <span className={cn("absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5")} />
+        className={cn("relative h-5 w-9 shrink-0 rounded-full transition-colors", checked ? "bg-accent" : "bg-panel-3 border border-line")}>
+        <span className={cn("absolute left-0 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform", checked ? "translate-x-[18px]" : "translate-x-0.5")} />
       </button>
       {label && <span className="text-fg">{label}</span>}
     </label>

@@ -113,6 +113,30 @@ class Fades(BaseModel):
     video_out: float = Field(0.25, ge=0, le=3)
 
 
+EMOJIS = ("laugh", "rofl", "shock", "fire", "skull", "flushed", "cry", "cool", "hundred", "eyes")
+EmojiName = Literal["laugh", "rofl", "shock", "fire", "skull", "flushed", "cry", "cool", "hundred", "eyes"]
+
+
+class Overlay(BaseModel):
+    """Emote superpuesto. `t` está en la línea de tiempo de SALIDA; x/y son el centro (0..1)."""
+
+    kind: Literal["emoji"] = "emoji"
+    name: EmojiName
+    t: float = Field(ge=0)
+    duration: float = Field(1.6, ge=0.3, le=5)
+    x: float = Field(0.8, ge=0, le=1)
+    y: float = Field(0.2, ge=0, le=1)
+    size: float = Field(0.2, ge=0.05, le=0.5)  # fracción del ancho del vídeo
+
+
+class TitleCard(BaseModel):
+    """Título gancho al inicio del clip."""
+
+    enabled: bool = False
+    text: str = Field("", max_length=80)
+    duration: float = Field(2.6, ge=1, le=6)
+
+
 class EditSpec(BaseModel):
     version: int = 1
     source_asset_id: str
@@ -124,6 +148,8 @@ class EditSpec(BaseModel):
     subtitles: Subtitles = Field(default_factory=Subtitles)
     audio: Audio = Field(default_factory=Audio)
     fades: Fades = Field(default_factory=Fades)
+    overlays: list[Overlay] = Field(default_factory=list, max_length=12)
+    title_card: TitleCard = Field(default_factory=TitleCard)
     auto_edit: bool = True
 
     @property

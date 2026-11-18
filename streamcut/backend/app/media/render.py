@@ -60,7 +60,18 @@ def _zoom_expr(spec: EditSpec) -> str | None:
     return "1+" + "+".join(terms)
 
 
-def build_filter(spec: EditSpec, info: ProbeInfo, ass_path: Path | None) -> tuple[str, list[str]]:
+EMOJI_DIR = Path(__file__).parent / "assets" / "emoji"
+
+
+def emoji_path(name: str) -> Path:
+    p = EMOJI_DIR / f"{name}.png"
+    if not p.exists():
+        raise MediaError(f"Falta la imagen del emote {name}")
+    return p
+
+
+def build_filter(spec: EditSpec, info: ProbeInfo, ass_path: Path | None,
+                 overlay_inputs: list[int] | None = None) -> tuple[str, list[str]]:
     W, H = spec.size()
     sw, sh = info.width or W, info.height or H
     n = len(spec.segments)
@@ -98,9 +109,21 @@ def build_filter(spec: EditSpec, info: ProbeInfo, ass_path: Path | None) -> tupl
 
     chain = "[lv]"
     zexpr = _zoom_expr(spec)
-    post: list[str] = []
     if zexpr:
-        post.append(f"zoompan=z='{zexpr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS}")
+        parts.append(f"[lv]zoompan=z='{zexpr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS}[zv]")
+        chain = "[zv]"
+    # Emotes: imágenes PNG con transparencia que aparecen y desaparecen con un fundido
+    for k, (ov, idx) in enumerate(zip(spec.overlays, overlay_inputs or [])):
+        size = _even(W * ov.size)
+        t0, t1 = ov.t, ov.t + ov.duration
+        parts.append(f"[{idx}:v]format=rgba,scale={size}:{size},fade=t=in:st={t0:.3f}:d=0.15:alpha=1,"
+                     f"fade=t=out:st={max(t0, t1 - 0.25):.3f}:d=0.25:alpha=1[em{k}]")
+        x = int(min(max(0, W * ov.x - size / 2), W - size))
+        y = int(min(max(0, H * ov.y - size / 2), H - size))
+        parts.append(f"{chain}[em{k}]overlay=x={x}:y={y}:enable='between(t,{t0:.3f},{t1:.3f})'"
+                     f":eof_action=pass:format=auto[ov{k}]")
+        chain = f"[ov{k}]"
+    post: list[str] = []
     total = spec.output_duration
     if spec.fades.video_in > 0:
         post.append(f"fade=t=in:st=0:d={spec.fades.video_in:.3f}")
@@ -142,14 +165,19 @@ def render(spec: EditSpec, src: Path, dest: Path, workdir: Path, *, cancel=None,
     segs = [s.model_copy(update={"end": min(s.end, info.duration)}) for s in spec.segments]
     spec = spec.model_copy(update={"segments": segs})
     ass_path = None
-    if spec.subtitles.enabled and spec.subtitles.cues:
+    if (spec.subtitles.enabled and spec.subtitles.cues) or (spec.title_card.enabled and spec.title_card.text.strip()):
         ass_path = workdir / "subs.ass"
         ass_path.write_text(build_ass(spec), encoding="utf-8")
-    graph, maps = build_filter(spec, info, ass_path)
+    total = spec.output_duration
+    overlays = [o for o in spec.overlays if o.t < total]
+    spec = spec.model_copy(update={"overlays": overlays})
+    n = len(spec.segments)
+    graph, maps = build_filter(spec, info, ass_path, list(range(n, n + len(overlays))))
     cmd = [ffmpeg_bin(), "-hide_banner", "-nostdin", "-y"]
     for s in spec.segments:
         cmd += ["-ss", f"{s.start:.3f}", "-t", f"{s.end - s.start:.3f}", "-i", str(src)]
-    total = spec.output_duration
+    for ov in overlays:
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-t", f"{total:.3f}", "-i", str(emoji_path(ov.name))]
     cmd += ["-filter_complex", graph, *maps, *video_encoder_args(20, "medium"), "-r", str(FPS),
             "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-t", f"{total:.3f}",
             "-movflags", "+faststart", "-progress", "pipe:2", "-nostats", str(dest)]

@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.deps import limiter
 from app.api.routes import (
+    ai_editor,
     assets,
     auth,
     channels,
@@ -110,7 +111,7 @@ def create_app() -> FastAPI:
         response.headers.setdefault("X-Frame-Options", "DENY")
         return response
 
-    for r in (auth, channels, live, assets, clips, library, templates_routes, settings_routes, stats, events,
+    for r in (auth, channels, live, assets, clips, ai_editor, library, templates_routes, settings_routes, stats, events,
               media, oauth):
         app.include_router(r.router, prefix="/api")
 

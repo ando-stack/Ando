@@ -39,13 +39,22 @@ def build_ass(spec: EditSpec) -> str:
         f"Style: Main,{st.font},{size},{_ass_color(st.color)},{_ass_color(st.highlight_color)},"
         f"{_ass_color(st.outline_color)},{_ass_color('#000000', 0x80)},{-1 if st.bold else 0},0,0,0,100,100,"
         f"0,0,1,{st.outline * scale:.1f},{st.shadow * scale:.1f},{align},{int(60 * scale)},{int(60 * scale)},"
-        f"{margin_v},1\n\n"
+        f"{margin_v},1\n"
+        f"Style: Hook,{st.font},{int(62 * scale)},{_ass_color('#FFFFFF')},{_ass_color('#FFFFFF')},"
+        f"{_ass_color('#7C3AED')},{_ass_color('#7C3AED')},-1,0,0,0,100,100,0,0,3,{18 * scale:.1f},0,8,"
+        f"{int(90 * scale)},{int(90 * scale)},{int(200 * scale)},1\n\n"
         "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
     )
     lines: list[str] = []
     hl = _ass_color(st.highlight_color)
     base = _ass_color(st.color)
-    for cue in spec.subtitles.cues:
+    tc = spec.title_card
+    if tc.enabled and tc.text.strip():
+        d = min(tc.duration, spec.output_duration)
+        lines.append(f"Dialogue: 1,{_ts(0.05)},{_ts(d)},Hook,,0,0,0,,"
+                     f"{{\\fad(180,220)\\fscx92\\fscy92\\t(0,180,\\fscx100\\fscy100)}}{_escape(tc.text.strip())}")
+    cues = spec.subtitles.cues if spec.subtitles.enabled else []
+    for cue in cues:
         a = spec.to_output_time(cue.start)
         b = spec.to_output_time(min(cue.end, cue.end))
         if a is None and b is None:

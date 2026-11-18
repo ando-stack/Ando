@@ -50,6 +50,8 @@ class UploadIn(BaseModel):
 
 class CompleteIn(BaseModel):
     auto_analyze: bool = True
+    mode: Literal["highlights", "edit"] = "highlights"  # edit = Editor IA: editar el vídeo completo
+    options: dict[str, Any] | None = None
 
 
 class AnalyzeIn(BaseModel):
@@ -207,7 +209,8 @@ def complete_upload(upload_id: uuid.UUID, body: CompleteIn, request: Request,
             storage.put_file(local, key)
             storage.delete(a.upload_tmp_key)
     a.storage_key, a.sha256, a.size_bytes, a.status, a.upload_tmp_key = key, digest, size, "uploaded", None
-    job = IngestionJob(workspace_id=p.workspace_id, source_asset_id=a.id, auto_analyze=body.auto_analyze)
+    job = IngestionJob(workspace_id=p.workspace_id, source_asset_id=a.id, auto_analyze=body.auto_analyze,
+                       params={"mode": body.mode, "options": body.options or {}})
     db.add(job)
     db.commit()
     enqueue_ingestion(job.id)

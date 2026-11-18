@@ -68,6 +68,23 @@ STREAMCUT no trae credenciales. Sin ellas el reproductor y el chat de Twitch fun
 - Opcional: cliente OAuth web (redirect `…/api/oauth/youtube/callback`) → `STREAMCUT_GOOGLE_CLIENT_ID/SECRET`.
 - Cuota: la detección de directos usa la lista de subidas (≈2 unidades por consulta) en lugar de `search.list` (100).
 
+## Editor IA
+
+Sección **Editor IA** del menú. Edita clips completos de forma automática y profesional:
+
+- **Encuadre vertical** (o 1:1 / 16:9): webcam arriba y juego abajo si detecta webcam; si no, cara centrada o fondo difuminado.
+- **Corta los silencios muertos** (jump cuts) sin partir palabras.
+- **Subtítulos en las frases clave** («de vez en cuando»), en mayúsculas y con la palabra activa resaltada; o todo, o ninguno.
+- **Pocos emotes** (1-2 por defecto) colocados en las reacciones reales: risas 😂, gritos 😱, victorias 🔥, fallos 💀…
+- **Zoom** suave en la reacción más fuerte, **título gancho** al inicio y **audio nivelado**.
+
+Cómo usarlo:
+1. En **Clips** (o **Biblioteca**) marca uno o varios clips y pulsa **Enviar al Editor IA**.
+2. O, en **Editor IA**, arrastra tus propios clips (MP4, MOV, MKV, WEBM): se suben y se editan enteros.
+3. Cada resultado se puede **ver, descargar, publicar** o **retocar a mano** en el editor manual. «Editar de nuevo» crea otra versión con las opciones actuales; las anteriores se conservan.
+
+Los clips oficiales de Twitch sin vídeo hay que descargarlos antes (botón de la nube en su tarjeta; solo propietario o editores del canal). Los emotes son imágenes de Noto Emoji (Google, licencia Apache 2.0, ver `backend/app/media/assets/emoji/NOTICE.md`).
+
 ## Publicar clips en YouTube Shorts, TikTok e Instagram Reels
 
 Cada clip editado tiene un botón **Publicar** (icono de avión de papel). Antes hay que crear una app de desarrollador en cada red (gratis) y conectar tu cuenta en **Configuración → Publicación en redes sociales**.

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, FileJson, FolderPlus, Heart, Library, Search, Trash2 } from "lucide-react";
+import { Download, FileJson, FolderPlus, Heart, Library, Search, Sparkles, Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { ClipCard } from "@/components/ClipCard";
@@ -52,6 +52,15 @@ function LibraryPage() {
   const addToCol = useMutation({
     mutationFn: async (colId: string) => { for (const id of selected) await post(`/clips/${id}/collections/${colId}`); },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["collections"] }); qc.invalidateQueries({ queryKey: ["clips"] }); toast("Añadidos a la colección", "ok"); },
+  });
+  const sendAi = useMutation({
+    mutationFn: () => post<{ accepted: unknown[]; rejected: { title?: string; reason: string }[] }>("/ai-editor/jobs", { clip_ids: [...selected] }),
+    onSuccess: (r) => {
+      if (r.accepted.length) toast(`${r.accepted.length} clip(s) enviados al Editor IA`, "ok");
+      r.rejected.forEach((x) => toast(`${x.title ?? "Clip"}: ${x.reason}`, "error"));
+      setSelected(new Set());
+      if (r.accepted.length) router.push("/ai-editor");
+    },
   });
   const bulkDelete = useMutation({
     mutationFn: async () => { for (const id of selected) await del(`/clips/${id}`); },
@@ -142,6 +151,7 @@ function LibraryPage() {
           {selected.size > 0 && (
             <div className="sticky top-2 z-20 mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-accent/40 bg-panel-2/95 px-3 py-2 text-sm shadow-lg backdrop-blur">
               <span>{selected.size} seleccionados</span>
+              <button className="btn-primary h-8" onClick={() => sendAi.mutate()} disabled={sendAi.isPending}><Sparkles className="h-4 w-4" />Enviar al Editor IA</button>
               <button className="btn-secondary h-8" onClick={downloadZip}><Download className="h-4 w-4" />Descargar ZIP</button>
               <Select ariaLabel="Añadir a colección" className="h-8 w-48" value="" onChange={(v) => v && addToCol.mutate(v)} options={[{ value: "", label: "Añadir a colección…" }, ...(cols.data ?? []).map((c) => ({ value: c.id, label: c.name }))]} />
               <button className="btn-danger h-8" onClick={() => bulkDelete.mutate()}><Trash2 className="h-4 w-4" />Eliminar</button>

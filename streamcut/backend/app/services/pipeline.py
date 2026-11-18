@@ -129,11 +129,26 @@ def run_ingestion(job_id: uuid.UUID) -> None:
                 db.commit()
                 publish(asset.workspace_id, "asset", asset_brief(asset))
                 auto = job.auto_analyze
+                mode = (job.params or {}).get("mode", "highlights")
                 ws = asset.workspace_id
                 aid = asset.id
         ctx.finish("succeeded")
         ctx.log("info", "Ingesta completada", asset_id=str(aid))
-        if auto:
+        if mode == "edit":
+            from app.workers.dispatch import enqueue_analysis
+            with SessionLocal() as db:
+                a = db.get(SourceAsset, aid)
+                clip = Clip(workspace_id=ws, origin="manual", source_asset_id=aid, title=a.title, status="processing",
+                            start=0.0, end=a.duration, streamer_name=a.streamer_name, game=a.game,
+                            channel_id=a.channel_id)
+                db.add(clip)
+                db.flush()
+                aj = AnalysisJob(workspace_id=ws, source_asset_id=aid, kind="ai_edit",
+                                 params={"clip_id": str(clip.id), "options": (job.params or {}).get("options") or {}})
+                db.add(aj)
+                db.commit()
+                enqueue_analysis(aj.id)
+        elif auto:
             from app.workers.dispatch import enqueue_analysis
             with SessionLocal() as db:
                 params: dict[str, Any] = {}
@@ -238,6 +253,12 @@ def words_in(db: Session, asset_id: uuid.UUID, start: float, end: float) -> list
 
 
 def run_analysis(job_id: uuid.UUID) -> None:
+    with SessionLocal() as db:
+        j = db.get(AnalysisJob, job_id)
+        kind = j.kind if j else None
+    if kind == "ai_edit":
+        from .ai_editor import run_ai_edit
+        return run_ai_edit(job_id)
     ctx = JobContext("analysis", job_id)
     if not ctx.start():
         return

@@ -80,3 +80,15 @@ test("dashboard y estadísticas con datos reales", async ({ page }) => {
     await expect(page.locator("main h1")).toBeVisible();
   }
 });
+
+test("clips → seleccionar → Enviar al Editor IA → edición lista", async ({ page }) => {
+  await page.goto("/clips");
+  await page.getByRole("button", { name: "Todos", exact: true }).click();
+  const card = page.locator(".card").filter({ has: page.getByTitle("Descargar MP4") }).first();
+  await card.getByLabel("Seleccionar clip").check();
+  await page.getByRole("button", { name: "Enviar al Editor IA" }).click();
+  await expect(page).toHaveURL(/\/ai-editor/);
+  await expect(page.getByRole("heading", { name: "Editor IA" })).toBeVisible();
+  await expect(page.getByText("Listo", { exact: true }).first()).toBeVisible({ timeout: 8 * 60_000 });
+  await page.screenshot({ path: `${SHOTS}/ai-editor.png` });
+});

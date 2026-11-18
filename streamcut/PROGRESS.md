@@ -46,6 +46,8 @@ Leyenda: ✅ implementado y verificado con pruebas · 🟡 implementado, verific
 - ✅ Filtro por streamer en Clips.
 - 🟡 Publicación en YouTube Shorts, TikTok e Instagram Reels (botón «Publicar», cola `publish`, estado y enlace de cada publicación). Probado con las respuestas oficiales simuladas; falta probarlo con apps y cuentas reales.
 
+- ✅ Editor IA: sección propia, envío de uno o varios clips desde Clips/Biblioteca, subida de clips propios en modo «solo editar», cortes de silencios, subtítulos en frases clave, pocos emotes en las reacciones, zoom, título gancho y audio nivelado (probado con vídeo real de extremo a extremo y en el navegador).
+
 ## Limitaciones conocidas (por diseño o externas)
 
 - **Ver un directo no da acceso a su vídeo.** Sin fuente autorizada, un canal queda en VIEW_ONLY o PLATFORM_CLIPS; la interfaz lo indica y no simula análisis.

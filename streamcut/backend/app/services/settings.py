@@ -51,6 +51,16 @@ DEFAULTS: dict[str, Any] = {
         "clip_delay_s": 8,  # espera tras la reacción del chat para que el clip incluya el momento completo
         "storage_policy": "keep_renders",
     },
+    "ai_editor": {
+        "format": "9:16",
+        "style": "gaming-viral",
+        "subtitles": "key",
+        "emotes": "few",
+        "cut_silences": True,
+        "zoom": True,
+        "hook_title": True,
+        "denoise": False,
+    },
     "retention": {
         "trash_days": 30,
         "proxy_days": 0,  # 0 = conservar

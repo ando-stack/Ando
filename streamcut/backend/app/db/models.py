@@ -305,6 +305,8 @@ class IngestionJob(_JobMixin, Base):
     source_asset_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("source_assets.id", ondelete="CASCADE"),
                                                        nullable=False, index=True)
     auto_analyze: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    params: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False,
+                                                   server_default="{}")  # p. ej. {"mode": "edit"}
 
 
 class AnalysisJob(_JobMixin, Base):

@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   BarChart3, Bot, Clapperboard, Film, LayoutDashboard, LayoutTemplate, Library, LogOut, Radio, Settings,
-  Tv, Upload,
+  Sparkles, Tv, Upload,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -23,7 +23,8 @@ const NAV = [
   { href: "/import", label: "Importar vídeo", icon: Upload },
   { href: "/clips", label: "Clips", icon: Clapperboard },
   { href: "/library", label: "Biblioteca", icon: Library },
-  { href: "/editor", label: "Editor", icon: Film },
+  { href: "/ai-editor", label: "Editor IA", icon: Sparkles },
+  { href: "/editor", label: "Editor manual", icon: Film },
   { href: "/templates", label: "Plantillas", icon: LayoutTemplate },
   { href: "/automations", label: "Automatizaciones", icon: Bot },
   { href: "/stats", label: "Estadísticas", icon: BarChart3 },
