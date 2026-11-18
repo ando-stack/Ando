@@ -94,6 +94,7 @@ function SocialAccounts() {
   const toast = useApp((s) => s.toast);
   const targets = useQuery({ queryKey: ["publish-targets"], queryFn: () => get<Target[]>("/oauth/publish-targets") });
   const [igToken, setIgToken] = useState("");
+  const [igAccount, setIgAccount] = useState("");
   const connect = async (platform: string) => {
     try {
       const r = await get<{ url: string }>(`/oauth/${platform}/start`);
@@ -101,8 +102,8 @@ function SocialAccounts() {
     } catch (e) { toast(e instanceof ApiError ? e.message : "Error", "error"); }
   };
   const saveIg = useMutation({
-    mutationFn: () => post("/oauth/instagram/token", { token: igToken }),
-    onSuccess: () => { setIgToken(""); toast("Cuenta de Instagram conectada", "ok"); qc.invalidateQueries({ queryKey: ["publish-targets"] }); qc.invalidateQueries({ queryKey: ["connections"] }); },
+    mutationFn: () => post("/oauth/instagram/token", { token: igToken, account_id: igAccount.trim() || null }),
+    onSuccess: () => { setIgToken(""); setIgAccount(""); toast("Cuenta de Instagram conectada", "ok"); qc.invalidateQueries({ queryKey: ["publish-targets"] }); qc.invalidateQueries({ queryKey: ["connections"] }); },
     onError: (e: ApiError) => toast(e.message, "error"),
   });
   const env: Record<string, string> = {
@@ -132,8 +133,13 @@ function SocialAccounts() {
       </div>
       <form className="flex flex-wrap items-end gap-2 border-t border-line p-4" onSubmit={(e) => { e.preventDefault(); if (igToken.trim()) saveIg.mutate(); }}>
         <div className="min-w-64 flex-1">
-          <Field label="O pega un token de Instagram" hint="Generado en developers.facebook.com → tu app → API de Instagram → «Generar token». Útil porque Instagram exige HTTPS para el botón Conectar.">
+          <Field label="O pega un token de Instagram" hint="Del panel de Meta (developers.facebook.com): el identificador de usuario del sistema del «inicio de sesión unificado» (EAA…, no caduca) o un token de Instagram (IG…).">
             <input className="input" type="password" value={igToken} onChange={(e) => setIgToken(e.target.value)} autoComplete="off" />
+          </Field>
+        </div>
+        <div className="w-56">
+          <Field label="ID de la cuenta (opcional)" hint="Solo si no la encuentra sola">
+            <input className="input" inputMode="numeric" value={igAccount} onChange={(e) => setIgAccount(e.target.value.replace(/\D/g, ""))} placeholder="1784…" />
           </Field>
         </div>
         <button className="btn-secondary" disabled={!igToken.trim() || saveIg.isPending}>{saveIg.isPending && <Spinner />}Guardar token</button>

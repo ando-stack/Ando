@@ -147,25 +147,44 @@ def disconnect(connection_id: uuid.UUID, request: Request, p: Principal = Depend
 
 class InstagramTokenIn(BaseModel):
     token: str = Field(min_length=20, max_length=1000)
+    account_id: str | None = Field(None, pattern=r"^\d{5,30}$")  # ID de la cuenta de Instagram (opcional)
 
 
 @router.post("/instagram/token")
 def instagram_token(body: InstagramTokenIn, request: Request, p: Principal = Depends(current_principal),
                     db: Session = Depends(get_db)):
-    """Alternativa sin redirección HTTPS: pegar el token generado en el panel de Meta para desarrolladores."""
+    """Conectar Instagram pegando un token del panel de Meta (sin redirección HTTPS).
+
+    Acepta tokens de «Instagram Login» (IG…, caducan a los 60 días y se renuevan solos) y tokens de
+    Facebook/Meta Business, como el identificador de usuario del sistema del inicio de sesión unificado
+    (EAA…, no caducan); en ese caso la cuenta de Instagram se busca sola o se indica su ID."""
     ig = InstagramClient()
     token = body.token.strip()
+    exp = None
+    scopes = ["content_publish"]
     try:
-        me = ig.me(token)
-        exp = None
-        try:
-            d = ig.refresh(token)  # alarga la validez a 60 días si el token ya es de larga duración
-            token, exp = d["access_token"], d.get("expires_at")
-        except PublishError:
-            pass
+        if token.startswith("IG"):
+            me = ig.me(token)
+            uid, username = str(me.get("user_id") or me.get("id")), me.get("username")
+            try:
+                d = ig.refresh(token)  # alarga la validez a 60 días si el token ya es de larga duración
+                token, exp = d["access_token"], d.get("expires_at")
+            except PublishError:
+                pass
+        else:
+            scopes.append("fb_graph")
+            if body.account_id:
+                acc = ig.account(token, body.account_id)
+            else:
+                accounts = ig.discover_accounts(token)
+                if not accounts:
+                    raise PublishError("no encuentro ninguna cuenta de Instagram con ese token. Comprueba que tu "
+                                       "Instagram profesional está añadido al portfolio empresarial y asignado al "
+                                       "usuario del sistema, o escribe el ID de la cuenta de Instagram")
+                acc = accounts[0]
+            uid, username = str(acc["id"]), acc.get("username")
     except PublishError as exc:
         raise HTTPException(422, f"Token de Instagram no válido: {exc}") from exc
-    uid = str(me.get("user_id") or me.get("id"))
     conn = db.scalar(select(ChannelConnection).where(ChannelConnection.workspace_id == p.workspace_id,
                                                      ChannelConnection.platform == "instagram",
                                                      ChannelConnection.kind == "oauth_user",
@@ -173,7 +192,7 @@ def instagram_token(body: InstagramTokenIn, request: Request, p: Principal = Dep
     if conn is None:
         conn = ChannelConnection(workspace_id=p.workspace_id, platform="instagram", kind="oauth_user")
         db.add(conn)
-    conn.external_user_id, conn.external_login, conn.scopes = uid, me.get("username"), ["content_publish"]
+    conn.external_user_id, conn.external_login, conn.scopes = uid, username, scopes
     conn.access_token_enc, conn.expires_at, conn.status, conn.last_error = encrypt(token), exp, "active", None
     db.commit()
     audit(db, p, "oauth.connected", "instagram", conn.id, request, method="token")

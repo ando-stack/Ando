@@ -211,6 +211,13 @@ IG_AUTH = "https://www.instagram.com/oauth/authorize"
 IG_GRAPH = "https://graph.instagram.com"
 IG_VERSION = "v21.0"
 IG_SCOPES = "instagram_business_basic,instagram_business_content_publish"
+FB_GRAPH = "https://graph.facebook.com"
+
+
+def graph_base(token: str) -> str:
+    """Tokens de «Instagram Login» (IG…) van a graph.instagram.com; los de Facebook/Meta Business
+    (p. ej. el identificador de usuario del sistema del inicio de sesión unificado, EAA…) a graph.facebook.com."""
+    return IG_GRAPH if token.startswith("IG") else FB_GRAPH
 
 
 class InstagramClient:
@@ -229,8 +236,9 @@ class InstagramClient:
         return f"{IG_AUTH}?" + urlencode({"client_id": self.app_id, "redirect_uri": redirect_uri,
                                          "response_type": "code", "scope": IG_SCOPES, "state": state})
 
-    def _get(self, path: str, params: dict) -> dict:
-        r = self.http.get(f"{IG_GRAPH}/{path}", params=params)
+    def _get(self, path: str, params: dict, base: str | None = None) -> dict:
+        base = base or graph_base(params.get("access_token", "") or "IG")
+        r = self.http.get(f"{base}/{path}", params=params)
         body = r.json() if r.content else {}
         if r.status_code >= 400 or "error" in body:
             e = body.get("error", {})
@@ -250,21 +258,52 @@ class InstagramClient:
 
     def long_lived(self, short_token: str) -> dict:
         body = self._get("access_token", {"grant_type": "ig_exchange_token", "client_secret": self.secret,
-                                          "access_token": short_token})
+                                          "access_token": short_token}, base=IG_GRAPH)
         body["expires_at"] = _expires(body.get("expires_in"))
         return body
 
     def refresh(self, token: str) -> dict:
-        body = self._get("refresh_access_token", {"grant_type": "ig_refresh_token", "access_token": token})
+        body = self._get("refresh_access_token", {"grant_type": "ig_refresh_token", "access_token": token},
+                         base=IG_GRAPH)
         body["expires_at"] = _expires(body.get("expires_in"))
         return body
 
     def me(self, token: str) -> dict:
-        return self._get(f"{IG_VERSION}/me", {"fields": "user_id,username,account_type", "access_token": token})
+        return self._get(f"{IG_VERSION}/me", {"fields": "user_id,username,account_type", "access_token": token},
+                         base=IG_GRAPH)
+
+    def account(self, token: str, ig_user_id: str) -> dict:
+        """Comprueba una cuenta profesional de Instagram con un token de Facebook/Meta Business."""
+        return self._get(f"{IG_VERSION}/{ig_user_id}", {"fields": "id,username", "access_token": token}, base=FB_GRAPH)
+
+    def discover_accounts(self, token: str) -> list[dict]:
+        """Cuentas de Instagram accesibles con un token de Facebook (páginas o portfolio empresarial)."""
+        found: dict[str, dict] = {}
+        queries = [
+            ("me/accounts", {"fields": "instagram_business_account{id,username}"}),
+            ("me", {"fields": "businesses{instagram_business_accounts{id,username},"
+                              "owned_instagram_accounts{id,username}}"}),
+        ]
+        for path, params in queries:
+            try:
+                body = self._get(f"{IG_VERSION}/{path}", {**params, "access_token": token}, base=FB_GRAPH)
+            except PublishError:
+                continue
+            for page in body.get("data", []):
+                acc = page.get("instagram_business_account")
+                if acc and acc.get("id"):
+                    found[acc["id"]] = acc
+            for biz in (body.get("businesses") or {}).get("data", []):
+                for edge in ("instagram_business_accounts", "owned_instagram_accounts"):
+                    for acc in (biz.get(edge) or {}).get("data", []):
+                        if acc.get("id"):
+                            found[acc["id"]] = acc
+        return list(found.values())
 
     def publish(self, token: str, ig_user_id: str, path: Path, caption: str, progress: Progress) -> PublishResult:
         size = path.stat().st_size
-        r = self.http.post(f"{IG_GRAPH}/{IG_VERSION}/{ig_user_id}/media", params={
+        base = graph_base(token)
+        r = self.http.post(f"{base}/{IG_VERSION}/{ig_user_id}/media", params={
             "media_type": "REELS", "upload_type": "resumable", "caption": caption[:2200], "share_to_feed": "true",
             "access_token": token})
         body = r.json() if r.content else {}
@@ -290,7 +329,7 @@ class InstagramClient:
                 raise PublishError(f"Instagram no pudo procesar el vídeo: {st.get('status', code)}")
         else:
             raise PublishError("Instagram tardó demasiado en procesar el vídeo", retryable=True)
-        pub = self.http.post(f"{IG_GRAPH}/{IG_VERSION}/{ig_user_id}/media_publish",
+        pub = self.http.post(f"{base}/{IG_VERSION}/{ig_user_id}/media_publish",
                              params={"creation_id": container, "access_token": token})
         pbody = pub.json() if pub.content else {}
         if pub.status_code >= 400 or "id" not in pbody:

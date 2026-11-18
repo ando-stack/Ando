@@ -104,7 +104,7 @@ def test_instagram_reel_flow(video, creds):
                                            httpx.Response(200, json={"status_code": "FINISHED"})])
         m.post(f"{g}/999/media_publish").respond(json={"id": "m1"})
         m.get(f"{g}/m1").respond(json={"permalink": "https://www.instagram.com/reel/XYZ/"})
-        res = P.InstagramClient().publish("tok", "999", video, "caption", lambda p, s: None)
+        res = P.InstagramClient().publish("IGAAtok", "999", video, "caption", lambda p, s: None)
         assert up.calls[0].request.headers["file_size"] == str(video.stat().st_size)
     assert res.url == "https://www.instagram.com/reel/XYZ/"
 
@@ -129,7 +129,7 @@ def test_publish_end_to_end_with_worker(auth_client, worker, creds, highlight_vi
         ws = db.scalar(select(Workspace))
         db.add(ChannelConnection(workspace_id=ws.id, platform="instagram", kind="oauth_user", external_user_id="999",
                                  external_login="mi_cuenta", scopes=["content_publish"],
-                                 access_token_enc=encrypt("ig-token")))
+                                 access_token_enc=encrypt("IGAA-token")))
         db.commit()
     g = f"{P.IG_GRAPH}/{P.IG_VERSION}"
     with respx.mock(assert_all_called=False) as m:
@@ -212,3 +212,43 @@ def test_twitch_clip_download_is_edited_and_publishable(auth_client, worker, hig
     assert clip["format"] == "9:16" and clip["versions"][0]["status"] == "ready"
     # sigue conservando el enlace oficial de Twitch
     assert clip["platform_clip_url"] == "https://clips.twitch.tv/ClipABC"
+
+
+def test_instagram_system_user_token_uses_facebook_graph(video, creds):
+    """Apps nuevas de Meta: identificador de usuario del sistema (EAA…) → graph.facebook.com."""
+    g = f"{P.FB_GRAPH}/{P.IG_VERSION}"
+    with respx.mock() as m:
+        m.post(f"{g}/178/media").respond(json={"id": "c2"})
+        m.post(f"https://rupload.facebook.com/ig-api-upload/{P.IG_VERSION}/c2").respond(json={"success": True})
+        m.get(f"{g}/c2").respond(json={"status_code": "FINISHED"})
+        m.post(f"{g}/178/media_publish").respond(json={"id": "m2"})
+        m.get(f"{g}/m2").respond(json={"permalink": "https://www.instagram.com/reel/BBB/"})
+        res = P.InstagramClient().publish("EAAsystemtoken", "178", video, "cap", lambda p, s: None)
+    assert res.url == "https://www.instagram.com/reel/BBB/"
+
+
+def test_instagram_token_endpoint_discovers_account(auth_client):
+    g = f"{P.FB_GRAPH}/{P.IG_VERSION}"
+    with respx.mock(assert_all_called=False) as m:
+        m.route(host="testserver").pass_through()
+        m.route(host="localhost").pass_through()
+        m.get(f"{g}/me/accounts").respond(400, json={"error": {"message": "not a user"}})
+        m.get(f"{g}/me").respond(json={"businesses": {"data": [{"instagram_business_accounts": {
+            "data": [{"id": "17841400000000", "username": "mi_cuenta_pro"}]}}]}})
+        r = auth_client.post("/api/oauth/instagram/token", json={"token": "EAA" + "x" * 40})
+    assert r.status_code == 200, r.text
+    assert r.json()["login"] == "mi_cuenta_pro" and "fb_graph" in r.json()["scopes"]
+    with respx.mock(assert_all_called=False) as m:
+        m.route(host="testserver").pass_through()
+        m.route(host="localhost").pass_through()
+        m.get(f"{g}/me/accounts").respond(json={"data": []})
+        m.get(f"{g}/me").respond(json={})
+        r = auth_client.post("/api/oauth/instagram/token", json={"token": "EAA" + "y" * 40})
+    assert r.status_code == 422 and "ID de la cuenta" in r.json()["detail"]
+    with respx.mock(assert_all_called=False) as m:
+        m.route(host="testserver").pass_through()
+        m.route(host="localhost").pass_through()
+        m.get(f"{g}/17841400000001").respond(json={"id": "17841400000001", "username": "otra"})
+        r = auth_client.post("/api/oauth/instagram/token",
+                             json={"token": "EAA" + "z" * 40, "account_id": "17841400000001"})
+    assert r.status_code == 200 and r.json()["login"] == "otra"
