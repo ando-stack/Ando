@@ -83,6 +83,9 @@ class Settings(BaseSettings):
     # Publicación en redes sociales
     tiktok_client_key: str = ""
     tiktok_client_secret: str = ""
+    # TikTok no admite redirecciones a localhost: se puede usar una página HTTPS puente que reenvía
+    # ?code=...&state=... a <PUBLIC_BASE_URL>/api/oauth/tiktok/callback (ver README).
+    tiktok_redirect_uri: str = ""
     instagram_app_id: str = ""
     instagram_app_secret: str = ""
 

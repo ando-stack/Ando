@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="robots" content="noindex"><title>StreamCut</title></head>
+<body style="font-family:sans-serif;text-align:center;padding:40px">
+<p>Volviendo a StreamCut&hellip;</p>
+<p><a id="l" href="#">Pulsa aqu&iacute; si no pasa nada</a></p>
+<script>
+  // Página puente: TikTok solo permite redirecciones HTTPS, así que reenvía el código a STREAMCUT en tu PC.
+  var destino = "http://localhost:3000/api/oauth/tiktok/callback" + location.search;
+  document.getElementById("l").href = destino;
+  location.replace(destino);
+</script>
+</body>
+</html>

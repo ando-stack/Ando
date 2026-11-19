@@ -25,7 +25,10 @@ router = APIRouter(prefix="/oauth", tags=["oauth"])
 
 
 def _redirect_uri(platform: str) -> str:
-    return f"{get_settings().public_base_url.rstrip('/')}/api/oauth/{platform}/callback"
+    s = get_settings()
+    if platform == "tiktok" and s.tiktok_redirect_uri.strip():
+        return s.tiktok_redirect_uri.strip()
+    return f"{s.public_base_url.rstrip('/')}/api/oauth/{platform}/callback"
 
 
 def conn_out(c: ChannelConnection) -> dict:

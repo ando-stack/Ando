@@ -252,3 +252,14 @@ def test_instagram_token_endpoint_discovers_account(auth_client):
         r = auth_client.post("/api/oauth/instagram/token",
                              json={"token": "EAA" + "z" * 40, "account_id": "17841400000001"})
     assert r.status_code == 200 and r.json()["login"] == "otra"
+
+
+def test_tiktok_redirect_uri_puente(monkeypatch):
+    from app.api.routes import oauth
+    from app.core.config import get_settings
+    s = get_settings()
+    monkeypatch.setattr(s, "tiktok_redirect_uri", "https://x.github.io/legal/tiktok.html")
+    assert oauth._redirect_uri("tiktok") == "https://x.github.io/legal/tiktok.html"
+    assert oauth._redirect_uri("youtube").endswith("/api/oauth/youtube/callback")
+    monkeypatch.setattr(s, "tiktok_redirect_uri", "")
+    assert oauth._redirect_uri("tiktok").endswith("/api/oauth/tiktok/callback")
