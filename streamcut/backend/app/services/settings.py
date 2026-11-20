@@ -48,7 +48,9 @@ DEFAULTS: dict[str, Any] = {
         "auto_save": True,
         "create_platform_clips": True,
         "clip_cooldown_s": 30,  # tiempo mínimo entre dos clips del mismo directo
-        "clip_delay_s": 8,  # espera tras la reacción del chat para que el clip incluya el momento completo
+        "clip_delay_s": 8,
+        # Clips solo por reacciones del chat (JAJAJA, W, KEKW…); si es True, también cuando el chat se acelera
+        "chat_rate_clips": False,  # espera tras la reacción del chat para que el clip incluya el momento completo
         "storage_policy": "keep_renders",
     },
     "ai_editor": {

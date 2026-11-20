@@ -75,7 +75,8 @@ class ChatSpikeDetector:
 
     def __init__(self, window_s: float = 10.0, baseline_s: float = 300.0, min_rate: float = 1.0,
                  z_threshold: float = 3.0, cooldown_s: float = 30.0, min_emotes: int = 8,
-                 emote_ratio: float = 0.5, small_chat_rate: float = 0.5):
+                 emote_ratio: float = 0.5, small_chat_rate: float = 0.5,
+                 rate_trigger: bool = True):
         self.window_s = window_s
         self.baseline_s = baseline_s
         self.min_rate = min_rate
@@ -84,6 +85,7 @@ class ChatSpikeDetector:
         self.min_emotes = min_emotes
         self.emote_ratio = emote_ratio
         self.small_chat_rate = small_chat_rate
+        self.rate_trigger = rate_trigger  # False: solo cuentan las ráfagas de reacciones
         self.times: list[float] = []
         self.flags: list[tuple[int, int]] = []
         self.tokens: list[str] = []
@@ -127,7 +129,7 @@ class ChatSpikeDetector:
         min_rate = min(self.min_rate, 0.5) if small else self.min_rate
         min_emotes = max(3, round(self.min_emotes / 2)) if small else self.min_emotes
         kind = None
-        if rate >= min_rate and z >= self.z_threshold:
+        if self.rate_trigger and rate >= min_rate and z >= self.z_threshold:
             kind = "rate"
         elif len(emo) >= min_emotes and ratio >= max(self.emote_ratio, base_ratio + 0.25):
             kind = "emotes"

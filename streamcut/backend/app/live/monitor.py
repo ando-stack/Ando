@@ -215,7 +215,8 @@ class Monitor:
         r.clip_delay = max(0.0, min(30.0, float(ap.get("clip_delay_s", 8))))
         r.chat = ChatSpikeDetector(z_threshold=3.0 / sens,
                                    cooldown_s=max(10.0, min(600.0, float(ap.get("clip_cooldown_s", 30)))),
-                                   min_emotes=max(4, round(8 / sens)))
+                                   min_emotes=max(4, round(8 / sens)),
+                                   rate_trigger=bool(ap.get("chat_rate_clips", False)))
         self.runners[sess.id] = r
         if ch.platform == "twitch":
             r.tasks.append(asyncio.create_task(twitch_chat(ch.external_id, lambda t, u, m: self._on_chat(r, t, m, u),

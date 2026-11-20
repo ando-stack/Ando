@@ -258,3 +258,19 @@ def test_small_chat_single_spammer_does_not_trigger():
         return hit
     assert run(["pepe"] * 6) is None
     assert run(["ana", "luis", "pepe", "ana", "luis", "pepe"]) is not None
+
+
+def test_only_reactions_when_rate_trigger_off():
+    """Con rate_trigger=False, el chat acelerado con mensajes normales no crea clips; las risas sí."""
+    def run(msg):
+        det = C.ChatSpikeDetector(rate_trigger=False)
+        t0, hit = 50000.0, None
+        for sec in range(250):
+            n = 12 if 200 <= sec < 210 else (1 if sec % 2 == 0 else 0)
+            for i in range(n):
+                det.add(t0 + sec + i / max(n, 1), msg if sec >= 200 else "hola", f"u{sec}-{i}")
+            if det.check(t0 + sec) and hit is None:
+                hit = sec
+        return hit
+    assert run("que dices tio") is None
+    assert run("KEKW") is not None

@@ -35,6 +35,7 @@ function AutopilotForm({ value, onChange, templates }: { value: AP; onChange: (v
         <Toggle checked={value.subtitles ?? true} onChange={(v) => set("subtitles", v)} label="Subtítulos" />
         <Toggle checked={value.auto_edit ?? true} onChange={(v) => set("auto_edit", v)} label="Edición automática" />
         <Toggle checked={value.auto_save ?? true} onChange={(v) => set("auto_save", v)} label="Renderizar y guardar automáticamente" />
+        <Toggle checked={value.chat_rate_clips ?? false} onChange={(v) => set("chat_rate_clips", v)} label="Clip también si el chat se acelera sin reacciones" />
         <Toggle checked={value.create_platform_clips ?? true} onChange={(v) => set("create_platform_clips", v)} label="Crear clips oficiales (Twitch, si está autorizado)" />
       </div>
       <div>
