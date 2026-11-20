@@ -67,11 +67,14 @@ class ChatSpikeDetector:
     - "rate": el chat va mucho más rápido de lo normal (mensajes/s frente a los últimos minutos), o
     - "emotes": el chat se llena de golpe de spam de reacción ("W", "KEKW", "POG", "JAJAJA"…) aunque
       la velocidad apenas cambie (canales con el chat siempre rápido).
+
+    Los umbrales se adaptan al tamaño del chat: en canales pequeños (menos de ``small_chat_rate``
+    mensajes/s de media) bastan ráfagas más cortas (unos 5–6 mensajes o 3–4 reacciones seguidas).
     """
 
     def __init__(self, window_s: float = 10.0, baseline_s: float = 300.0, min_rate: float = 1.0,
                  z_threshold: float = 3.0, cooldown_s: float = 30.0, min_emotes: int = 8,
-                 emote_ratio: float = 0.5):
+                 emote_ratio: float = 0.5, small_chat_rate: float = 0.5):
         self.window_s = window_s
         self.baseline_s = baseline_s
         self.min_rate = min_rate
@@ -79,6 +82,7 @@ class ChatSpikeDetector:
         self.cooldown_s = cooldown_s
         self.min_emotes = min_emotes
         self.emote_ratio = emote_ratio
+        self.small_chat_rate = small_chat_rate
         self.times: list[float] = []
         self.flags: list[tuple[int, int]] = []
         self.tokens: list[str] = []
@@ -110,13 +114,18 @@ class ChatSpikeDetector:
             return None
         base = np.array(self.rates[:-3] or [0.0])
         med = float(np.median(base))
-        mad = float(np.median(np.abs(base - med)) * 1.4826) or max(0.3, med * 0.5)
+        small = med < self.small_chat_rate
+        floor = 0.15 if small else 0.3
+        mad = max(float(np.median(np.abs(base - med)) * 1.4826), floor) if small else \
+            (float(np.median(np.abs(base - med)) * 1.4826) or max(floor, med * 0.5))
         z = (rate - med) / mad
         base_ratio = float(np.median(self.ratios[:-3] or [0.0]))
+        min_rate = min(self.min_rate, 0.5) if small else self.min_rate
+        min_emotes = max(3, round(self.min_emotes / 2)) if small else self.min_emotes
         kind = None
-        if rate >= self.min_rate and z >= self.z_threshold:
+        if rate >= min_rate and z >= self.z_threshold:
             kind = "rate"
-        elif len(emo) >= self.min_emotes and ratio >= max(self.emote_ratio, base_ratio + 0.25):
+        elif len(emo) >= min_emotes and ratio >= max(self.emote_ratio, base_ratio + 0.25):
             kind = "emotes"
         if kind is None:
             return None

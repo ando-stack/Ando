@@ -209,3 +209,35 @@ def test_normal_chat_with_some_w_does_not_trigger():
         if det.check(t0 + sec):
             fired.append(sec)
     assert fired == []
+
+
+def test_small_chat_burst_triggers():
+    """Canal pequeño (un mensaje cada ~15 s): una ráfaga de 6 risas en 10 s ya cuenta como momento."""
+    det = C.ChatSpikeDetector()
+    t0 = 20000.0
+    found = None
+    for sec in range(400):
+        if 300 <= sec < 306:
+            det.add(t0 + sec, ["JAJAJA", "jajaja", "KEKW", "XD", "jajajaja", "LUL"][sec - 300])
+        elif sec % 15 == 0:
+            det.add(t0 + sec, "buenas")
+        s = det.check(t0 + sec)
+        if s and found is None:
+            found = (sec, s)
+    assert found is not None and 300 <= found[0] <= 310, found
+
+
+def test_small_chat_normal_messages_do_not_trigger():
+    """En un chat pequeño, dos o tres mensajes seguidos de vez en cuando no crean clips."""
+    det = C.ChatSpikeDetector()
+    t0 = 30000.0
+    fired = []
+    for sec in range(900):
+        if sec % 40 == 0:
+            for k in range(3):
+                det.add(t0 + sec + k, ["hola", "que tal", "buenas"][k])
+        elif sec % 13 == 0:
+            det.add(t0 + sec, "jaja")
+        if det.check(t0 + sec):
+            fired.append(sec)
+    assert fired == [], fired

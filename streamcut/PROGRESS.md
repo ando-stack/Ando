@@ -42,7 +42,7 @@ Leyenda: ✅ implementado y verificado con pruebas · 🟡 implementado, verific
 ## Añadido después de la primera versión
 
 - ✅ Varios canales monitorizados a la vez desde la pantalla Directos (barra de canales, «Monitorizar todos los que estén en directo»).
-- ✅ Clips de Twitch por spam de reacciones en el chat (W, KEKW, POG, JAJAJA…), tiempo mínimo entre clips (30 s por defecto) y espera configurable antes de crear el clip para incluir el momento completo (`has_delay` de Twitch).
+- ✅ Clips de Twitch por spam de reacciones en el chat (W, KEKW, POG, JAJAJA…; umbrales adaptados a chats pequeños), tiempo mínimo entre clips (30 s por defecto) y espera configurable antes de crear el clip para incluir el momento completo (`has_delay` de Twitch).
 - ✅ Filtro por streamer en Clips.
 - 🟡 Publicación en YouTube Shorts, TikTok e Instagram Reels (botón «Publicar», cola `publish`, estado y enlace de cada publicación). Probado con las respuestas oficiales simuladas; falta probarlo con apps y cuentas reales.
 
