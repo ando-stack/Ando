@@ -218,10 +218,10 @@ class Monitor:
                                    min_emotes=max(4, round(8 / sens)))
         self.runners[sess.id] = r
         if ch.platform == "twitch":
-            r.tasks.append(asyncio.create_task(twitch_chat(ch.external_id, lambda t, u, m: self._on_chat(r, t, m),
+            r.tasks.append(asyncio.create_task(twitch_chat(ch.external_id, lambda t, u, m: self._on_chat(r, t, m, u),
                                                            r.stop)))
         elif ch.platform == "youtube" and ch.live_video_id:
-            r.tasks.append(asyncio.create_task(youtube_chat(ch.live_video_id, lambda t, u, m: self._on_chat(r, t, m),
+            r.tasks.append(asyncio.create_task(youtube_chat(ch.live_video_id, lambda t, u, m: self._on_chat(r, t, m, u),
                                                             r.stop, on_error=lambda e: setattr(r, "note", e))))
         r.tasks.append(asyncio.create_task(self._chat_loop(r)))
         r.status = "monitoring"
@@ -241,9 +241,9 @@ class Monitor:
         self._publish_stats(r)
         write_log(r.workspace_id, "live", r.session_id, "info", "Monitorización detenida")
 
-    def _on_chat(self, r: SessionRunner, t: float, text: str) -> None:
+    def _on_chat(self, r: SessionRunner, t: float, text: str, user: str | None = None) -> None:
         r.chat_count += 1
-        r.chat.add(t, text)
+        r.chat.add(t, text, user)
         rel = t - (r.ingest.started_wall if r.ingest else r.started)
         r.chat_log.append((rel, text))
         if len(r.chat_log) > 20000:

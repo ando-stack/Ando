@@ -241,3 +241,20 @@ def test_small_chat_normal_messages_do_not_trigger():
         if det.check(t0 + sec):
             fired.append(sec)
     assert fired == [], fired
+
+
+def test_small_chat_single_spammer_does_not_trigger():
+    """Canal pequeño: una sola persona escribiendo JAJAJA seis veces no crea un clip; tres personas sí."""
+    def run(users):
+        det = C.ChatSpikeDetector()
+        t0, hit = 40000.0, None
+        for sec in range(400):
+            if 300 <= sec < 306:
+                det.add(t0 + sec, "JAJAJA", users[sec - 300])
+            elif sec % 15 == 0:
+                det.add(t0 + sec, "buenas", f"u{sec}")
+            if det.check(t0 + sec) and hit is None:
+                hit = sec
+        return hit
+    assert run(["pepe"] * 6) is None
+    assert run(["ana", "luis", "pepe", "ana", "luis", "pepe"]) is not None

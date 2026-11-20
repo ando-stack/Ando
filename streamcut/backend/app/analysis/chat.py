@@ -69,7 +69,8 @@ class ChatSpikeDetector:
       la velocidad apenas cambie (canales con el chat siempre rápido).
 
     Los umbrales se adaptan al tamaño del chat: en canales pequeños (menos de ``small_chat_rate``
-    mensajes/s de media) bastan ráfagas más cortas (unos 5–6 mensajes o 3–4 reacciones seguidas).
+    mensajes/s de media) bastan ráfagas más cortas (unos 5–6 mensajes o 3–4 reacciones seguidas) de al
+    menos 3 personas distintas.
     """
 
     def __init__(self, window_s: float = 10.0, baseline_s: float = 300.0, min_rate: float = 1.0,
@@ -86,11 +87,13 @@ class ChatSpikeDetector:
         self.times: list[float] = []
         self.flags: list[tuple[int, int]] = []
         self.tokens: list[str] = []
+        self.users: list[str | None] = []
         self.rates: list[float] = []
         self.ratios: list[float] = []
         self.last_spike = -1e9
 
-    def add(self, t: float, text: str) -> None:
+    def add(self, t: float, text: str, user: str | None = None) -> None:
+        self.users.append(user)
         flags = classify(text)
         self.times.append(t)
         self.flags.append(flags)
@@ -102,6 +105,7 @@ class ChatSpikeDetector:
             self.times.pop(0)
             self.flags.pop(0)
             self.tokens.pop(0)
+            self.users.pop(0)
         recent = [i for i, t in enumerate(self.times) if t >= now - self.window_s]
         rate = len(recent) / self.window_s
         emo = [i for i in recent if any(self.flags[i])]
@@ -128,6 +132,10 @@ class ChatSpikeDetector:
         elif len(emo) >= min_emotes and ratio >= max(self.emote_ratio, base_ratio + 0.25):
             kind = "emotes"
         if kind is None:
+            return None
+        # En chats pequeños, una sola persona spameando no es un momento: hacen falta al menos 3 personas
+        names = {self.users[i] for i in recent if self.users[i]}
+        if small and names and len(names) < 3:
             return None
         self.last_spike = now
         laugh = sum(self.flags[i][0] for i in recent)
