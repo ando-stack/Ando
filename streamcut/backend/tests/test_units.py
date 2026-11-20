@@ -274,3 +274,19 @@ def test_only_reactions_when_rate_trigger_off():
         return hit
     assert run("que dices tio") is None
     assert run("KEKW") is not None
+
+
+def test_rate_factor_5_2():
+    """Chat a 1 msg/s de media: ×4 más rápido no crea clip; ×6 sí (umbral ×5.2)."""
+    def run(burst):
+        det = C.ChatSpikeDetector(rate_factor=5.2)
+        t0, hit = 60000.0, None
+        for sec in range(260):
+            n = burst if 200 <= sec < 215 else 1
+            for i in range(n):
+                det.add(t0 + sec + i / n, "que tal", f"u{sec}-{i}")
+            if det.check(t0 + sec) and hit is None:
+                hit = sec
+        return hit
+    assert run(4) is None
+    assert run(6) is not None

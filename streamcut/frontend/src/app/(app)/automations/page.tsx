@@ -29,13 +29,16 @@ function AutopilotForm({ value, onChange, templates }: { value: AP; onChange: (v
         <Field label={`Espera antes de crear el clip: ${value.clip_delay_s ?? 8} s`} hint="Tras la reacción del chat, para que el clip incluya el momento completo">
           <input type="range" min={0} max={20} step={1} value={value.clip_delay_s ?? 8} onChange={(e) => set("clip_delay_s", +e.target.value)} className="w-full accent-[var(--color-accent)]" />
         </Field>
+        <Field label={`Aceleración del chat para clip: ×${Number(value.chat_rate_factor ?? 5.2).toFixed(1)}`} hint="Cuántas veces más rápido que lo normal tiene que ir el chat">
+          <input type="range" min={2} max={10} step={0.1} value={value.chat_rate_factor ?? 5.2} onChange={(e) => set("chat_rate_factor", +e.target.value)} className="w-full accent-[var(--color-accent)]" />
+        </Field>
         <Field label="Plantilla"><Select value={value.template_slug ?? "gaming-viral"} onChange={(v) => set("template_slug", v)} options={templates.map((t) => ({ value: t.slug, label: t.name }))} /></Field>
       </div>
       <div className="flex flex-wrap gap-5">
         <Toggle checked={value.subtitles ?? true} onChange={(v) => set("subtitles", v)} label="Subtítulos" />
         <Toggle checked={value.auto_edit ?? true} onChange={(v) => set("auto_edit", v)} label="Edición automática" />
         <Toggle checked={value.auto_save ?? true} onChange={(v) => set("auto_save", v)} label="Renderizar y guardar automáticamente" />
-        <Toggle checked={value.chat_rate_clips ?? false} onChange={(v) => set("chat_rate_clips", v)} label="Clip también si el chat se acelera sin reacciones" />
+        <Toggle checked={value.chat_rate_clips ?? true} onChange={(v) => set("chat_rate_clips", v)} label={`Clip también si el chat va ×${Number(value.chat_rate_factor ?? 5.2).toFixed(1)} más rápido de lo normal`} />
         <Toggle checked={value.create_platform_clips ?? true} onChange={(v) => set("create_platform_clips", v)} label="Crear clips oficiales (Twitch, si está autorizado)" />
       </div>
       <div>
