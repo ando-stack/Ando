@@ -39,7 +39,7 @@ from app.db.models import (
 from app.db.session import get_db
 from app.media.editspec import EditSpec
 from app.services.jobs import job_dict
-from app.services.pipeline import media_of, queue_render, words_in
+from app.services.pipeline import face_track_cache, media_of, queue_render, words_in
 from app.services.retention import purge_clip
 from app.storage import get_storage
 
@@ -406,8 +406,10 @@ def edit_state(clip_id: uuid.UUID, p: Principal = Depends(current_principal), db
     wf = media_of(db, src.id, "waveform")
     first, last = min(s.start for s in spec.segments), max(s.end for s in spec.segments)
     ctx_a, ctx_b = max(0.0, first - 30), min(src.duration or last, last + 30)
-    an = db.scalar(select(AnalysisJob).where(AnalysisJob.source_asset_id == src.id, AnalysisJob.status == "succeeded")
-                   .order_by(AnalysisJob.created_at.desc()))
+    an = next((j for j in db.scalars(select(AnalysisJob).where(AnalysisJob.source_asset_id == src.id,
+                                                                AnalysisJob.status == "succeeded")
+                                       .order_by(AnalysisJob.created_at.desc()).limit(10))
+               if (j.result or {}).get("webcam_region")), None)
     ops = db.scalar(select(func.count(EditOperation.id)).where(EditOperation.edit_project_id == proj.id))
     return {"clip": clip_out(db, c), "spec": proj.current_spec, "head_seq": proj.head_seq, "operations": ops,
             "dirty": proj.current_spec != (db.get(ClipVersion, c.current_version_id).edit_spec
@@ -417,6 +419,51 @@ def edit_state(clip_id: uuid.UUID, p: Principal = Depends(current_principal), db
                        "waveform_url": media_url(wf), "context_start": ctx_a, "context_end": ctx_b,
                        "webcam_region": (an.result or {}).get("webcam_region") if an else None},
             "words": words_in(db, src.id, ctx_a, ctx_b)}
+
+
+def _clip_faces(db: Session, p: Principal, clip_id: uuid.UUID):
+    from app.media import facetrack
+    c = _clip(db, p, clip_id)
+    spec = EditSpec.model_validate(_project(db, c).current_spec)
+    src = db.get(SourceAsset, uuid.UUID(spec.source_asset_id))
+    if src is None or src.workspace_id != p.workspace_id or not src.storage_key:
+        raise HTTPException(410, "El vídeo original ya no existe")
+    a = max(0.0, min(s.start for s in spec.segments) - 2)
+    b = max(s.end for s in spec.segments) + 2
+    with get_storage().as_local(src.storage_key) as path:
+        dets = facetrack.detections(path, a, b, src.width, src.height, face_track_cache(src.id))
+    return spec, src, dets
+
+
+@router.get("/{clip_id}/face-track")
+def face_track(clip_id: uuid.UUID, p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
+    """Trayectoria de la cara para la vista previa del editor (la misma que usará el render)."""
+    from app.media import facetrack
+    spec, _, dets = _clip_faces(db, p, clip_id)
+    lay = spec.layout
+    zone = lay.webcam.model_dump() if lay.mode == "split" and lay.webcam else None
+    main = facetrack.build_track(dets)
+    cam = facetrack.build_track(dets, zone=zone) if zone else []
+    seen = sum(1 for _, f in dets if f)
+    return {"main": main, "webcam": cam, "frames": len(dets), "frames_with_face": seen}
+
+
+@router.get("/{clip_id}/auto-frame")
+def auto_frame(clip_id: uuid.UUID, p: Principal = Depends(current_principal), db: Session = Depends(get_db)):
+    """Encuadre sugerido: pantalla dividida si hay una webcam superpuesta; si no, vertical que sigue la cara."""
+    from app.media import facetrack
+    _, src, dets = _clip_faces(db, p, clip_id)
+    cam = facetrack.webcam_from_detections(dets)
+    if cam is None:
+        for an in db.scalars(select(AnalysisJob).where(AnalysisJob.source_asset_id == src.id,
+                                                       AnalysisJob.status == "succeeded")
+                             .order_by(AnalysisJob.created_at.desc()).limit(10)):
+            if (an.result or {}).get("webcam_region"):
+                cam = an.result["webcam_region"]
+                break
+    faces = sum(1 for _, f in dets if f)
+    return {"mode": "split" if cam else ("crop" if faces else "fit_blur"), "webcam": cam,
+            "face_track": bool(cam or faces), "frames": len(dets), "frames_with_face": faces}
 
 
 @router.post("/{clip_id}/edit/ops")

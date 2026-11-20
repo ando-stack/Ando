@@ -98,7 +98,7 @@ export interface SubtitleStyle {
 export interface EditSpec {
   version: number; source_asset_id: string; segments: Segment[]; format: "9:16" | "16:9" | "1:1";
   quality: "1080p" | "720p";
-  layout: { mode: "fit_blur" | "crop" | "split" | "fit_black"; main: Region; webcam: Region | null; split_ratio: number };
+  layout: { mode: "fit_blur" | "crop" | "split" | "fit_black"; main: Region; webcam: Region | null; split_ratio: number; face_track?: boolean };
   zoom: { enabled: boolean; punch_ins: { t: number; duration: number; scale: number }[] };
   subtitles: { enabled: boolean; style: SubtitleStyle; cues: Cue[] };
   audio: { normalize: boolean; target_lufs: number; limiter: boolean; denoise: boolean; gain_db: number };

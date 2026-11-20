@@ -44,6 +44,9 @@ class Layout(BaseModel):
     main: Region = Field(default_factory=Region)  # zona principal (gameplay / cara)
     webcam: Region | None = None  # zona de la webcam para split screen
     split_ratio: float = Field(0.38, ge=0.2, le=0.6)  # proporción superior ocupada por la webcam
+    # Seguimiento de cara: en «crop» el encuadre sigue a la cara; en «split», la parte de arriba sigue a
+    # la cara dentro de la zona de la webcam. La trayectoria se calcula al renderizar.
+    face_track: bool = False
 
 
 class PunchIn(BaseModel):

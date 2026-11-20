@@ -312,7 +312,20 @@ def run_ai_edit(job_id: uuid.UUID) -> None:
             an = db.scalar(select(AnalysisJob).where(AnalysisJob.source_asset_id == asset.id,
                                                      AnalysisJob.kind == "full", AnalysisJob.status == "succeeded")
                            .order_by(AnalysisJob.created_at.desc()))
-            res = an.result if an else {}
+            res = dict(an.result or {}) if an else {}
+            if not res.get("webcam_region"):
+                # Clip subido para editar (sin análisis completo): busca la webcam en el propio clip
+                from app.media import facetrack
+                from app.services.pipeline import face_track_cache
+                try:
+                    with storage.as_local(asset.storage_key) as srcp:
+                        dets = facetrack.detections(srcp, start, end, asset.width, asset.height,
+                                                    face_track_cache(asset.id))
+                    res["webcam_region"] = facetrack.webcam_from_detections(dets)
+                    res["faces"] = res.get("faces") or [(t, cx - w / 2, cy - h / 2, w, h)
+                                                        for t, fs in dets[::8] for (cx, cy, w, h) in fs]
+                except Exception as exc:
+                    log.warning("No se pudo buscar la webcam: %s", exc)
             tpl = get_template(db, clip.workspace_id, slug=opts["style"]) or \
                 get_template(db, clip.workspace_id, slug="gaming-viral")
             plan = plan_edit(asset_id=str(asset.id), start=start, end=end, words=words_in(db, asset.id, start, end),
@@ -333,7 +346,7 @@ def run_ai_edit(job_id: uuid.UUID) -> None:
             plan.summary["processing_seconds"] = round(time.monotonic() - t0, 2)
             plan.summary["version"] = n
             publish(clip.workspace_id, "clip", {"id": str(clip.id), "status": clip.status, "title": clip.title})
-        ctx.finish("succeeded", result=plan.summary)
+        ctx.finish("succeeded", result={**plan.summary, "webcam_region": res.get("webcam_region")})
     except Exception as exc:
         log.exception("Edición IA fallida")
         ctx.log("error", f"Edición IA fallida: {exc}")

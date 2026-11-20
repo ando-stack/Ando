@@ -72,7 +72,7 @@ STREAMCUT no trae credenciales. Sin ellas el reproductor y el chat de Twitch fun
 
 Sección **Editor IA** del menú. Edita clips completos de forma automática y profesional:
 
-- **Encuadre vertical** (o 1:1 / 16:9): webcam arriba y juego abajo si detecta webcam; si no, cara centrada o fondo difuminado.
+- **Encuadre vertical** (o 1:1 / 16:9): webcam arriba y juego abajo si detecta webcam; si no, encuadre que sigue la cara o fondo difuminado.
 - **Corta los silencios muertos** (jump cuts) sin partir palabras.
 - **Subtítulos en las frases clave** («de vez en cuando»), en mayúsculas y con la palabra activa resaltada; o todo, o ninguno.
 - **Pocos emotes** (1-2 por defecto) colocados en las reacciones reales: risas 😂, gritos 😱, victorias 🔥, fallos 💀…
@@ -82,6 +82,15 @@ Cómo usarlo:
 1. En **Clips** (o **Biblioteca**) marca uno o varios clips y pulsa **Enviar al Editor IA**.
 2. O, en **Editor IA**, arrastra tus propios clips (MP4, MOV, MKV, WEBM): se suben y se editan enteros.
 3. Cada resultado se puede **ver, descargar, publicar** o **retocar a mano** en el editor manual. «Editar de nuevo» crea otra versión con las opciones actuales; las anteriores se conservan.
+
+## Editor manual: encuadre y seguimiento de cara
+
+En **Editor manual → Encuadre**:
+- **Encuadre automático**: si hay una webcam superpuesta, pone **la cara arriba y el gameplay abajo** (pantalla dividida); si no, un **vertical que sigue la cara**.
+- **Seguimiento de cara**: la zona de la cara se mueve con el streamer a lo largo del clip (suave, sin temblores). En pantalla dividida sigue la cara dentro de la zona de la webcam.
+- **Zonas sobre la imagen**: arrastra el recuadro morado (gameplay / zona visible) y el azul (cara / webcam) sobre el fotograma; la esquina cambia el tamaño. «Altura de la cara arriba» reparte la pantalla.
+
+Las caras se detectan con YuNet (OpenCV Zoo, licencia MIT, `backend/app/media/assets/models/NOTICE.md`).
 
 Los clips oficiales de Twitch sin vídeo hay que descargarlos antes (botón de la nube en su tarjeta; solo propietario o editores del canal). Los emotes son imágenes de Noto Emoji (Google, licencia Apache 2.0, ver `backend/app/media/assets/emoji/NOTICE.md`).
 

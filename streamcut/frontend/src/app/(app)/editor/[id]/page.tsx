@@ -2,13 +2,14 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft, Captions, Combine, Crop, Download, Film, Pause, Play, Plus, Redo2, RotateCcw, Save, Scissors, Trash2,
-  Undo2, Volume2, ZoomIn,
+  ArrowLeft, Captions, Combine, Crop, Download, Film, Pause, Play, Plus, Redo2, RotateCcw, Save, Scissors, ScanFace,
+  Trash2, Undo2, Volume2, Wand2, ZoomIn,
 } from "lucide-react";
 import Link from "next/link";
 import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ClipStatus } from "@/components/ClipCard";
-import { Preview, type PreviewHandle } from "@/components/editor/Preview";
+import { type FaceTrack, Preview, type PreviewHandle } from "@/components/editor/Preview";
+import { RegionPicker } from "@/components/editor/RegionPicker";
 import { Timeline } from "@/components/editor/Timeline";
 import { Badge, Card, Field, Progress, Select, Spinner, Toggle } from "@/components/ui";
 import { ApiError, get, post } from "@/lib/api";
@@ -95,6 +96,27 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const seqRef = useRef(0);
   const committed = useRef<EditSpec | null>(null);
   const initialSeek = useRef(false);
+
+  const trackKey = spec ? JSON.stringify([spec.layout.mode, spec.layout.webcam, spec.segments]) : "";
+  const faceTrack = useQuery({
+    queryKey: ["face-track", id, trackKey],
+    queryFn: () => get<FaceTrack & { frames: number; frames_with_face: number }>(`/clips/${id}/face-track`),
+    enabled: !!spec?.layout.face_track && (spec.layout.mode === "crop" || spec.layout.mode === "split"),
+    staleTime: Infinity, retry: false, placeholderData: (prev) => prev,
+  });
+
+  const autoFrame = useMutation({
+    mutationFn: () => get<{ mode: EditSpec["layout"]["mode"]; webcam: (Region & { confidence?: number }) | null; face_track: boolean; frames_with_face: number }>(`/clips/${id}/auto-frame`),
+    onSuccess: (r) => {
+      apply("auto_frame", (s) => {
+        s.layout = { ...s.layout, mode: r.mode, main: { x: 0, y: 0, w: 1, h: 1 }, face_track: r.face_track,
+          webcam: r.webcam ? { x: r.webcam.x, y: r.webcam.y, w: r.webcam.w, h: r.webcam.h } : s.layout.webcam };
+        return s;
+      });
+      toast(r.mode === "split" ? "Webcam encontrada: cara arriba y gameplay abajo" : r.mode === "crop" ? "Encuadre vertical siguiendo la cara" : "No se ve ninguna cara: vídeo completo con fondo difuminado", r.mode === "fit_blur" ? "info" : "ok");
+    },
+    onError: (e) => toast(e instanceof ApiError ? e.message : "No se pudo analizar el vídeo", "error"),
+  });
 
   useEffect(() => {
     if (state.data && !spec) {
@@ -273,7 +295,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0 space-y-3">
           <Card className="grid h-[min(62dvh,640px)] place-items-center bg-[radial-gradient(ellipse_at_center,#1b1e25,#0d0e11)] p-4">
-            <Preview ref={preview} spec={spec} src={src.video_url} srcAspect={srcAspect} outTime={outTime} sourceTime={time} />
+            <Preview ref={preview} spec={spec} src={src.video_url} srcAspect={srcAspect} outTime={outTime} sourceTime={time} track={faceTrack.data} />
           </Card>
           <Card className="space-y-3 p-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -322,21 +344,53 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               <Field label="Composición">
                 <Select value={spec.layout.mode} onChange={(v) => apply("layout_mode", (s) => { s.layout.mode = v as EditSpec["layout"]["mode"]; if (v === "split" && !s.layout.webcam) s.layout.webcam = src.webcam_region ?? { x: 0.7, y: 0.05, w: 0.28, h: 0.3 }; return s; })}
                   options={[{ value: "fit_blur", label: "Completo con fondo difuminado" }, { value: "crop", label: "Reencuadre (recorte)" },
-                    { value: "split", label: "Split screen (webcam + gameplay)" }, { value: "fit_black", label: "Completo con bandas" }]} />
+                    { value: "split", label: "Pantalla dividida (cara arriba + gameplay abajo)" }, { value: "fit_black", label: "Completo con bandas" }]} />
               </Field>
-              {src.webcam_region && <p className="text-[11px] text-ok">Webcam detectada automáticamente ({Math.round((src.webcam_region as any).confidence * 100)} % de las muestras).</p>}
-              {spec.layout.mode !== "fit_black" && (
-                <RegionEditor label={spec.layout.mode === "split" ? "Zona principal (gameplay)" : "Zona visible"} region={spec.layout.main}
-                  onChange={(r, final) => apply("reframe_main", (s) => { s.layout.main = r; return s; }, final)} />
+              <button className="btn-secondary w-full" disabled={autoFrame.isPending} onClick={() => autoFrame.mutate()}>
+                {autoFrame.isPending ? <Spinner /> : <Wand2 className="h-4 w-4" />}{autoFrame.isPending ? "Buscando la cara…" : "Encuadre automático"}</button>
+              <p className="text-[11px] text-faint">Si hay una webcam en el vídeo: cara arriba y gameplay abajo. Si no: vertical que sigue la cara.</p>
+              {(spec.layout.mode === "crop" || spec.layout.mode === "split") && (
+                <div className="space-y-1">
+                  <Toggle checked={!!spec.layout.face_track} onChange={(v) => apply("face_track", (s) => { s.layout.face_track = v; return s; })}
+                    label={<span className="inline-flex items-center gap-1.5"><ScanFace className="h-4 w-4" />Seguimiento de cara</span>} />
+                  {spec.layout.face_track && (
+                    <p className="pl-11 text-[11px] text-faint">
+                      {faceTrack.isFetching ? "Buscando la cara en el clip…" : faceTrack.isError ? "No se pudo analizar el vídeo." :
+                        faceTrack.data && !(spec.layout.mode === "split" ? faceTrack.data.webcam : faceTrack.data.main).length
+                          ? (spec.layout.mode === "split" ? "No veo una cara dentro de la zona de la webcam: ajusta el recuadro azul." : "No se ve una cara clara en este clip: el encuadre se queda fijo.")
+                          : spec.layout.mode === "split" ? "La parte de arriba sigue a la cara dentro de la webcam." : "El encuadre sigue a la cara durante todo el clip."}
+                    </p>
+                  )}
+                </div>
               )}
-              {spec.layout.mode === "split" && spec.layout.webcam && (<>
-                <RegionEditor label="Zona de la webcam" region={spec.layout.webcam} onChange={(r, final) => apply("reframe_webcam", (s) => { s.layout.webcam = r; return s; }, final)} />
-                <Field label={`Altura de la webcam: ${Math.round(spec.layout.split_ratio * 100)} %`}>
+              {spec.layout.mode !== "fit_black" && (
+                <div className="space-y-1.5">
+                  <span className="label">Zonas (arrastra para mover · esquina para cambiar el tamaño)</span>
+                  <RegionPicker src={src.video_url} time={time} srcAspect={srcAspect}
+                    boxes={[{ key: "main", label: spec.layout.mode === "split" ? "Gameplay" : spec.layout.face_track && spec.layout.mode === "crop" ? "Tamaño del encuadre" : "Zona visible", color: "#8b5cf6", region: spec.layout.main },
+                      ...(spec.layout.mode === "split" && spec.layout.webcam ? [{ key: "webcam", label: "Cara / webcam", color: "#22d3ee", region: spec.layout.webcam }] : [])]}
+                    onChange={(key, r, final) => apply(key === "webcam" ? "reframe_webcam" : "reframe_main", (s) => { if (key === "webcam") s.layout.webcam = r; else s.layout.main = r; return s; }, final)} />
+                </div>
+              )}
+              {spec.layout.mode === "split" && spec.layout.webcam && (
+                <Field label={`Altura de la cara arriba: ${Math.round(spec.layout.split_ratio * 100)} %`}>
                   <input type="range" min={0.2} max={0.6} step={0.01} value={spec.layout.split_ratio} className="w-full accent-[var(--color-accent)]"
                     onChange={(e) => apply("split_ratio", (s) => { s.layout.split_ratio = +e.target.value; return s; }, false)}
                     onPointerUp={() => apply("split_ratio", (s) => s)} />
                 </Field>
-              </>)}
+              )}
+              {spec.layout.mode !== "fit_black" && (
+                <details className="rounded-lg border border-line p-2.5">
+                  <summary className="cursor-pointer text-xs text-muted">Ajuste fino con números</summary>
+                  <div className="mt-3 space-y-4">
+                    <RegionEditor label={spec.layout.mode === "split" ? "Zona principal (gameplay)" : "Zona visible"} region={spec.layout.main}
+                      onChange={(r, final) => apply("reframe_main", (s) => { s.layout.main = r; return s; }, final)} />
+                    {spec.layout.mode === "split" && spec.layout.webcam && (
+                      <RegionEditor label="Zona de la webcam" region={spec.layout.webcam} onChange={(r, final) => apply("reframe_webcam", (s) => { s.layout.webcam = r; return s; }, final)} />
+                    )}
+                  </div>
+                </details>
+              )}
               <Field label="Calidad de exportación"><Select value={spec.quality} onChange={(v) => apply("quality", (s) => { s.quality = v as EditSpec["quality"]; return s; })}
                 options={[{ value: "1080p", label: "1080p" }, { value: "720p", label: "720p (más rápido)" }]} /></Field>
             </>)}

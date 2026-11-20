@@ -31,18 +31,20 @@ class VisualFeatures:
     face_ratio: float = 0.0
 
 
-def _frames(path: Path, fps: float, width: int, height: int):
+def _frames(path: Path, fps: float, width: int, height: int, color: bool = False):
     cmd = [ffmpeg_bin(), "-hide_banner", "-nostdin", "-v", "error", "-i", str(path), "-an", "-sn",
-           "-vf", f"fps={fps},scale={width}:{height}", "-pix_fmt", "gray", "-f", "rawvideo", "pipe:1"]
+           "-vf", f"fps={fps},scale={width}:{height}", "-pix_fmt", "bgr24" if color else "gray",
+           "-f", "rawvideo", "pipe:1"]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    size = width * height
+    size = width * height * (3 if color else 1)
     assert proc.stdout is not None
     try:
         while True:
             buf = proc.stdout.read(size)
             if len(buf) < size:
                 break
-            yield np.frombuffer(buf, dtype=np.uint8).reshape(height, width)
+            img = np.frombuffer(buf, dtype=np.uint8)
+            yield img.reshape(height, width, 3) if color else img.reshape(height, width)
     finally:
         proc.stdout.close()
         proc.wait()
@@ -66,15 +68,6 @@ def analyze(path: Path, duration: float, src_w: int | None, src_h: int | None, h
     h = max(2, int(round((src_h or 9) / (src_w or 16) * w / 2)) * 2)
     prev = None
     faces: list[tuple[float, float, float, float, float]] = []
-    cascade = None
-    try:
-        import cv2
-        cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-        if cascade.empty():
-            cascade = None
-    except Exception:
-        cascade = None
-    # Para caras usamos más resolución (320 px) a 0.5 fps
     for i, frame in enumerate(_frames(path, fps, w, h)):
         t = i / fps
         if prev is not None:
@@ -83,12 +76,16 @@ def analyze(path: Path, duration: float, src_w: int | None, src_h: int | None, h
         prev = frame.astype(np.int16)
         if cancel and i % 50 == 0 and cancel():
             break
-    if cascade is not None:
-        fw, fh = 320, h * 2
-        for i, frame in enumerate(_frames(path, 0.5, fw, fh)):
-            found = cascade.detectMultiScale(frame, scaleFactor=1.15, minNeighbors=5, minSize=(16, 16))
-            for (x, y, fw_, fh_) in found:
-                faces.append((i / 0.5, x / fw, y / fh, fw_ / fw, fh_ / fh))
+    # Caras: 640 px de ancho a 0.5 fps (las webcams superpuestas son pequeñas)
+    from app.media.faces import FaceDetector
+    fw, fh = 640, h * 4
+    detector = FaceDetector(fw, fh)
+    if detector.available:
+        for i, frame in enumerate(_frames(path, 0.5, fw, fh, color=True)):
+            for (cx, cy, w_, h_) in detector.detect(frame):
+                faces.append((i / 0.5, cx - w_ / 2, cy - h_ / 2, w_, h_))
+            if cancel and i % 20 == 0 and cancel():
+                break
     # Rellena huecos de movimiento (muestreo a fps < 1/hop)
     if fps < 1 / hop:
         step = int(round(1 / (fps * hop)))
@@ -116,6 +113,10 @@ def estimate_webcam(faces: list[tuple[float, float, float, float, float]], sampl
         return None
     fw = float(np.median([f[3] for f in near]))
     fh = float(np.median([f[4] for f in near]))
+    # Una cara grande en el centro es una cámara a pantalla completa (Just Chatting), no una webcam
+    # superpuesta al juego: esas suelen ir en una esquina o en un borde.
+    if 0.3 < cx < 0.7 and cy < 0.7 and fw > 0.07:
+        return None
     # La webcam suele ser ~3x el tamaño de la cara
     w, h = min(0.5, fw * 3.2), min(0.5, fh * 3.2)
     x = float(np.clip(cx - w / 2, 0, 1 - w))

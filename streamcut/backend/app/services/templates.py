@@ -120,6 +120,7 @@ def build_spec(template_spec: dict[str, Any], *, source_asset_id: str, start: fl
     if layout.get("mode") == "split":
         if webcam:
             layout["webcam"] = {k: webcam[k] for k in ("x", "y", "w", "h")}
+            layout.setdefault("face_track", True)  # la parte de arriba sigue a la cara dentro de la webcam
         else:
             # Sin webcam fiable: encuadre por defecto editable (vídeo completo con fondo difuminado)
             layout["mode"] = "fit_blur"
@@ -128,6 +129,7 @@ def build_spec(template_spec: dict[str, Any], *, source_asset_id: str, start: fl
             fx = sorted(f[1] + f[3] / 2 for f in faces)[len(faces) // 2]
             w = min(1.0, ((source_h or 9) / (source_w or 16)) * 9 / 16) if fmt == "9:16" else 1.0
             layout["main"] = {"x": max(0.0, min(1 - w, fx - w / 2)), "y": 0.0, "w": w, "h": 1.0}
+            layout.setdefault("face_track", True)  # el encuadre sigue a la cara durante el clip
         elif not face_center:
             layout["main"] = {"x": 0.0, "y": 0.0, "w": 1.0, "h": 1.0}
     zoom_cfg = dict(t.get("zoom", {}))

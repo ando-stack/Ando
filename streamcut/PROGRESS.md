@@ -48,6 +48,8 @@ Leyenda: ✅ implementado y verificado con pruebas · 🟡 implementado, verific
 
 - ✅ Editor IA: sección propia, envío de uno o varios clips desde Clips/Biblioteca, subida de clips propios en modo «solo editar», cortes de silencios, subtítulos en frases clave, pocos emotes en las reacciones, zoom, título gancho y audio nivelado (probado con vídeo real de extremo a extremo y en el navegador).
 
+- ✅ Editor manual: encuadre automático (cara arriba + gameplay abajo si hay webcam; vertical que sigue la cara si no), seguimiento de cara suave en el render y en la vista previa, y zonas que se dibujan arrastrando sobre el fotograma. Detector de caras YuNet (el clasificador Haar ya no existe en OpenCV 5; antes la detección de webcam no funcionaba).
+
 ## Limitaciones conocidas (por diseño o externas)
 
 - **Ver un directo no da acceso a su vídeo.** Sin fuente autorizada, un canal queda en VIEW_ONLY o PLATFORM_CLIPS; la interfaz lo indica y no simula análisis.

@@ -113,7 +113,7 @@ def test_publish_endpoint_requires_connection_and_render(auth_client, creds):
     t = auth_client.get("/api/oauth/publish-targets").json()
     assert {x["platform"] for x in t} == {"youtube", "tiktok", "instagram"}
     assert all(not x["ready"] for x in t)
-    clips = auth_client.get("/api/clips").json()["items"]
+    clips = [c for c in auth_client.get("/api/clips").json()["items"] if c.get("video_url")]
     if not clips:
         pytest.skip("sin clips renderizados en esta sesión de pruebas")
     r = auth_client.post(f"/api/clips/{clips[0]['id']}/publish", json={"platforms": ["tiktok"], "title": "x"})

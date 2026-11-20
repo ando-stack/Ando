@@ -518,6 +518,11 @@ def edit_whole_asset_clip(db: Session, clip: Clip, asset: SourceAsset, clip_cfg:
     return clip
 
 
+def face_track_cache(asset_id: uuid.UUID) -> Path:
+    """Carpeta de caché de detecciones de caras de un vídeo original (compartida por editor y render)."""
+    return get_settings().data_dir / "cache" / "facetrack" / str(asset_id)
+
+
 def queue_render(db: Session, clip: Clip, version: ClipVersion, priority: int = 5) -> Export:
     from app.workers.dispatch import enqueue_export
     exp = Export(workspace_id=clip.workspace_id, clip_id=clip.id, clip_version_id=version.id, priority=priority)
@@ -549,7 +554,8 @@ def run_export(export_id: uuid.UUID) -> None:
                 out = tmp / "clip.mp4"
                 ctx.progress(0.01, "Renderizando", force=True)
                 res = render(spec, src, out, tmp, cancel=ctx.cancelled,
-                             progress=lambda p: ctx.progress(0.02 + 0.93 * p, "Renderizando"))
+                             progress=lambda p: ctx.progress(0.02 + 0.93 * p, "Renderizando"),
+                             track_cache=face_track_cache(asset.id))
                 thumb = tmp / "thumb.jpg"
                 ff.thumbnail(out, thumb, min(res.duration * 0.35, max(0.0, res.duration - 0.5)), width=540)
                 base = f"ws/{clip.workspace_id}/renders/{clip.id}/v{version.version_no}-{export_id.hex[:8]}"

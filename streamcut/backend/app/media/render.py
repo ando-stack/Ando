@@ -47,6 +47,52 @@ def _crop_expr(region: Region, src_w: int, src_h: int, target_aspect: float | No
     return f"crop={_even(w)}:{_even(h)}:{int(x)}:{int(y)}"
 
 
+def _fit(region: Region, src_w: int, src_h: int, target_aspect: float) -> tuple[float, float]:
+    w, h = region.w * src_w, region.h * src_h
+    if w / h > target_aspect:
+        w = h * target_aspect
+    else:
+        h = w / target_aspect
+    return w, h
+
+
+def _piecewise(points: list[tuple[float, float]]) -> str:
+    """Expresión de FFmpeg (variable t) que interpola linealmente entre puntos (t, valor)."""
+    if len(points) == 1:
+        return f"{points[0][1]:.1f}"
+    terms = [f"lt(t,{points[0][0]:.3f})*{points[0][1]:.1f}"]
+    for (t0, v0), (t1, v1) in zip(points, points[1:]):
+        if t1 - t0 < 1e-3:
+            continue
+        terms.append(f"gte(t,{t0:.3f})*lt(t,{t1:.3f})*({v0:.1f}+{(v1 - v0) / (t1 - t0):.3f}*(t-{t0:.3f}))")
+    terms.append(f"gte(t,{points[-1][0]:.3f})*{points[-1][1]:.1f}")
+    return "+".join(terms)
+
+
+def _tracked_crop(region: Region, src_w: int, src_h: int, target_aspect: float, track: list[dict],
+                  spec: EditSpec, bounds: Region | None = None) -> str:
+    """crop con x/y animados para seguir la cara (puntos en tiempo del original → tiempo de salida)."""
+    w, h = _fit(region, src_w, src_h, target_aspect)
+    w, h = _even(w), _even(h)
+    bx0, by0 = (bounds.x * src_w, bounds.y * src_h) if bounds else (0.0, 0.0)
+    bx1, by1 = ((bounds.x + bounds.w) * src_w, (bounds.y + bounds.h) * src_h) if bounds else (src_w, src_h)
+    if bx1 - bx0 < w:
+        bx0, bx1 = 0.0, float(src_w)
+    if by1 - by0 < h:
+        by0, by1 = 0.0, float(src_h)
+    px: list[tuple[float, float]] = []
+    py: list[tuple[float, float]] = []
+    for p in track:
+        to = spec.to_output_time(p["t"])
+        if to is None:
+            continue
+        px.append((to, min(max(bx0, p["x"] * src_w - w / 2), bx1 - w)))
+        py.append((to, min(max(by0, p["y"] * src_h - h / 2), by1 - h)))
+    if not px:
+        return _crop_expr(region, src_w, src_h, target_aspect)
+    return (f"crop={w}:{h}:x='clip({_piecewise(px)},0,{src_w - w})':y='clip({_piecewise(py)},0,{src_h - h})'")
+
+
 def _zoom_expr(spec: EditSpec) -> str | None:
     if not spec.zoom.enabled or not spec.zoom.punch_ins:
         return None
@@ -71,7 +117,8 @@ def emoji_path(name: str) -> Path:
 
 
 def build_filter(spec: EditSpec, info: ProbeInfo, ass_path: Path | None,
-                 overlay_inputs: list[int] | None = None) -> tuple[str, list[str]]:
+                 overlay_inputs: list[int] | None = None,
+                 tracks: dict[str, list[dict]] | None = None) -> tuple[str, list[str]]:
     W, H = spec.size()
     sw, sh = info.width or W, info.height or H
     n = len(spec.segments)
@@ -87,13 +134,18 @@ def build_filter(spec: EditSpec, info: ProbeInfo, ass_path: Path | None,
 
     lay = spec.layout
     aspect = W / H
+    tracks = tracks or {}
     if lay.mode == "crop":
-        parts.append(f"[cv]{_crop_expr(lay.main, sw, sh, aspect)},scale={W}:{H}[lv]")
+        crop = (_tracked_crop(lay.main, sw, sh, aspect, tracks["main"], spec) if tracks.get("main")
+                else _crop_expr(lay.main, sw, sh, aspect))
+        parts.append(f"[cv]{crop},scale={W}:{H}[lv]")
     elif lay.mode == "split" and lay.webcam is not None:
         top_h = _even(H * lay.split_ratio)
         bot_h = H - top_h
         parts.append("[cv]split=2[cw][cg]")
-        parts.append(f"[cw]{_crop_expr(lay.webcam, sw, sh, W / top_h)},scale={W}:{top_h}[top]")
+        cam = (_tracked_crop(lay.webcam, sw, sh, W / top_h, tracks["webcam"], spec, bounds=lay.webcam)
+               if tracks.get("webcam") else _crop_expr(lay.webcam, sw, sh, W / top_h))
+        parts.append(f"[cw]{cam},scale={W}:{top_h}[top]")
         parts.append(f"[cg]{_crop_expr(lay.main, sw, sh, W / bot_h)},scale={W}:{bot_h}[bot]")
         parts.append("[top][bot]vstack=inputs=2[lv]")
     elif lay.mode == "fit_black":
@@ -155,7 +207,27 @@ def build_filter(spec: EditSpec, info: ProbeInfo, ass_path: Path | None,
     return ";".join(parts), ["-map", "[outv]", "-map", "[outa]"]
 
 
-def render(spec: EditSpec, src: Path, dest: Path, workdir: Path, *, cancel=None, progress=None) -> RenderResult:
+def face_tracks(spec: EditSpec, src: Path, info: ProbeInfo, cache_dir: Path | None) -> dict[str, list[dict]]:
+    """Trayectorias de cara para el layout del spec (vacío si no hay seguimiento o no se ven caras)."""
+    lay = spec.layout
+    if not lay.face_track or lay.mode not in ("crop", "split"):
+        return {}
+    from . import facetrack
+    a, b = min(s.start for s in spec.segments), max(s.end for s in spec.segments)
+    try:
+        dets = facetrack.detections(src, a, b, info.width, info.height, cache_dir)
+    except Exception as exc:  # el seguimiento nunca debe impedir el render
+        log.warning("Seguimiento de cara no disponible: %s", exc)
+        return {}
+    if lay.mode == "crop":
+        return {"main": facetrack.build_track(dets)}
+    if lay.webcam is not None:
+        return {"webcam": facetrack.build_track(dets, zone=lay.webcam.model_dump())}
+    return {}
+
+
+def render(spec: EditSpec, src: Path, dest: Path, workdir: Path, *, cancel=None, progress=None,
+           track_cache: Path | None = None) -> RenderResult:
     info = probe(src)
     if not info.has_video:
         raise MediaError("La fuente no tiene vídeo")
@@ -172,7 +244,8 @@ def render(spec: EditSpec, src: Path, dest: Path, workdir: Path, *, cancel=None,
     overlays = [o for o in spec.overlays if o.t < total]
     spec = spec.model_copy(update={"overlays": overlays})
     n = len(spec.segments)
-    graph, maps = build_filter(spec, info, ass_path, list(range(n, n + len(overlays))))
+    tracks = face_tracks(spec, src, info, track_cache)
+    graph, maps = build_filter(spec, info, ass_path, list(range(n, n + len(overlays))), tracks)
     cmd = [ffmpeg_bin(), "-hide_banner", "-nostdin", "-y"]
     for s in spec.segments:
         cmd += ["-ss", f"{s.start:.3f}", "-t", f"{s.end - s.start:.3f}", "-i", str(src)]
