@@ -64,8 +64,14 @@ class Settings:
     frame_width: int = field(default_factory=lambda: _int("FRAME_WIDTH", 1280))
 
     # --- AI (server side only)
-    vision_provider: str = field(default_factory=lambda: _env("VISION_PROVIDER", "anthropic"))
-    vision_model: str = field(default_factory=lambda: _env("VISION_MODEL", "claude-opus-5-5"))
+    # "ollama" = modelo local, sin claves (por defecto) · "anthropic" = API de Claude
+    vision_provider: str = field(default_factory=lambda: _env("VISION_PROVIDER", "ollama"))
+    vision_model: str = field(default_factory=lambda: _env("VISION_MODEL") or "")
+    ollama_url: str = field(default_factory=lambda: _env("OLLAMA_URL", "http://127.0.0.1:11434"))
+    ollama_max_images: int = field(default_factory=lambda: _int("OLLAMA_MAX_IMAGES", 6))
+    ollama_image_side: int = field(default_factory=lambda: _int("OLLAMA_IMAGE_SIDE", 896))
+    ollama_num_ctx: int = field(default_factory=lambda: _int("OLLAMA_NUM_CTX", 16384))
+    ollama_timeout: float = field(default_factory=lambda: _float("OLLAMA_TIMEOUT", 900))
     vision_effort: str = field(default_factory=lambda: _env("VISION_EFFORT", "high"))
     vision_fallbacks: bool = field(default_factory=lambda: _bool("VISION_FALLBACKS", True))
     vision_concurrency: int = field(default_factory=lambda: _int("VISION_CONCURRENCY", 3))
@@ -81,6 +87,8 @@ class Settings:
     job_max_attempts: int = field(default_factory=lambda: _int("JOB_MAX_ATTEMPTS", 2))
 
     def __post_init__(self):
+        if not self.vision_model:
+            object.__setattr__(self, "vision_model", "qwen2.5vl:7b" if self.vision_provider == "ollama" else "claude-opus-5-5")
         if not self.database_url:
             object.__setattr__(self, "database_url", f"sqlite:///{self.data_dir / 'fva.db'}")
 

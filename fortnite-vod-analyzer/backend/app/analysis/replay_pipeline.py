@@ -211,7 +211,7 @@ def run_replay_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
         actx.unavailable_modules["communication"] = "Las replays no contienen audio de voz."
         actx.available_modules = modules
         ctx.progress("Módulos de coaching", 35, ", ".join(modules), force=True)
-        mod = engine.run_modules(actx, [], [], lambda name, x: ctx.progress("Módulos de coaching", 35 + 45 * x, name), s.vision_concurrency)
+        mod = engine.run_modules(actx, [], [], lambda name, x: ctx.progress("Módulos de coaching", 35 + 45 * x, name), provider.concurrency or s.vision_concurrency)
         scores = engine.score(mod["findings"], mod["strengths"], mod["assessable"], actx.analysed_minutes)
         ctx.progress("Redactando informe", 85, force=True)
         report = engine.synthesize_report(actx, mod, scores, stats)

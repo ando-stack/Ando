@@ -184,7 +184,7 @@ def run_modules(ctx: AnalysisContext, observations: list[dict], events: list[dic
     modules = ctx.available_modules
 
     def one(m: str):
-        key = select_key_frames(ctx, m, observations, events) if ctx.source_type == "video" else []
+        key = select_key_frames(ctx, m, observations, events, limit=min(16, ctx.provider.max_images)) if ctx.source_type == "video" else []
         last_err = None
         for _attempt in range(2):
             try:

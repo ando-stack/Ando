@@ -63,6 +63,8 @@ class Usage:
 class VisionProvider(ABC):
     name = "abstract"
     model = ""
+    max_images = 20  # images per request the model handles well
+    concurrency: int | None = None  # None = VISION_CONCURRENCY
 
     @abstractmethod
     def configured(self) -> tuple[bool, str]: ...
@@ -170,6 +172,11 @@ def get_provider() -> VisionProvider:
         s = get_settings()
         if s.vision_provider == "anthropic":
             _provider = AnthropicProvider(s.vision_model, s.vision_effort, s.vision_fallbacks)
+        elif s.vision_provider == "ollama":
+            from .local_ollama import OllamaProvider
+
+            _provider = OllamaProvider(s.vision_model, s.ollama_url, s.ollama_max_images, s.ollama_image_side, s.ollama_num_ctx, s.ollama_timeout)
+            _provider.concurrency = 1  # one GPU: run requests sequentially
         else:
             raise RuntimeError(f"VISION_PROVIDER desconocido: {s.vision_provider}")
     return _provider

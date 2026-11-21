@@ -4,7 +4,7 @@ Plataforma web para coaches de Fortnite competitivo: sube una partida (vídeo o 
 
 - **Backend**: Python 3.11+ · FastAPI · SQLAlchemy (PostgreSQL/Supabase o SQLite) · FFmpeg · worker en segundo plano.
 - **Frontend**: Next.js 15 · TypeScript · Tailwind CSS 4 · Recharts.
-- **IA**: modelo multimodal configurable en el servidor (por defecto Anthropic `claude-opus-5-5`, salidas JSON estructuradas, fallback por rechazo activado).
+- **IA**: por defecto un **modelo de visión local con Ollama** (gratis, sin claves, nada sale de tu ordenador). Opcional: API de Claude (`VISION_PROVIDER=anthropic`) para más calidad.
 - **Replays**: lector de eventos propio en Python + adaptador opcional FortniteReplayDecompressor (posiciones y zonas).
 
 Documentación: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/REPLAYS.md`](docs/REPLAYS.md)
@@ -17,7 +17,17 @@ Requisitos: Python 3.11+, Node 20+, FFmpeg en el PATH.
 cd backend && pip install -r requirements-dev.txt && cp .env.example .env
 ```
 
-Edita `backend/.env` (como mínimo `APP_SECRET` y `ANTHROPIC_API_KEY`; sin `DATABASE_URL` usa SQLite). Después, en dos terminales:
+Edita `backend/.env` (como mínimo `APP_SECRET`; sin `DATABASE_URL` usa SQLite).
+
+IA local (sin claves): instala [Ollama](https://ollama.com) y descarga un modelo de visión:
+
+```bash
+ollama pull qwen2.5vl:7b
+```
+
+Recomendado: GPU NVIDIA con 8 GB de VRAM o más (o Mac con Apple Silicon y 16 GB). En CPU funciona, pero muy lento. Con más VRAM puedes usar `qwen2.5vl:32b` y subir `OLLAMA_MAX_IMAGES`.
+
+Después, en dos terminales:
 
 ```bash
 cd backend && uvicorn app.main:app --port 8000
@@ -80,7 +90,8 @@ Para incluir replays reales, apunta `FVA_TEST_REPLAYS` a una carpeta con `chapte
 
 ## Limitaciones conocidas (honestas)
 
-- **El análisis real necesita una API key** del proveedor multimodal en el servidor. Sin ella, la subida y el procesado funcionan pero el análisis termina con un error explicativo (no se generan resultados de relleno).
+- **El análisis necesita un modelo de visión**: Ollama local (por defecto) o una API. Si Ollama no está abierto o falta el modelo, el análisis termina con un error explicativo (`ollama pull …`) y no se generan resultados de relleno.
+- Los modelos locales leen peor el HUD y las jugadas que los grandes modelos en la nube; por eso reciben menos imágenes por petición (`OLLAMA_MAX_IMAGES`) y su salida se valida contra el esquema y se reintenta si viene mal formada. La integración con Ollama se ha probado contra un servidor que imita su API, no contra un modelo real.
 - La IA ve **fotogramas muestreados**, no el vídeo continuo: velocidad de edición, precisión exacta de aim o piece control rápido entre muestras no son verificables y se marcan como tales.
 - La **comunicación** solo se evalúa con transcripción (`WHISPER_MODEL` + `faster-whisper`); si no, aparece como "sin datos".
 - Las replays de la **temporada actual** no se han podido probar (no hay muestras públicas). Si Epic cambia el formato, el lector lo detecta y lo explica; FRD se actualiza recompilando FrdExport.

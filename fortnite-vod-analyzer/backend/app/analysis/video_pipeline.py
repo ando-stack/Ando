@@ -124,7 +124,7 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
 
         # 4-5. plan + extract frames
         segments, planned = plan_frames(info.duration, times, combined, motion, audio, segment_seconds=s.segment_seconds,
-                                        max_total=s.max_frames_total, max_per_segment=s.max_frames_per_segment, skip_mask=skip)
+                                        max_total=s.max_frames_total, max_per_segment=min(s.max_frames_per_segment, provider.max_images), skip_mask=skip)
         ctx.progress("Extrayendo fotogramas", 22, f"{len(planned)} fotogramas en {len(segments)} segmentos", force=True)
         frames_dir = work / "frames"
         frames_dir.mkdir(exist_ok=True)
@@ -192,7 +192,7 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
         actx = AnalysisContext(source_type="video", provider=provider, player_label=player_label, match_context=context,
                                frame_loader=lambda lab: frame_bytes[lab])
         failed_segments = []
-        with ThreadPoolExecutor(max_workers=max(1, s.vision_concurrency)) as pool:
+        with ThreadPoolExecutor(max_workers=max(1, provider.concurrency or s.vision_concurrency)) as pool:
             for n, (si, data, usage, err) in enumerate(pool.map(observe, seg_ids)):
                 if err:
                     if err.code in ("ai_auth", "ai_model", "ai_permission", "ai_bad_request"):
@@ -288,7 +288,7 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
         actx.available_modules = modules
         ctx.progress("Módulos de coaching", 78, "Posicionamiento, rotaciones, peleas, endgame, decisiones, mecánicas", force=True)
         mod = engine.run_modules(actx, observations, [{"type": e["type"], "evidence": e["evidence"]} for e in events],
-                                 lambda name, x: ctx.progress("Módulos de coaching", 78 + 14 * x, name), s.vision_concurrency)
+                                 lambda name, x: ctx.progress("Módulos de coaching", 78 + 14 * x, name), provider.concurrency or s.vision_concurrency)
 
         # scores + report
         stats = _video_stats(info, actx.frame_items, events, frames, segments, transcript)
