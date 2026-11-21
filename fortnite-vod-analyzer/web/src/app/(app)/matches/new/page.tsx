@@ -146,7 +146,12 @@ function Wizard() {
               <>
                 <h2 className="font-semibold">Todo listo</h2>
                 <p className="text-sm text-ink-2">El análisis se ejecuta en segundo plano: puedes cerrar esta página y volver más tarde. Verás el progreso en la partida y en el dashboard.</p>
-                {status.data && !status.data.ai.configured && <ErrorBox message={`La IA no está configurada en el servidor: ${status.data.ai.detail}`} />}
+                {status.data && !status.data.ai.configured && (
+                  <div className="rounded-lg border border-line bg-surface-2 px-4 py-3 text-sm text-ink-2">
+                    Modo reglas: se leerá el HUD (vida, escudo, materiales, jugadores, tormenta) y se aplicarán reglas de coaching, sin IA generativa.
+                    {source === "video" && player && !player.hud_calibrated && <> Para lecturas fiables, <a className="text-brand hover:underline" href={`/players/${player.id}/hud`}>calibra el HUD de {player.name}</a> (puedes hacerlo ahora o después y re-analizar).</>}
+                  </div>
+                )}
                 {error && <ErrorBox message={error} />}
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" onClick={() => router.push(`/matches/${match.id}`)}>Analizar más tarde</Button>

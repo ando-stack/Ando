@@ -5,7 +5,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import analyses, auth, dashboard, matches, media, players, uploads
+from .api import analyses, auth, dashboard, hud, matches, media, players, uploads
 from .config import get_settings
 from .db import init_db
 
@@ -24,7 +24,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
         expose_headers=["Content-Disposition"],
     )
-    for r in (auth.router, players.router, matches.router, uploads.router, media.router, analyses.router, dashboard.router):
+    for r in (auth.router, players.router, matches.router, uploads.router, media.router, analyses.router, dashboard.router, hud.router):
         app.include_router(r)
 
     @app.get("/health")

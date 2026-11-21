@@ -163,6 +163,19 @@ class AnthropicProvider(VisionProvider):
         return data, usage
 
 
+class NoAIProvider(VisionProvider):
+    """Rules-only mode: no generative model is called."""
+
+    name = "none"
+    model = "reglas"
+
+    def configured(self) -> tuple[bool, str]:
+        return False, "Modo reglas: lectura del HUD y reglas de coaching, sin IA generativa."
+
+    def complete_json(self, system, parts, schema, *, max_tokens=16000):  # pragma: no cover
+        raise ProviderError("No hay modelo de IA configurado.", code="ai_not_configured")
+
+
 _provider: VisionProvider | None = None
 
 
@@ -170,7 +183,14 @@ def get_provider() -> VisionProvider:
     global _provider
     if _provider is None:
         s = get_settings()
-        if s.vision_provider == "anthropic":
+        if s.vision_provider == "none":
+            _provider = NoAIProvider()
+        elif s.vision_provider == "builtin":
+            from .builtin import BuiltinProvider
+
+            _provider = BuiltinProvider(s.vision_model, s.builtin_max_images, s.ollama_image_side)
+            _provider.concurrency = 1
+        elif s.vision_provider == "anthropic":
             _provider = AnthropicProvider(s.vision_model, s.vision_effort, s.vision_fallbacks)
         elif s.vision_provider == "ollama":
             from .local_ollama import OllamaProvider

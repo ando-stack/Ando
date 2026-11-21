@@ -118,7 +118,7 @@ def patch_finding(finding_id: str, body: FindingPatch, db: Session = Depends(get
 def delete_finding(finding_id: str, db: Session = Depends(get_db), user: User = Depends(current_user)):
     f = _own_finding(db, user, finding_id)
     if f.origin != "coach":
-        raise HTTPException(400, "Los hallazgos de la IA no se borran: márcalos como descartados")
+        raise HTTPException(400, "Los hallazgos automáticos no se borran: márcalos como descartados")
     mid = f.match_id
     db.delete(f)
     db.flush()

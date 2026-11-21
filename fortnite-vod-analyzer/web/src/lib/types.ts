@@ -8,7 +8,7 @@ export interface User { id: string; email: string; display_name: string | null }
 
 export interface Player {
   id: string; name: string; epic_id: string | null; platform: string | null; region: string | null;
-  game_mode: string | null; competitive_level: string | null; coach_notes: string | null;
+  game_mode: string | null; competitive_level: string | null; coach_notes: string | null; hud_calibrated?: boolean;
   created_at: string; updated_at: string;
   matches?: number; last_score?: number | null; last_analysis_at?: string | null;
 }
@@ -38,7 +38,7 @@ export interface Match {
 export interface Evidence { id: string; t: number; kind: string }
 
 export interface Finding {
-  id: string; origin: "ai" | "coach"; module: string | null; category: Category; error_type: ErrorType | null;
+  id: string; origin: "ai" | "rules" | "coach"; module: string | null; category: Category; error_type: ErrorType | null;
   severity: Severity; phase: "early" | "mid" | "end" | null; t_start: number; t_end: number | null; title: string;
   what_happened: string; why_error: string | null; what_to_do: string | null; how_to_avoid: string | null;
   evidence: Evidence[]; confidence: number | null; review_status: "open" | "confirmed" | "dismissed"; created_at: string;
@@ -61,13 +61,14 @@ export interface Report {
   drills: { name: string; goal: string; how: string; duration_minutes: number; category: Category }[];
   next_session_goals: { title: string; measurable_target: string; category: Category }[];
   limitations: string[];
+  generated_by?: "rules";
   module_summaries?: Record<string, string>;
   not_assessable?: Record<string, string[]>;
   strengths_evidence?: { module: string; description: string; evidence: string[]; t: number }[];
 }
 
 export interface TimelineItem {
-  id: string; kind: "frame" | "event" | "observation" | "speech" | "replay_event"; t: number; t_end?: number | null;
+  id: string; kind: "frame" | "hud" | "event" | "observation" | "speech" | "replay_event"; t: number; t_end?: number | null;
   type?: string; description?: string; text?: string; situation?: string; phase?: string;
   hud?: Record<string, number | string | null>; evidence?: string[]; frames?: string[]; category?: string; obs_kind?: string;
   players_alive_after?: number | null; confidence?: number;

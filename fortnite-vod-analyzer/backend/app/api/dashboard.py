@@ -81,9 +81,13 @@ def system_status(user: User = Depends(current_user)):
     s = get_settings()
     ok, why = get_provider().configured()
     stt_ok, stt_why = transcribe.available()
+    from ..hud.reader import ocr_available
+
+    ocr_ok, ocr_why = ocr_available()
     return {
         "ffmpeg": ffmpeg_version(),
         "ai": {"configured": ok, "detail": why, "provider": s.vision_provider, "model": s.vision_model, "effort": s.vision_effort},
+        "rules": {"available": ocr_ok, "detail": ocr_why, "hud_sample_seconds": s.hud_every},
         "speech_to_text": {"available": stt_ok, "detail": stt_why},
         "replay_adapters": adapters_status(),
         "storage": s.storage_backend,

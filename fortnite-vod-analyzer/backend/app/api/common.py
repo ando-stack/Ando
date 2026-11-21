@@ -39,6 +39,7 @@ def player_out(p: Player) -> dict:
     return {
         "id": p.id, "name": p.name, "epic_id": p.epic_id, "platform": p.platform, "region": p.region,
         "game_mode": p.game_mode, "competitive_level": p.competitive_level, "coach_notes": p.coach_notes,
+        "hud_calibrated": bool((p.hud_layout or {}).get("calibrated")),
         "created_at": iso(p.created_at), "updated_at": iso(p.updated_at),
     }
 
@@ -72,7 +73,7 @@ def finding_out(f: Finding) -> dict:
 
 
 def finding_dict_for_score(f: Finding) -> dict:
-    return {"category": f.category, "severity": f.severity, "confidence": f.confidence if f.origin == "ai" else 1.0, "review_status": f.review_status}
+    return {"category": f.category, "severity": f.severity, "confidence": f.confidence if f.origin != "coach" else 1.0, "review_status": f.review_status}
 
 
 def match_out(m: Match, *, media: list[MediaFile] | None = None, job: Job | None = None, analysis: Analysis | None = None) -> dict:

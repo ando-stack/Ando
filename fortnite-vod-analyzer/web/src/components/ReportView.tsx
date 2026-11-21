@@ -22,6 +22,7 @@ export function ReportView({ match, bundle, onOpenFinding }: { match: Match; bun
         <Button icon={<Target className="size-4" />} onClick={async () => { const x = await post(`/matches/${match.id}/goals-from-report`); setGoalsMsg(x.created ? `${x.created} objetivos añadidos al perfil del jugador` : "Los objetivos ya estaban añadidos"); }}>Añadir objetivos al jugador</Button>
         <Button variant="primary" icon={<Download className="size-4" />} loading={pdfBusy} onClick={async () => { setPdfBusy(true); try { await downloadFile(`/matches/${match.id}/report.pdf`, "informe.pdf"); } finally { setPdfBusy(false); } }}>Exportar PDF</Button>
       </div>
+      {r.generated_by === "rules" && <div className="rounded-lg border border-line bg-surface-2 px-4 py-2 text-sm text-ink-2">Informe generado por reglas a partir de datos medidos (HUD, audio, eventos). Posicionamiento, mecánicas y decisiones complejas requieren tu revisión en el VOD o activar la IA de visión.</div>}
       {goalsMsg && <div className="rounded-lg border border-[#1d3766] bg-brand-soft px-4 py-2 text-sm">{goalsMsg}</div>}
 
       <Card>

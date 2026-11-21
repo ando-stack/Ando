@@ -62,6 +62,8 @@ class Player(Base):
     game_mode: Mapped[str | None] = mapped_column(String(60))
     competitive_level: Mapped[str | None] = mapped_column(String(60))
     coach_notes: Mapped[str | None] = mapped_column(Text)
+    # HUD calibration for the rules engine (see app/hud/layout.py)
+    hud_layout: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
     created_at: Mapped[dt.datetime] = _ts(default=utcnow)
     updated_at: Mapped[dt.datetime] = _ts(default=utcnow, onupdate=utcnow)
 
@@ -209,7 +211,7 @@ class Finding(Base):
     analysis_id: Mapped[str | None] = mapped_column(
         ForeignKey("analyses.id", ondelete="CASCADE"), index=True, nullable=True
     )
-    origin: Mapped[str] = mapped_column(String(10), default="ai")  # ai|coach
+    origin: Mapped[str] = mapped_column(String(10), default="ai")  # ai|rules|coach
     module: Mapped[str | None] = mapped_column(String(30))
     category: Mapped[str] = mapped_column(String(30))
     error_type: Mapped[str | None] = mapped_column(String(20))

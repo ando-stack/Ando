@@ -3,6 +3,7 @@ never executed; arguments are passed as lists (no shell)."""
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -52,8 +53,53 @@ def run(args: list[str], timeout: int | None = None, capture: bool = True) -> su
     return subprocess.run(args, capture_output=capture, timeout=timeout, check=False)
 
 
+_FMT_RE = re.compile(r"Input #0, (.+?), from")
+_DUR_RE = re.compile(r"Duration: (\d+):(\d+):(\d+(?:\.\d+)?)")
+_BR_RE = re.compile(r"bitrate: (\d+) kb/s")
+_VID_RE = re.compile(r"Stream #0:\d+[^:]*: Video: (\w+)(.*)")
+_AUD_RE = re.compile(r"Stream #0:\d+[^:]*: Audio: (\w+)")
+_TIME_RE = re.compile(r"time=(\d+):(\d+):(\d+(?:\.\d+)?)")
+
+
+def _probe_with_ffmpeg(path: Path) -> ProbeResult:
+    """Fallback when ffprobe is not available (pip-bundled ffmpeg): parse `ffmpeg -i`."""
+    s = get_settings()
+    err = run([s.ffmpeg, "-hide_banner", "-i", str(path)], timeout=120).stderr.decode(errors="replace")
+    m = _FMT_RE.search(err)
+    if not m:
+        raise VideoError("FFmpeg no puede leer el archivo: no es un vídeo válido o está dañado.")
+    fname = m.group(1).strip()
+    if fname not in ALLOWED_CONTAINERS:
+        raise VideoError(f"Contenedor no permitido ({fname}). Formatos aceptados: MP4, MOV, MKV, WEBM.", "bad_format")
+    v = next((x for x in _VID_RE.finditer(err) if "attached pic" not in x.group(2)), None)
+    if not v:
+        raise VideoError("El archivo no contiene ninguna pista de vídeo.", "no_video")
+    rest = v.group(2)
+    wh = re.search(r"(\d{2,5})x(\d{2,5})", rest)
+    fps_m = re.search(r"([\d.]+) fps", rest) or re.search(r"([\d.]+) tbr", rest)
+    a = _AUD_RE.search(err)
+    d = _DUR_RE.search(err)
+    duration = int(d.group(1)) * 3600 + int(d.group(2)) * 60 + float(d.group(3)) if d else 0.0
+    if duration <= 0:  # e.g. some WEBM without duration in the header: decode to find it
+        out = run([s.ffmpeg, "-hide_banner", "-i", str(path), "-map", "0:v:0", "-c", "copy", "-f", "null", "-"], timeout=1800).stderr.decode(errors="replace")
+        ts = _TIME_RE.findall(out)
+        if ts:
+            h, mi, se = ts[-1]
+            duration = int(h) * 3600 + int(mi) * 60 + float(se)
+    if duration <= 0:
+        raise VideoError("No se pudo determinar la duración del vídeo.")
+    br = _BR_RE.search(err)
+    return ProbeResult(
+        format_name=fname, duration=duration, width=int(wh.group(1)) if wh else 0, height=int(wh.group(2)) if wh else 0,
+        fps=float(fps_m.group(1)) if fps_m else 0.0, video_codec=v.group(1), audio_codec=a.group(1) if a else None,
+        has_audio=bool(a), bitrate=int(br.group(1)) * 1000 if br else None, raw={"format": {"format_name": fname, "probe": "ffmpeg"}},
+    )
+
+
 def probe(path: Path) -> ProbeResult:
     s = get_settings()
+    if not s.ffprobe:
+        return _probe_with_ffmpeg(path)
     proc = run(
         [s.ffprobe, "-v", "error", "-print_format", "json", "-show_format", "-show_streams", str(path)],
         timeout=120,

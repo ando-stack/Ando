@@ -53,7 +53,18 @@ fortnite-vod-analyzer/
 | `coach_notes` | notas con o sin timestamp |
 | `activity` | actividad reciente |
 
-## Pipeline de vídeo (sin enviar nunca el vídeo entero a la IA)
+## Modo reglas (por defecto, sin IA generativa)
+
+1. Se decodifica el vídeo una vez a 1 fotograma cada `HUD_SAMPLE_SECONDS` (por defecto 2 s; tiempos exactos).
+2. **OCR** (RapidOCR/ONNX, CPU, modelos dentro del paquete pip) de las zonas calibradas del HUD: vida, escudo, madera, ladrillo, metal, jugadores restantes, eliminaciones, temporizador. Valores fuera de rango se descartan; picos aislados se eliminan; jugadores restantes solo puede bajar.
+3. **Tormenta** por color: proporción de píxeles con tinte morado en el borde (≥ 35 %).
+4. **Peleas** por señal: picos sostenidos de audio/actividad visual (≥ 6 s).
+5. **Reglas** (`analysis/rules_video.py`, `rules_replay.py`): cada regla solo se dispara con las lecturas necesarias y cita los fotogramas (`H0001…`) o eventos (`E001…`) en los que se basa. Se guardan como imagen solo los fotogramas citados.
+6. Informe con la misma estructura de 12 secciones generado a partir de los datos (`analysis/report_template.py`).
+
+Si hay IA de visión configurada, el pipeline de IA se ejecuta además y sus hallazgos se fusionan con los de las reglas.
+
+## Pipeline de vídeo con IA (opcional; nunca se envía el vídeo entero)
 
 1. **Validación**: extensión permitida, tamaño, `ffprobe` (contenedor MP4/MOV/MKV/WEBM, pista de vídeo, duración máx.).
 2. **Proxy**: si el códec/contenedor no se reproduce en navegador → H.264/AAC con los mismos tiempos.

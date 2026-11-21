@@ -11,7 +11,7 @@ def save_analysis(analysis_id, match_id, owner_id, timeline, stats, scores, repo
         db.execute(update(Analysis).where(Analysis.match_id == match_id, Analysis.id != analysis_id).values(is_current=False))
         rows = []
         for f in mod["findings"]:
-            row = Finding(owner_id=owner_id, match_id=match_id, analysis_id=analysis_id, origin="ai", **f)
+            row = Finding(owner_id=owner_id, match_id=match_id, analysis_id=analysis_id, origin="rules" if f.get("module") == "rules" else "ai", **f)
             db.add(row)
             rows.append(row)
         db.flush()

@@ -1,0 +1,6 @@
+# Modelo de visión integrado (opcional, VISION_PROVIDER=builtin).
+# La primera vez descarga el modelo (~7 GB para Qwen2.5-VL-3B). Con GPU NVIDIA
+# instala antes torch con CUDA desde https://pytorch.org.
+torch>=2.4
+transformers>=4.49
+accelerate>=1.0

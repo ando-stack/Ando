@@ -2,9 +2,22 @@
 from __future__ import annotations
 
 import os
+import shutil
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
+
+
+def _find_ffmpeg() -> str:
+    found = shutil.which("ffmpeg")
+    if found:
+        return found
+    try:
+        import imageio_ffmpeg
+
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:  # noqa: BLE001
+        return "ffmpeg"
 
 
 def _env(name: str, default: str | None = None) -> str | None:
@@ -56,16 +69,21 @@ class Settings:
     upload_chunk_bytes: int = field(default_factory=lambda: _int("UPLOAD_CHUNK_MB", 8) * 1024 * 1024)
 
     # --- video processing
-    ffmpeg: str = field(default_factory=lambda: _env("FFMPEG_BIN", "ffmpeg"))
-    ffprobe: str = field(default_factory=lambda: _env("FFPROBE_BIN", "ffprobe"))
+    # Sin FFmpeg instalado se usa el binario que trae el paquete pip imageio-ffmpeg.
+    ffmpeg: str = field(default_factory=lambda: _env("FFMPEG_BIN") or _find_ffmpeg())
+    ffprobe: str | None = field(default_factory=lambda: _env("FFPROBE_BIN") or shutil.which("ffprobe"))
     segment_seconds: int = field(default_factory=lambda: _int("SEGMENT_SECONDS", 60))
     max_frames_total: int = field(default_factory=lambda: _int("MAX_FRAMES_TOTAL", 480))
     max_frames_per_segment: int = field(default_factory=lambda: _int("MAX_FRAMES_PER_SEGMENT", 14))
     frame_width: int = field(default_factory=lambda: _int("FRAME_WIDTH", 1280))
 
     # --- AI (server side only)
-    # "ollama" = modelo local, sin claves (por defecto) · "anthropic" = API de Claude
-    vision_provider: str = field(default_factory=lambda: _env("VISION_PROVIDER", "ollama"))
+    # "none" = solo lectura de HUD + reglas (por defecto, sin IA generativa)
+    # "builtin" = modelo de visión integrado (se descarga solo, pip install -r requirements-ai.txt)
+    # "ollama" = Ollama local · "anthropic" = API de Claude
+    vision_provider: str = field(default_factory=lambda: _env("VISION_PROVIDER", "none"))
+    builtin_max_images: int = field(default_factory=lambda: _int("BUILTIN_MAX_IMAGES", 4))
+    hud_every: float = field(default_factory=lambda: _float("HUD_SAMPLE_SECONDS", 2.0))
     vision_model: str = field(default_factory=lambda: _env("VISION_MODEL") or "")
     ollama_url: str = field(default_factory=lambda: _env("OLLAMA_URL", "http://127.0.0.1:11434"))
     ollama_max_images: int = field(default_factory=lambda: _int("OLLAMA_MAX_IMAGES", 6))
@@ -88,7 +106,8 @@ class Settings:
 
     def __post_init__(self):
         if not self.vision_model:
-            object.__setattr__(self, "vision_model", "qwen2.5vl:7b" if self.vision_provider == "ollama" else "claude-opus-5-5")
+            default_models = {"ollama": "qwen2.5vl:7b", "builtin": "Qwen/Qwen2.5-VL-3B-Instruct", "anthropic": "claude-opus-5-5", "none": "reglas"}
+            object.__setattr__(self, "vision_model", default_models.get(self.vision_provider, "reglas"))
         if not self.database_url:
             object.__setattr__(self, "database_url", f"sqlite:///{self.data_dir / 'fva.db'}")
 

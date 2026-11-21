@@ -9,5 +9,10 @@ anthropic>=2.0
 numpy>=1.26
 reportlab>=4.2
 boto3>=1.34
+# FFmpeg incluido (no hace falta instalarlo aparte) y OCR del HUD sin IA generativa
+imageio-ffmpeg>=0.5
+rapidocr-onnxruntime>=1.2
+pillow>=10
+httpx>=0.27
 # opcional: transcripción de voz para el analizador de comunicación
 # faster-whisper>=1.0

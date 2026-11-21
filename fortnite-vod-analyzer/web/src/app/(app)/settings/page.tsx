@@ -17,7 +17,8 @@ export default function SettingsPage() {
           <CardHeader title="Procesamiento" />
           <ul className="divide-y divide-line">
             <Row ok={!!data.ffmpeg} label="FFmpeg" detail={data.ffmpeg || "No encontrado"} />
-            <Row ok={data.ai.configured} label="Modelo multimodal" detail={data.ai.configured ? `${data.ai.provider} · ${data.ai.model} · esfuerzo ${data.ai.effort}` : data.ai.detail} />
+            <Row ok={data.rules.available} label="Lectura de HUD + reglas (sin IA)" detail={`${data.rules.detail} · una muestra cada ${data.rules.hud_sample_seconds} s`} />
+            <Row ok={data.ai.configured} label="IA de visión" detail={data.ai.configured ? data.ai.detail : `${data.ai.detail} Opciones: VISION_PROVIDER=builtin (modelo integrado), ollama o anthropic.`} optional />
             <Row ok={data.speech_to_text.available} label="Transcripción de voz" detail={data.speech_to_text.detail} optional />
           </ul>
         </Card>

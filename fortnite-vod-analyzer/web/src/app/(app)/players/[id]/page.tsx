@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, GitCompare, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Check, GitCompare, Pencil, Plus, ScanText, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -51,6 +51,7 @@ export default function PlayerPage() {
         subtitle={<span className="flex flex-wrap gap-1.5">{[data.epic_id && `Epic: ${data.epic_id}`, data.platform, data.region, data.game_mode, data.competitive_level].filter(Boolean).map((x) => <Badge key={x as string}>{x}</Badge>)}</span>}
         actions={<>
           <Link href={`/matches/new?player=${id}`}><Button variant="primary" icon={<Plus className="size-4" />}>Nueva partida</Button></Link>
+          <Link href={`/players/${id}/hud`}><Button icon={<ScanText className="size-4" />}>{data.hud_calibrated ? "HUD calibrado" : "Calibrar HUD"}</Button></Link>
           <Button icon={<Pencil className="size-4" />} onClick={() => setEdit(true)}>Editar</Button>
           <Button variant="danger" icon={<Trash2 className="size-4" />} onClick={removePlayer}>Eliminar</Button>
         </>} />

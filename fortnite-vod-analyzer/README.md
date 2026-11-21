@@ -4,30 +4,20 @@ Plataforma web para coaches de Fortnite competitivo: sube una partida (vídeo o 
 
 - **Backend**: Python 3.11+ · FastAPI · SQLAlchemy (PostgreSQL/Supabase o SQLite) · FFmpeg · worker en segundo plano.
 - **Frontend**: Next.js 15 · TypeScript · Tailwind CSS 4 · Recharts.
-- **IA**: por defecto un **modelo de visión local con Ollama** (gratis, sin claves, nada sale de tu ordenador). Opcional: API de Claude (`VISION_PROVIDER=anthropic`) para más calidad.
+- **Análisis sin IA ni claves (por defecto)**: lectura del HUD con OCR (incluido en pip) + detección de tormenta por color + reglas de coaching deterministas. **IA de visión opcional**: modelo integrado que se descarga solo, Ollama o API de Claude.
 - **Replays**: lector de eventos propio en Python + adaptador opcional FortniteReplayDecompressor (posiciones y zonas).
 
 Documentación: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/REPLAYS.md`](docs/REPLAYS.md)
 
 ## Puesta en marcha (desarrollo)
 
-Requisitos: Python 3.11+, Node 20+, FFmpeg en el PATH.
+Requisitos: Python 3.11+ y Node 20+. **No hace falta instalar FFmpeg ni ninguna IA**: FFmpeg y el OCR vienen en los paquetes de pip.
 
 ```bash
 cd backend && pip install -r requirements-dev.txt && cp .env.example .env
 ```
 
-Edita `backend/.env` (como mínimo `APP_SECRET`; sin `DATABASE_URL` usa SQLite).
-
-IA local (sin claves): instala [Ollama](https://ollama.com) y descarga un modelo de visión:
-
-```bash
-ollama pull qwen2.5vl:7b
-```
-
-Recomendado: GPU NVIDIA con 8 GB de VRAM o más (o Mac con Apple Silicon y 16 GB). En CPU funciona, pero muy lento. Con más VRAM puedes usar `qwen2.5vl:32b` y subir `OLLAMA_MAX_IMAGES`.
-
-Después, en dos terminales:
+En `backend/.env` cambia `APP_SECRET` por un texto largo cualquiera. Después, en dos terminales:
 
 ```bash
 cd backend && uvicorn app.main:app --port 8000
@@ -43,7 +33,15 @@ Frontend:
 cd web && npm install && cp .env.example .env.local && npm run dev
 ```
 
-Abre http://localhost:3000, crea tu cuenta de coach y un jugador, y pulsa **Nueva partida**.
+Abre http://localhost:3000, crea tu cuenta, un jugador y sube una partida. Para lecturas fiables, en el perfil del jugador pulsa **Calibrar HUD** y marca dónde están vida, escudo, materiales y jugadores restantes (se hace una vez por jugador).
+
+### Modos de análisis
+
+| Modo | Qué necesitas | Qué analiza |
+|---|---|---|
+| **Reglas** (por defecto) | nada | tiempo en tormenta, peleas iniciadas con poca vida, no curarse tras pelear, materiales en endgame, jugar sin escudo, eliminaciones/knocks y rotación en replays |
+| **+ Modelo integrado** (`VISION_PROVIDER=builtin`) | `pip install -r requirements-ai.txt`; se descarga solo (~7 GB). GPU recomendada | además: posicionamiento, altura, cobertura, mecánicas visibles, decisiones |
+| + Ollama / API de Claude | Ollama instalado / `ANTHROPIC_API_KEY` | igual que el anterior; Claude da la mejor calidad |
 
 Con Docker: `docker compose up --build` (Postgres + API + worker + web; el Dockerfile del backend compila también FrdExport).
 
@@ -90,8 +88,10 @@ Para incluir replays reales, apunta `FVA_TEST_REPLAYS` a una carpeta con `chapte
 
 ## Limitaciones conocidas (honestas)
 
-- **El análisis necesita un modelo de visión**: Ollama local (por defecto) o una API. Si Ollama no está abierto o falta el modelo, el análisis termina con un error explicativo (`ollama pull …`) y no se generan resultados de relleno.
-- Los modelos locales leen peor el HUD y las jugadas que los grandes modelos en la nube; por eso reciben menos imágenes por petición (`OLLAMA_MAX_IMAGES`) y su salida se valida contra el esquema y se reintenta si viene mal formada. La integración con Ollama se ha probado contra un servidor que imita su API, no contra un modelo real.
+- **Modo reglas**: la lectura del HUD se ha probado con un HUD sintético, no con partidas reales de Fortnite. El preset de posiciones es aproximado: **calibra el HUD de cada jugador** antes de fiarte de las lecturas. La tormenta se detecta por el tinte morado de la pantalla (puede dar falsos positivos con skins o efectos morados; cada caso lleva su fotograma para confirmarlo o descartarlo).
+- Sin IA de visión no se evalúan posicionamiento, altura, cobertura, builds, edits ni aim: aparecen como "sin datos" y quedan para la revisión del coach en el VOD.
+- **Modelo integrado**: probado de punta a punta con un modelo diminuto (descarga, carga, generación, validación). Con modelos pequeños el JSON a veces sale mal formado y se reintenta; la calidad real con Qwen2.5-VL-3B no se ha medido. Sin GPU es muy lento.
+- La integración con Ollama se ha probado contra un servidor que imita su API, no contra un modelo real.
 - La IA ve **fotogramas muestreados**, no el vídeo continuo: velocidad de edición, precisión exacta de aim o piece control rápido entre muestras no son verificables y se marcan como tales.
 - La **comunicación** solo se evalúa con transcripción (`WHISPER_MODEL` + `faster-whisper`); si no, aparece como "sin datos".
 - Las replays de la **temporada actual** no se han podido probar (no hay muestras públicas). Si Epic cambia el formato, el lector lo detecta y lo explica; FRD se actualiza recompilando FrdExport.

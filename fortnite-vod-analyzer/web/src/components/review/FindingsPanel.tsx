@@ -7,7 +7,7 @@ import { CATEGORIES, CATEGORY_LABEL, ERROR_TYPE_LABEL, PHASE_LABEL, SEVERITY_COL
 import type { Category, ErrorType, Finding, Severity } from "@/lib/types";
 import { Badge, Button, ErrorBox, Field, Input, Modal, Select, SeverityBadge, Textarea, cx } from "../ui";
 
-export interface Filters { cats: Set<Category>; sevs: Set<Severity>; origin: "all" | "ai" | "coach"; showDismissed: boolean }
+export interface Filters { cats: Set<Category>; sevs: Set<Severity>; origin: "all" | "ai" | "rules" | "coach"; showDismissed: boolean }
 export const defaultFilters = (): Filters => ({ cats: new Set(), sevs: new Set(), origin: "all", showDismissed: false });
 
 export function applyFilters(fs: Finding[], f: Filters) {
@@ -37,7 +37,7 @@ export function FilterBar({ findings, filters, onChange }: { findings: Finding[]
           </button>
         ))}
         <select value={filters.origin} onChange={(e) => onChange({ ...filters, origin: e.target.value as Filters["origin"] })} className="focus-ring h-7 rounded-md border border-line bg-surface-2 px-2 text-xs text-ink-2" aria-label="Origen">
-          <option value="all">IA + coach</option><option value="ai">Solo IA</option><option value="coach">Solo coach</option>
+          <option value="all">Todos los orígenes</option><option value="rules">Solo reglas</option><option value="ai">Solo IA</option><option value="coach">Solo coach</option>
         </select>
         <label className="ml-auto flex items-center gap-1.5 text-xs text-ink-3"><input type="checkbox" checked={filters.showDismissed} onChange={(e) => onChange({ ...filters, showDismissed: e.target.checked })} className="accent-[var(--color-brand)]" />Descartados</label>
       </div>
@@ -61,7 +61,8 @@ export function FindingsList({ findings, selectedId, onPick }: { findings: Findi
               <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-ink-3">
                 {CATEGORY_LABEL[f.category]}{f.error_type && ` · ${ERROR_TYPE_LABEL[f.error_type]}`}{f.phase && ` · ${PHASE_LABEL[f.phase]}`}
                 {f.origin === "coach" && <Badge tone="brand"><UserRound className="size-3" />Coach</Badge>}
-                {f.review_status === "confirmed" && f.origin === "ai" && <Badge tone="ok">Confirmado</Badge>}
+                {f.origin === "rules" && <Badge>Regla</Badge>}
+                {f.review_status === "confirmed" && f.origin !== "coach" && <Badge tone="ok">Confirmado</Badge>}
               </span>
             </span>
           </button>
@@ -87,14 +88,14 @@ export function FindingDetail({ f, frameUrl, onSeek, onChanged }: { f: Finding; 
             <Badge>{CATEGORY_LABEL[f.category]}</Badge>
             {f.error_type && <Badge>{ERROR_TYPE_LABEL[f.error_type]}</Badge>}
             {f.phase && <Badge>{PHASE_LABEL[f.phase]}</Badge>}
-            {f.origin === "ai" ? <Badge><Bot className="size-3" />IA · confianza {Math.round((f.confidence || 0) * 100)}%</Badge> : <Badge tone="brand"><UserRound className="size-3" />Coach</Badge>}
+            {f.origin === "coach" ? <Badge tone="brand"><UserRound className="size-3" />Coach</Badge> : <Badge><Bot className="size-3" />{f.origin === "rules" ? "Regla automática" : "IA"} · confianza {Math.round((f.confidence || 0) * 100)}%</Badge>}
           </div>
           <h3 className="mt-2 text-lg font-semibold tracking-tight">{f.title}</h3>
         </div>
         <div className="flex gap-1.5">
-          {f.origin === "ai" && f.review_status !== "confirmed" && <Button size="sm" icon={<CheckCircle2 className="size-3.5" />} loading={busy === "c"} onClick={() => set({ review_status: "confirmed" }, "c")}>Confirmar</Button>}
-          {f.origin === "ai" && f.review_status !== "dismissed" && <Button size="sm" variant="ghost" icon={<CircleSlash className="size-3.5" />} loading={busy === "d"} onClick={() => set({ review_status: "dismissed" }, "d")}>Descartar</Button>}
-          {f.origin === "ai" && f.review_status === "dismissed" && <Button size="sm" variant="ghost" loading={busy === "r"} onClick={() => set({ review_status: "open" }, "r")}>Restaurar</Button>}
+          {f.origin !== "coach" && f.review_status !== "confirmed" && <Button size="sm" icon={<CheckCircle2 className="size-3.5" />} loading={busy === "c"} onClick={() => set({ review_status: "confirmed" }, "c")}>Confirmar</Button>}
+          {f.origin !== "coach" && f.review_status !== "dismissed" && <Button size="sm" variant="ghost" icon={<CircleSlash className="size-3.5" />} loading={busy === "d"} onClick={() => set({ review_status: "dismissed" }, "d")}>Descartar</Button>}
+          {f.origin !== "coach" && f.review_status === "dismissed" && <Button size="sm" variant="ghost" loading={busy === "r"} onClick={() => set({ review_status: "open" }, "r")}>Restaurar</Button>}
           {f.origin === "coach" && <Button size="sm" variant="danger" icon={<Trash2 className="size-3.5" />} onClick={async () => { await del(`/findings/${f.id}`); onChanged(); }}>Borrar</Button>}
           <Select className="h-8 w-auto text-xs" value={f.severity} onChange={(e) => set({ severity: e.target.value }, "s")} aria-label="Cambiar gravedad">
             {SEVERITY_ORDER.map((s) => <option key={s} value={s}>{SEVERITY_LABEL[s]}</option>)}

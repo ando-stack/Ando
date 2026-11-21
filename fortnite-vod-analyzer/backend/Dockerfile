@@ -6,7 +6,7 @@ RUN dotnet publish -c Release -o /out
 
 # --- Stage 2: API + worker
 FROM python:3.12-slim
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libicu-dev ca-certificates \
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libicu-dev libgl1 libglib2.0-0 ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 # .NET runtime for FrdExport
 COPY --from=mcr.microsoft.com/dotnet/runtime:10.0 /usr/share/dotnet /usr/share/dotnet

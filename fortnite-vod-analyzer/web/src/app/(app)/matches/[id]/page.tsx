@@ -137,8 +137,8 @@ export default function MatchPage() {
   );
 }
 
-const VIDEO_STAGES = ["Validando vídeo", "Preparando reproducción", "Detectando momentos relevantes", "Extrayendo fotogramas", "Transcribiendo audio", "Análisis visual por segmentos", "Construyendo cronología", "Módulos de coaching", "Redactando informe"];
-const REPLAY_STAGES = ["Interpretando replay", "Construyendo cronología", "Módulos de coaching", "Redactando informe"];
+const VIDEO_STAGES = ["Validando vídeo", "Preparando reproducción", "Detectando momentos relevantes", "Leyendo HUD", "Aplicando reglas de coaching", "Extrayendo fotogramas", "Transcribiendo audio", "Análisis visual por segmentos", "Construyendo cronología", "Módulos de coaching", "Redactando informe"];
+const REPLAY_STAGES = ["Interpretando replay", "Construyendo cronología", "Aplicando reglas de coaching", "Módulos de coaching", "Redactando informe"];
 
 function PipelineSteps({ source, stage }: { source: string; stage: string | null }) {
   const steps = source === "video" ? VIDEO_STAGES : REPLAY_STAGES;
@@ -155,8 +155,8 @@ function PipelineSteps({ source, stage }: { source: string; stage: string | null
 }
 
 function TimelineTab({ bundle }: { bundle: AnalysisBundle }) {
-  const items = bundle.analysis!.timeline.filter((x) => x.kind !== "frame");
-  const frames = bundle.analysis!.timeline.filter((x) => x.kind === "frame");
+  const items = bundle.analysis!.timeline.filter((x) => x.kind !== "frame" && x.kind !== "hud");
+  const frames = bundle.analysis!.timeline.filter((x) => x.kind === "frame" || x.kind === "hud");
   const [showFrames, setShowFrames] = useState(false);
   const list = (showFrames ? bundle.analysis!.timeline : items).slice(0, 2000);
   return (
@@ -167,8 +167,8 @@ function TimelineTab({ bundle }: { bundle: AnalysisBundle }) {
         {list.map((x) => (
           <li key={x.id} className="grid grid-cols-[64px_88px_1fr] gap-3 px-5 py-2.5 text-sm">
             <span className="tabular font-mono text-xs text-brand">{fmtTime(x.t)}</span>
-            <span className="truncate text-xs text-ink-3">{x.kind === "frame" ? `${x.id} · ${x.situation}` : x.kind === "speech" ? "Voz" : x.kind === "observation" ? `${x.obs_kind}` : x.type}</span>
-            <span className="text-ink-2">{x.description || x.text}{x.kind === "frame" && x.hud && <HudLine hud={x.hud} />}</span>
+            <span className="truncate text-xs text-ink-3">{x.kind === "hud" ? `${x.id} · HUD` : x.kind === "frame" ? `${x.id} · ${x.situation}` : x.kind === "speech" ? "Voz" : x.kind === "observation" ? `${x.obs_kind}` : x.type}</span>
+            <span className="text-ink-2">{x.kind === "hud" ? ((x as any).storm >= 0.35 ? "Tinte de tormenta" : "") : (x.description || x.text)}{x.kind === "frame" && x.hud && <HudLine hud={x.hud} />}{x.kind === "hud" && x.hud && <HudLine hud={x.hud} />}</span>
           </li>
         ))}
       </ul>
@@ -208,7 +208,14 @@ function FilesTab({ match, bundle, onChanged }: { match: Match; bundle: Analysis
         <Card>
           <CardHeader title="Cobertura del análisis" subtitle="Qué datos se usaron realmente" />
           <dl className="grid grid-cols-2 gap-x-6 gap-y-2 p-5 text-sm">
-            {a.source_type === "video" ? (
+            {a.source_type === "video" && cov.mode === "rules" ? (
+              <>
+                <Dt k="Modo" v="Reglas (sin IA generativa)" /><Dt k="Muestras de HUD" v={a.stats.hud_samples} />
+                <Dt k="Vida legible" v={`${a.stats.hud_legible_pct}%`} /><Dt k="Materiales legibles" v={`${a.stats.materials_legible_pct}%`} />
+                <Dt k="HUD" v={cov.hud_calibrated ? "Calibrado" : "Sin calibrar (aproximado)"} /><Dt k="Peleas detectadas" v={a.stats.fights_detected} />
+                <Dt k="Tiempo en tormenta" v={`${a.stats.storm_seconds} s`} /><Dt k="Fases por" v={cov.phase_method === "hud_players_remaining" ? "HUD (jugadores restantes)" : "tiempo (estimado)"} />
+              </>
+            ) : a.source_type === "video" ? (
               <>
                 <Dt k="Fotogramas analizados" v={cov.frames} /><Dt k="Con gameplay" v={cov.gameplay_frames} />
                 <Dt k="Segmentos" v={`${cov.segments_analysed}/${cov.segments_total}`} /><Dt k="Minutos de gameplay" v={cov.analysed_minutes} />

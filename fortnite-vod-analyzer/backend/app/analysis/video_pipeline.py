@@ -32,6 +32,8 @@ from ..video.sampling import intensity_curve, plan_frames
 from ..vision.provider import Part, ProviderError, get_provider
 from . import engine, prompts
 from .engine import AnalysisContext, Evidence, fmt_t
+from ..hud.layout import normalize_layout
+from . import hud_pass, report_template, rules_video
 from .persist import save_analysis
 from .schemas import SEGMENT_SCHEMA
 
@@ -67,9 +69,7 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
     s = get_settings()
     st = get_storage()
     provider = get_provider()
-    ok, why = provider.configured()
-    if not ok:
-        raise PipelineError(f"El análisis con IA no está configurado: {why}", "ai_not_configured")
+    use_ai, ai_reason = provider.configured()
 
     with session_scope() as db:
         match = db.get(Match, match_id)
@@ -81,9 +81,10 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
         if match.notes:
             context += f" Notas del coach: {match.notes[:500]}"
         video_key, video_id = video.storage_key, video.id
+        layout = normalize_layout(match.player.hud_layout)
         has_proxy = db.scalar(select(MediaFile.id).where(MediaFile.match_id == match_id, MediaFile.kind == "proxy")) is not None
         analysis = Analysis(owner_id=owner_id, match_id=match_id, job_id=ctx.job_id, source_type="video", is_current=False,
-                            model=provider.model, pipeline_version=engine.PIPELINE_VERSION)
+                            model=provider.model if use_ai else "reglas", pipeline_version=engine.PIPELINE_VERSION)
         db.add(analysis)
         db.flush()
         analysis_id = analysis.id
@@ -121,6 +122,35 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
             b = np.interp(times, act_t, bright)
             skip = b < 8  # black / loading screens
         ctx.check_cancel()
+
+        # 3b. HUD reading + deterministic rules (always, no generative AI)
+        ctx.progress("Leyendo HUD", 18, "OCR de vida, escudo, materiales y jugadores; detección de tormenta", force=True)
+        hud_dir = work / "hud"
+        samples = hud_pass.read_hud(src, info.duration, layout, s.hud_every, hud_dir, lambda x: ctx.progress("Leyendo HUD", 18 + (14 if use_ai else 52) * x))
+        fights = rules_video.detect_fights(times, combined, info.has_audio)
+        phase_of_rules, rules_phase_method = hud_pass.phase_from_samples(samples, info.duration)
+        rules = hud_pass.rules_findings(samples, fights, phase_of_rules, info.duration)
+        rules_stats = hud_pass.hud_stats(samples, fights, layout.get("calibrated", False), s.hud_every)
+        ctx.check_cancel()
+
+        if not use_ai:
+            ctx.progress("Aplicando reglas de coaching", 75, force=True)
+            _persist_hud_frames(owner_id, match_id, analysis_id, rules["findings"], rules["strengths"], samples, hud_dir, work)
+            findings = engine.dedupe(rules["findings"])
+            minutes = info.duration / 60.0
+            scores = engine.score(findings, rules["strengths"], rules["assessable"], minutes)
+            stats = {"source": "video", "duration_s": round(info.duration, 1), "resolution": f"{info.width}x{info.height}", "fps": info.fps, **rules_stats}
+            not_assessable = {m: ["Requiere un modelo de visión (VISION_PROVIDER)."] for m, ok_ in rules["assessable"].items() if not ok_}
+            report = report_template.build_report("video", findings, rules["strengths"], stats, scores, phase_of_rules, not_assessable)
+            report["not_assessable"] = not_assessable
+            report["strengths_evidence"] = rules["strengths"]
+            coverage = {"mode": "rules", "ai": ai_reason, "duration_s": info.duration, "analysed_minutes": round(minutes, 1),
+                        "phase_method": rules_phase_method, "has_audio": info.has_audio, "hud_layout": layout.get("name"),
+                        "hud_calibrated": layout.get("calibrated", False), "hud_readings": rules["readings"], "dropped_unverified_claims": 0}
+            timeline = sorted(hud_pass.hud_timeline(samples, fights), key=lambda x: (x["t"], x["id"]))
+            save_analysis(analysis_id, match_id, owner_id, timeline, stats, scores, report, coverage, {"findings": findings}, {"calls": 0})
+            ctx.progress("Completado", 100, f"{len(findings)} errores detectados por reglas", force=True)
+            return analysis_id
 
         # 4-5. plan + extract frames
         segments, planned = plan_frames(info.duration, times, combined, motion, audio, segment_seconds=s.segment_seconds,
@@ -290,8 +320,17 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
         mod = engine.run_modules(actx, observations, [{"type": e["type"], "evidence": e["evidence"]} for e in events],
                                  lambda name, x: ctx.progress("Módulos de coaching", 78 + 14 * x, name), provider.concurrency or s.vision_concurrency)
 
+        # merge deterministic rule findings
+        _persist_hud_frames(owner_id, match_id, analysis_id, rules["findings"], rules["strengths"], samples, hud_dir, work)
+        mod["findings"] = engine.dedupe(mod["findings"] + rules["findings"])
+        mod["strengths"] += rules["strengths"]
+        for m_, ok_ in rules["assessable"].items():
+            mod["assessable"][m_] = mod["assessable"].get(m_, False) or ok_
+        timeline += hud_pass.hud_timeline(samples, fights)
+        timeline.sort(key=lambda x: (x["t"], x["id"]))
+
         # scores + report
-        stats = _video_stats(info, actx.frame_items, events, frames, segments, transcript)
+        stats = {**_video_stats(info, actx.frame_items, events, frames, segments, transcript), **{k: v for k, v in rules_stats.items() if k not in ("fights_detected",)}}
         scores = engine.score(mod["findings"], mod["strengths"], mod["assessable"], actx.analysed_minutes)
         ctx.progress("Redactando informe", 93, force=True)
         report = engine.synthesize_report(actx, mod, scores, stats)
@@ -306,6 +345,7 @@ def run_video_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
             "phase_method": phase_method, "has_audio": info.has_audio, "transcript_lines": len(transcript),
             "speech_to_text": stt_reason if not stt_ok else "ok", "not_verifiable": not_verifiable[:80],
             "dropped_unverified_claims": mod["dropped_unverified"], "segment_summaries": seg_summaries,
+            "mode": "ai+rules", "hud_layout": layout.get("name"), "hud_calibrated": layout.get("calibrated", False), "hud_readings": rules["readings"],
             "sampling": {"segment_seconds": s.segment_seconds, "max_frames_total": s.max_frames_total, "max_frames_per_segment": s.max_frames_per_segment},
         }
         save_analysis(analysis_id, match_id, owner_id, timeline, stats, scores, report, coverage, mod, actx.usage.as_dict())
@@ -372,3 +412,20 @@ def _video_stats(info, frame_items, events, frames, segments, transcript) -> dic
         "speech_lines": len(transcript),
         "note": "Valores leídos del HUD en fotogramas muestreados; null = no legible o no observado.",
     }
+
+
+def _persist_hud_frames(owner_id, match_id, analysis_id, findings, strengths, samples, hud_dir: Path, work: Path) -> None:
+    """Upload only the HUD frames cited as evidence."""
+    cited = {e["id"] if isinstance(e, dict) else e for f in findings for e in f["evidence"]}
+    cited |= {e for s_ in strengths for e in s_.get("evidence", []) if str(e).startswith("H")}
+    st = get_storage()
+    with session_scope() as db:
+        for i, smp in enumerate(samples):
+            lab = rules_video.hid(i)
+            if lab not in cited or not (hud_dir / f"{lab}.jpg").exists():
+                continue
+            key = f"{owner_id}/{match_id}/analyses/{analysis_id}/frames/{lab}.jpg"
+            tmp = work / f"up-{lab}.jpg"
+            shutil.copyfile(hud_dir / f"{lab}.jpg", tmp)
+            st.put_file(tmp, key, "image/jpeg")
+            db.add(Frame(owner_id=owner_id, analysis_id=analysis_id, label=lab, t=smp.t, segment_index=-1, reason="hud", storage_key=key))

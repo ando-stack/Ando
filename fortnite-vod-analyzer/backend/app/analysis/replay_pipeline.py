@@ -23,7 +23,9 @@ from ..storage import materialize
 from ..vision.provider import get_provider
 from . import engine
 from .engine import AnalysisContext, Evidence, fmt_t
+from . import report_template
 from .persist import save_analysis
+from .rules_replay import run_replay_rules
 
 UNIT_TO_M = 0.01  # Unreal units are centimetres
 
@@ -153,9 +155,7 @@ def build_replay_timeline(r: ReplayParseResult, target: str) -> tuple[list[dict]
 def run_replay_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
     s = get_settings()
     provider = get_provider()
-    ok, why = provider.configured()
-    if not ok:
-        raise PipelineError(f"El análisis con IA no está configurado: {why}", "ai_not_configured")
+    use_ai, ai_reason = provider.configured()
     with session_scope() as db:
         match = db.get(Match, match_id)
         rep = db.scalar(select(MediaFile).where(MediaFile.match_id == match_id, MediaFile.kind == "replay"))
@@ -165,7 +165,7 @@ def run_replay_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
         player_label = match.player.name
         context = f"Partida '{match.title}'. Modo: {match.game_mode or match.player.game_mode or 'desconocido'}. Nivel: {match.player.competitive_level or '?'}."
         analysis = Analysis(owner_id=owner_id, match_id=match_id, job_id=ctx.job_id, source_type="replay", is_current=False,
-                            model=provider.model, pipeline_version=engine.PIPELINE_VERSION)
+                            model=provider.model if use_ai else "reglas", pipeline_version=engine.PIPELINE_VERSION)
         db.add(analysis)
         db.flush()
         analysis_id = analysis.id
@@ -210,18 +210,36 @@ def run_replay_analysis(ctx: JobCtx, match_id: str, owner_id: str) -> str:
         actx.unavailable_modules["mechanics"] = "Las mecánicas (builds, edits, aim) solo se pueden evaluar con vídeo."
         actx.unavailable_modules["communication"] = "Las replays no contienen audio de voz."
         actx.available_modules = modules
-        ctx.progress("Módulos de coaching", 35, ", ".join(modules), force=True)
-        mod = engine.run_modules(actx, [], [], lambda name, x: ctx.progress("Módulos de coaching", 35 + 45 * x, name), provider.concurrency or s.vision_concurrency)
-        scores = engine.score(mod["findings"], mod["strengths"], mod["assessable"], actx.analysed_minutes)
-        ctx.progress("Redactando informe", 85, force=True)
-        report = engine.synthesize_report(actx, mod, scores, stats)
-        report["module_summaries"] = mod["module_summaries"]
-        report["not_assessable"] = mod["not_assessable"]
+        rules = run_replay_rules(events, stats, r.length_ms / 1000)
+        for f in rules["findings"]:
+            ev = f["evidence"]
+            f["evidence"] = [{"id": e, "t": actx.evidence[e].t, "kind": "replay_event"} for e in ev]
+            f["module"], f["phase"] = "rules", actx.phase_of(f["t_start"])
+        not_assessable = {m: [why] for m, why in actx.unavailable_modules.items()}
+        if use_ai:
+            ctx.progress("Módulos de coaching", 35, ", ".join(modules), force=True)
+            mod = engine.run_modules(actx, [], [], lambda name, x: ctx.progress("Módulos de coaching", 35 + 45 * x, name), provider.concurrency or s.vision_concurrency)
+            mod["findings"] = engine.dedupe(mod["findings"] + rules["findings"])
+            mod["strengths"] += rules["strengths"]
+            for m_, ok_ in rules["assessable"].items():
+                mod["assessable"][m_] = mod["assessable"].get(m_, False) or ok_
+            scores = engine.score(mod["findings"], mod["strengths"], mod["assessable"], actx.analysed_minutes)
+            ctx.progress("Redactando informe", 85, force=True)
+            report = engine.synthesize_report(actx, mod, scores, stats)
+            report["module_summaries"] = mod["module_summaries"]
+            report["not_assessable"] = mod["not_assessable"]
+        else:
+            ctx.progress("Aplicando reglas de coaching", 60, force=True)
+            mod = {"findings": engine.dedupe(rules["findings"]), "strengths": rules["strengths"], "dropped_unverified": 0}
+            scores = engine.score(mod["findings"], mod["strengths"], rules["assessable"], actx.analysed_minutes)
+            report = report_template.build_report("replay", mod["findings"], mod["strengths"], stats, scores, actx.phase_of, not_assessable)
+            report["not_assessable"] = not_assessable
         report["strengths_evidence"] = mod["strengths"]
         coverage = {
             "adapter": r.adapter, "adapter_version": r.adapter_version, "version": r.version.__dict__ | {"season_label": r.version.season_label},
             "unavailable": r.unavailable, "warnings": r.warnings, "events": len(events), "target_player_ref": target,
             "dropped_unverified_claims": mod["dropped_unverified"], "analysed_minutes": round(actx.analysed_minutes, 1),
+            "mode": "ai+rules" if use_ai else "rules", "ai": ai_reason,
         }
         target_pos = [{"t": round(p.time_ms / 1000, 1), "x": round(p.x), "y": round(p.y)} for p in r.positions if p.player_id == target]
         replay_data = {
