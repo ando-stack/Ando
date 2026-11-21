@@ -1,3 +1,14 @@
+---
+title: Fortnite VOD Analyzer
+emoji: 🎯
+colorFrom: blue
+colorTo: gray
+sdk: docker
+app_port: 7860
+pinned: false
+short_description: Análisis de partidas de Fortnite para coaches
+---
+
 # Fortnite VOD Analyzer — AI Coaching Platform
 
 Plataforma web para coaches de Fortnite competitivo: sube una partida (vídeo o `.replay`), obtén errores con **minuto y segundo exactos**, revísalos en un reproductor con marcadores, añade tus notas y exporta un informe profesional en PDF.
@@ -8,6 +19,15 @@ Plataforma web para coaches de Fortnite competitivo: sube una partida (vídeo o 
 - **Replays**: lector de eventos propio en Python + adaptador opcional FortniteReplayDecompressor (posiciones y zonas).
 
 Documentación: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/REPLAYS.md`](docs/REPLAYS.md)
+
+## 🌐 Probarlo como web gratis (Hugging Face Spaces) — sin instalar nada
+
+1. En <https://huggingface.co/new-space>: nombre `fortnite-vod-analyzer`, SDK **Docker** → *Blank*, hardware gratis (*CPU basic*) y visibilidad **Private** (recomendado: solo tú podrás abrirla).
+2. Pestaña **Files → Add file → Upload files**: arrastra **todo el contenido de esta carpeta** (`Dockerfile`, `space-start.sh`, `README.md`, `backend/`, `web/`, `replay-tools/`…) y pulsa *Commit*.
+3. Espera a que ponga **Running** (la primera vez tarda ~10 min en construirse) y ábrela.
+4. **La primera cuenta que se registra es la tuya**; después el registro queda cerrado.
+
+Funciona en modo reglas (sin IA ni claves), con el adaptador de replays incluido. En el plan gratuito los datos se borran si el Space se reinicia o se duerme.
 
 ## Puesta en marcha (desarrollo)
 
