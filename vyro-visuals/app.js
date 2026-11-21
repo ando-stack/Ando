@@ -5,7 +5,7 @@
   // Forma de las tarjetas por categoría
   const SHAPES = {
     deportes:   { shape: "portrait", ratio: "4 / 5",  badge: "Deportes",   label: "Deportes" },
-    gaming:     { shape: "square",   ratio: "1 / 1",  badge: "Gaming",     label: "Gaming" },
+    gaming:     { shape: "wide",     ratio: "16 / 9",  badge: "Gaming",     label: "Gaming" },
     miniaturas: { shape: "wide",     ratio: "16 / 9", badge: "Miniatura",  label: "Miniaturas" },
     largos:     { shape: "wide",     ratio: "16 / 9", badge: "Vídeo",      label: "Vídeos largos" },
     shorts:     { shape: "portrait", ratio: "9 / 16", badge: "Short",      label: "Shorts" },

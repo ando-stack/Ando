@@ -32,6 +32,8 @@ const VYRO = {
       // { imagen: "media/gfx/deportes/matchday.jpg", titulo: "Matchday Poster", cliente: "Club X" },
     ],
     gaming: [
+      { imagen: "media/gfx/gaming/stream-offline-1.webp", titulo: "Stream Offline", cliente: "Twitch" },
+      { imagen: "media/gfx/gaming/stream-offline-2.webp", titulo: "Stream Offline · Versión 2", cliente: "Twitch" },
       // { imagen: "media/gfx/gaming/header-twitch.png", titulo: "Header Twitch", cliente: "Streamer Y" },
     ],
     miniaturas: [
