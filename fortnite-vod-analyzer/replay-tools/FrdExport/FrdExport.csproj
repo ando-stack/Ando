@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Thin CLI around FortniteReplayReader (MIT, https://github.com/Shiqan/FortniteReplayDecompressor).
+    It runs as a separate process so the backend never links its code: the
+    bundled Oodle decompressor (OozSharp) is derived from GPL-3.0 code.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FortniteReplayReader" Version="3.2.0" />
+  </ItemGroup>
+</Project>

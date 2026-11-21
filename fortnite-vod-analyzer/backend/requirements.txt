@@ -1,0 +1,13 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0
+psycopg[binary]>=3.2
+python-multipart>=0.0.9
+pyjwt[crypto]>=2.9
+cryptography>=43
+anthropic>=2.0
+numpy>=1.26
+reportlab>=4.2
+boto3>=1.34
+# opcional: transcripción de voz para el analizador de comunicación
+# faster-whisper>=1.0
