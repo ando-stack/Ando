@@ -3,3 +3,6 @@ __pycache__/
 .venv/
 trabajos/
 clips/
+fantasy_basket/scraper/raw/
+fantasy_basket/scraper/dataset.json
+fantasy_basket/scraper/matches.json
