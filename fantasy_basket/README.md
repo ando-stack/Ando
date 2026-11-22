@@ -18,7 +18,7 @@ Todos los jugadores, entrenadores y estadísticas salen de las plantillas y las 
 ```bash
 fantasy_basket/scraper/actualizar.sh
 ```
-Descarga la competición, los equipos y las actas nuevas, recalcula puntos y precios, baja las fotos y escribe `data.json`.
+Descarga la competición, los equipos y las actas nuevas, recalcula puntos y precios y escribe `data.json`. Las fotos no se descargan: se mantienen las que hay en `fotos/`. Los nombres corregidos a mano están en `scraper/nombres.json`.
 Solo cuentan los partidos terminados (estado 1 y sin directo): un partido en juego no suma.
 Hay tareas programadas que lo ejecutan los sábados a las 11:00, 12:30 y 16:00 (hora de España) y publican el juego si hay cambios.
 
