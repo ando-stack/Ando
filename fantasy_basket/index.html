@@ -240,6 +240,7 @@ const short = p => { const n = pname(p); if (/\./.test(n)) return n; const w = n
 const tc = tid => TEAM_COLORS[Object.keys(T).indexOf(tid) % TEAM_COLORS.length];
 const faces = (t, size=40) => { const imgs = (t.cph_img||[]).map((src,i)=>src?`<img src="${src}" alt="${esc(title((t.coaches||[])[i]||''))}" loading="lazy">`:'').join(''); return imgs ? `<span class="faces" style="--fs:${size}px;--tc:${tc(t.id)}">${imgs}</span>` : ''; };
 const face = (p, size=32) => p.img ? `<img class="face" src="${p.img}" alt="" loading="lazy" style="--fs:${size}px;--tc:${tc(p.t)}">` : '';
+const teamPart = g => Math.round(((g.res==='W'?2:0) + Math.max(-4, Math.min(4, g.pm/5)))*10)/10;
 const chip = tid => `<span class="chip" style="--tc:${tc(tid)}"><span class="dot"></span>${esc(T[tid].s)}</span>`;
 const trend = arr => { if (arr.length < 2) return 0; return Math.round((arr[arr.length-1] - arr[arr.length-2])*10)/10; };
 const trendHtml = arr => { const t = trend(arr); return t > 0 ? `<span class="up">▲ ${fmt(t)}</span>` : t < 0 ? `<span class="down">▼ ${fmt(-t)}</span>` : `<span class="flat">=</span>`; };
@@ -534,6 +535,7 @@ function viewRules(){
       <p>Vender devuelve el precio actual del jugador.</p></div>
     <div class="panel"><h3>Puntos de jugador</h3>
       <table style="width:100%"><tbody>
+        <tr><th class="l" colspan="2">Rendimiento individual · el que más pesa</th></tr>
         <tr><td class="l">Cada punto anotado</td><td class="num">+1</td></tr>
         <tr><td class="l">Extra por triple</td><td class="num">+0,5</td></tr>
         <tr><td class="l">Tiro de campo fallado</td><td class="num">−0,5</td></tr>
@@ -542,10 +544,11 @@ function viewRules(){
         <tr><td class="l">Eliminado (5 faltas)</td><td class="num">−3</td></tr>
         <tr><td class="l">Salir de titular</td><td class="num">+1</td></tr>
         <tr><td class="l">Cada 10 minutos jugados</td><td class="num">+1</td></tr>
+        <tr><th class="l" colspan="2" style="padding-top:10px">Rendimiento del equipo</th></tr>
         <tr><td class="l">+/− en pista (cada 5)</td><td class="num">±1 (tope ±4)</td></tr>
         <tr><td class="l">Victoria de su equipo</td><td class="num">+2</td></tr>
       </tbody></table>
-      <p class="note" style="margin-top:8px">No jugar = 0. Quinteto ×1, capitán ×2, banquillo ×0,5.</p></div>
+      <p class="note" style="margin-top:8px">De media, unos dos tercios de los puntos salen de lo que hace el jugador y un tercio de cómo le va a su equipo con él en pista. No jugar = 0. Quinteto ×1, capitán ×2, banquillo ×0,5.</p></div>
     <div class="panel"><h3>Entrenador</h3>
       <table style="width:100%"><tbody>
         <tr><td class="l">Victoria</td><td class="num">+10</td></tr>
@@ -590,10 +593,10 @@ function openPlayer(id){
         ? `${starter?`<button class="btn" data-act="captain" data-id="${id}" ${state.captain===id?'disabled':''}>${state.captain===id?'Es tu capitán':'Nombrar capitán'}</button>`:''}<button class="btn" data-act="swap" data-id="${id}">${starter?'Pasar al banquillo':'Subir al quinteto'}</button><button class="btn" data-act="sell" data-id="${id}">Vender · ${money(p.p)}</button>`
         : `<button class="btn primary" data-act="buy" data-id="${id}" ${err?'disabled':''}>Fichar · ${money(p.p)}</button>${err?`<span class="note">${esc(err)}</span>`:''}`}</div></div>
     <div class="eyebrow" style="margin-bottom:6px">Actas</div>
-    <div class="tablewrap"><table><thead><tr><th class="l">J</th><th class="l">Rival</th><th class="l">Res.</th><th>Tit.</th><th>Min</th><th>Pts</th><th>T2</th><th>T3</th><th>TL</th><th>F</th><th>+/−</th><th>Fantasy</th></tr></thead><tbody>
+    <div class="tablewrap"><table><thead><tr><th class="l">J</th><th class="l">Rival</th><th class="l">Res.</th><th>Tit.</th><th>Min</th><th>Pts</th><th>T2</th><th>T3</th><th>TL</th><th>F</th><th>+/−</th><th>Indiv.</th><th>Equipo</th><th>Fantasy</th></tr></thead><tbody>
       ${p.g.length ? p.g.map(g=>`<tr><td class="l num">${g.j}</td><td class="l">${chip(g.opp)}</td><td class="l"><span class="${g.res==='W'?'up':'down'}">${g.res==='W'?'V':'D'}</span> <span class="num note">${g.sc}</span></td>
-        ${g.fp==null?`<td colspan="9" class="note" style="text-align:center">No jugó</td>`:`<td>${g.st?'●':''}</td><td class="num">${fmt(g.min)}</td><td class="num"><b>${g.pts}</b></td><td class="num">${g.t2m}/${g.t2a}</td><td class="num">${g.t3m}/${g.t3a}</td><td class="num">${g.ftm}/${g.fta}</td><td class="num">${g.fc}</td><td class="num">${g.pm>0?'+':''}${g.pm}</td><td><span class="val-pill num" style="${valColor(g.fp)}">${fmt(g.fp)}</span></td>`}</tr>`).join('')
-        : '<tr><td colspan="12" class="note" style="text-align:center">Sin minutos en las actas publicadas</td></tr>'}
+        ${g.fp==null?`<td colspan="11" class="note" style="text-align:center">No jugó</td>`:`<td>${g.st?'●':''}</td><td class="num">${fmt(g.min)}</td><td class="num"><b>${g.pts}</b></td><td class="num">${g.t2m}/${g.t2a}</td><td class="num">${g.t3m}/${g.t3a}</td><td class="num">${g.ftm}/${g.fta}</td><td class="num">${g.fc}</td><td class="num">${g.pm>0?'+':''}${g.pm}</td><td class="num">${fmt(g.fp-teamPart(g))}</td><td class="num">${teamPart(g)>0?'+':''}${fmt(teamPart(g))}</td><td><span class="val-pill num" style="${valColor(g.fp)}">${fmt(g.fp)}</span></td>`}</tr>`).join('')
+        : '<tr><td colspan="14" class="note" style="text-align:center">Sin minutos en las actas publicadas</td></tr>'}
     </tbody></table></div>
   </div>`;
   bind(dlg);
