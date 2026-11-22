@@ -615,6 +615,30 @@ function openPlayer(id){
   bind(dlg);
   if (!dlg.open) dlg.showModal();
 }
+function openMember(uid, code){
+  const d = L.members[uid]; const e = d?.teams?.[code]; if (!e) return;
+  const lg = L.leagues[code] || {}; const t = leagueTotals(e, lg); const cur = latestSquad(e) ? sanitize(latestSquad(e)) : null;
+  const mgr = e.mgr || L.names[uid]?.name || 'Mánager';
+  const pl = (id, extra) => `<span class="withface">${face(P[id],26)}<button class="pname" data-act="open" data-id="${id}">${esc(short(P[id]))}</button> ${chip(P[id].t)}${extra||''}</span>`;
+  const squadRows = cur ? [...cur.starters.map(id=>[id,'Quinteto']), ...cur.bench.map(id=>[id,'Banquillo'])].filter(x=>x[0]).map(([id,role])=>
+      `<tr><td class="l">${pl(id, cur.captain===id?' <span class="chip">C</span>':'')}</td><td class="l note">${role}</td><td class="num">${money(P[id].p)}</td><td class="num">${fmt(P[id].avg)}</td></tr>`).join('')
+      + (cur.coach ? `<tr><td class="l"><span class="withface">${faces(T[cur.coach],26)}<b>${esc(title(T[cur.coach].coach))}</b> ${chip(cur.coach)}</span></td><td class="l note">Entrenador</td><td class="num">${money(T[cur.coach].cp)}</td><td></td></tr>` : '') : '';
+  const rounds = t.per.slice().reverse().map(({j, pts}) => { const s = squadFor(e, j); const sc = s ? roundScore(sanitize(s), j) : null;
+    return `<details ${j===t.per[t.per.length-1]?.j?'open':''} style="border-top:1px solid var(--line);padding:8px 0"><summary style="cursor:pointer;display:flex;justify-content:space-between;gap:10px"><b>Jornada ${j}</b><b class="num">${fmt(pts)} pts</b></summary>
+      ${sc ? `<div class="tablewrap" style="margin-top:8px"><table><thead><tr><th class="l">Jugador</th><th class="l">Rol</th><th>Acta</th><th>Puntos</th></tr></thead><tbody>
+        ${sc.rows.map(r=>`<tr><td class="l">${pl(r.id)}</td><td class="l note">${r.role}</td><td class="num">${fmt(r.base)}</td><td class="num"><b>${fmt(r.pts)}</b></td></tr>`).join('')}
+        ${s.coach && T[s.coach] ? `<tr><td class="l">${esc(title(T[s.coach].coach))} ${chip(s.coach)}</td><td class="l note">Entrenador</td><td class="num">${fmt(sc.coach)}</td><td class="num"><b>${fmt(sc.coach)}</b></td></tr>` : ''}
+      </tbody></table></div>` : '<p class="note">No tenía equipo esa jornada.</p>'}</details>`; }).join('');
+  const dlg = $('#dlg');
+  dlg.innerHTML = `<div class="mhead"><div style="min-width:0"><div class="eyebrow" style="color:var(--navy-ink);opacity:.7">${esc(lg.name||'Liga')} · ${esc(mgr)}${uid===L.me?' (tú)':''}</div><h2>${esc(e.name||'Equipo')}</h2></div><button class="close" data-act="close">Cerrar</button></div>
+  <div class="mbody">
+    <div class="stats"><div class="stat"><small>Puntos totales</small><b>${fmt(t.tot)}</b></div>${t.per.map(x=>`<div class="stat"><small>J${x.j}</small><b>${fmt(x.pts)}</b></div>`).join('')}<div class="stat"><small>Valor plantilla</small><b>${cur?money(marketValue(cur)):'—'}</b></div></div>
+    ${t.per.length ? `<div class="eyebrow" style="margin-bottom:4px">Puntos por jornada</div>${rounds}` : `<p class="note">La liga empieza a puntuar en la jornada ${lg.start}.</p>`}
+    <div class="eyebrow" style="margin:14px 0 6px">Plantilla actual</div>
+    ${cur && squadRows ? `<div class="tablewrap"><table><thead><tr><th class="l">Jugador</th><th class="l">Rol</th><th>Precio</th><th>Media</th></tr></thead><tbody>${squadRows}</tbody></table></div>` : '<p class="note">Todavía no ha fichado a nadie.</p>'}
+  </div>`;
+  bind(dlg); if (!dlg.open) dlg.showModal();
+}
 function openBot(i){
   const s = autoTeam(1000+i*7919), dlg = $('#dlg');
   const list = (ids, lbl) => ids.filter(Boolean).map(id=>`<tr><td class="l">${face(P[id],26)} <button class="pname" data-act="open" data-id="${id}">${esc(pname(P[id]))}</button>${s.captain===id?' <span class="chip">C</span>':''}</td><td class="l">${chip(P[id].t)}</td><td class="l note">${lbl}</td><td class="num">${money(P[id].p)}</td><td class="num">${fmt(P[id].avg)}</td></tr>`).join('');
@@ -647,7 +671,7 @@ function bind(root){
     else if (a==='reset') { $('#confirmReset').innerHTML = `<div class="actions"><span class="note">¿Vaciar toda la plantilla?</span><button class="btn sm primary" data-act="doreset">Sí, vaciar</button><button class="btn sm" data-act="noreset">No</button></div>`; bind($('#confirmReset')); }
     else if (a==='doreset') { const n = state.name; state = emptyState(); state.name = n; save(); render(); }
     else if (a==='noreset') { $('#confirmReset').innerHTML=''; }
-    else if (a==='logout') { SB.client && SB.client.auth.signOut(); }
+    else if (a==='member') { openMember(el.dataset.uid, el.dataset.code); }
     else if (a==='playpractice') { switchCtx(null); ui.tab='equipo'; render(); toast('Modo práctica'); }
     else if (a==='ligaview') { ui.ligaView = el.dataset.code; render(); }
     else if (a==='playliga') { switchCtx(el.dataset.code); ui.tab='equipo'; render(); toast(`Jugando: ${L.leagues[el.dataset.code]?.name||''}`); }
@@ -663,10 +687,10 @@ function bind(root){
   const q = $('#q', root); if (q) q.addEventListener('input', () => { ui.q = q.value; ui.limit = 40; const pos = q.selectionStart; render(); const n = $('#q'); n.focus(); n.setSelectionRange(pos,pos); });
   const ts = $('#teamSel', root); if (ts) ts.addEventListener('change', () => { ui.team = ts.value; ui.limit = 40; render(); });
   const ss = $('#sortSel', root); if (ss) ss.addEventListener('change', () => { ui.sort = ss.value; ui.dir = -1; render(); });
-  const fc = $('#fCreate', root); if (fc) fc.addEventListener('submit', e => { e.preventDefault(); createLeague($('#newLeague').value); });
+  const fc = $('#fCreate', root); if (fc) fc.addEventListener('submit', e => { e.preventDefault(); createLeague($('#newLeague').value, $('#mgrCreate').value); });
   const fl = $('#fLogin', root); if (fl) fl.addEventListener('submit', e => { e.preventDefault(); const em = $('#loginEmail'); if (em) sbLogin(em.value); });
   const fn = $('#fName', root); if (fn) fn.addEventListener('submit', e => { e.preventDefault(); sbSaveName($('#myName').value); });
-  const fj = $('#fJoin', root); if (fj) fj.addEventListener('submit', e => { e.preventDefault(); ui.joinCode = ''; joinLeague($('#joinCode').value); });
+  const fj = $('#fJoin', root); if (fj) fj.addEventListener('submit', e => { e.preventDefault(); ui.joinCode = ''; joinLeague($('#joinCode').value, false, $('#mgrJoin').value); });
   const tn = $('#teamName', root); if (tn) tn.addEventListener('change', () => { state.name = tn.value.trim() || 'Mi equipo'; save(); render(); });
 }
 document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => { ui.tab = b.dataset.tab; if (ui.tab !== 'mercado') ui.pick = null; render(); }));
@@ -726,25 +750,31 @@ async function writeMyLeagueTeam(){ // una escritura a la vez sobre mi documento
   L.pending = false;
   if (L.queued) { L.queued = false; writeMyLeagueTeam(); }
 }
-async function createLeague(name){
+const MGR_KEY = 'fantasyA1.mgr';
+const lastMgr = () => { try { return localStorage.getItem(MGR_KEY) || ''; } catch(e) { return ''; } };
+function cleanMgr(n){ n = (n||'').trim().slice(0,30); if (!n) { toast('Escribe tu nombre'); return null; } try { localStorage.setItem(MGR_KEY, n); } catch(e){} if (L.mode === 'web') SB.names[L.me] = n; return n; }
+async function createLeague(name, mgr){
   name = (name||'').trim().slice(0,40); if (!name) { toast('Ponle un nombre a la liga'); return; }
+  mgr = cleanMgr(mgr); if (!mgr) return;
   let code, tries = 0;
   do { code = newCode(); tries++; } while ((await L.db.doc('ligas/'+code).get()).exists && tries < 5);
   try {
     await L.db.doc('ligas/'+code).set({ name, owner: L.me, created: Date.now(), start: effRound() });
-    await joinLeague(code, true);
+    await joinLeague(code, true, mgr);
     toast(`Liga creada: ${name}`);
   } catch(e) { toast('No se pudo crear la liga. Necesitas acceso de Colaborador o superior.'); }
 }
-async function joinLeague(code, silent){
+async function joinLeague(code, silent, mgr){
   code = (code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
   if (code.length !== 6) { toast('El código tiene 6 caracteres'); return; }
+  if (!silent) { mgr = cleanMgr(mgr); if (!mgr) return; }
   const lg = await L.db.doc('ligas/'+code).get();
   if (!lg.exists) { toast('No existe ninguna liga con ese código'); return; }
   const doc = clone(L.myDoc || { ligas:[], teams:{} });
   doc.ligas = doc.ligas || []; doc.teams = doc.teams || {};
   if (!doc.ligas.includes(code)) doc.ligas.push(code);
-  if (!doc.teams[code]) doc.teams[code] = { name: 'Equipo de ' + ((await L.user.name()) || 'mánager').split(' ')[0], squads: {} };
+  if (!doc.teams[code]) doc.teams[code] = { name: 'Equipo de ' + (mgr || (await L.user.name()) || 'mánager').split(' ')[0], squads: {} };
+  doc.teams[code].mgr = mgr;
   try { await L.db.doc('equipos/'+L.me).set(doc); L.myDoc = doc; watchLeagueDocs(); ui.ligaView = code; switchCtx(code); ui.tab = 'equipo'; render();
     if (!silent) toast(`Te has unido a ${lg.data().name}. Ahora haz tu equipo.`); }
   catch(e) { toast('No se pudo unir. Necesitas acceso de Colaborador o superior al juego.'); }
@@ -832,8 +862,11 @@ async function initSupabase(){
   if (!window.supabase) await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');
   SB.client = window.supabase.createClient(SB.cfg.supabaseUrl, SB.cfg.supabaseKey);
   const { data } = await SB.client.auth.getSession(); SB.session = data.session;
-  SB.client.auth.onAuthStateChange((ev, session) => { const had = !!SB.session; SB.session = session; if (!!session !== had) location.reload(); });
-  if (!SB.session) { L.needLogin = true; L.ready = true; render(); return null; }
+  if (!SB.session) { // sin email: cuenta anónima guardada en este navegador
+    const r = await SB.client.auth.signInAnonymously();
+    if (r.error) { L.err = 'Las ligas no están activadas todavía (falta permitir el acceso anónimo en Supabase).'; L.ready = true; render(); return null; }
+    SB.session = r.data.session;
+  }
   const u = SB.session.user; const { data: row } = await SB.client.from('equipos').select('nombre').eq('id', u.id).maybeSingle();
   if (row && row.nombre) SB.names[u.id] = row.nombre;
   return makeSupabaseBackend(SB.client, u.id, u.email);
@@ -890,10 +923,13 @@ function viewLeagues(){
       <div class="eyebrow">Código ${c}</div><div class="nm" style="font-size:17px;min-height:0;margin-top:4px">${esc(lg?.name || 'Liga')}</div>
       <div class="meta note"><span>Tu equipo: <b>${esc(e?.name||'—')}</b></span>${ctx.code===c?'<span class="chip">Jugando</span>':''}</div></button>`; }).join('');
   const practiceCard = `<button class="card" data-act="playpractice" style="padding:12px"><div class="eyebrow">Solo tú</div><div class="nm" style="font-size:17px;min-height:0;margin-top:4px">Modo práctica</div><div class="meta note"><span>Equipo guardado en este navegador</span>${ctx.code?'':'<span class="chip">Jugando</span>'}</div></button>`;
+  const mgrInput = id => `<input type="search" id="${id}" placeholder="Tu nombre (lo verán los demás)" maxlength="30" value="${esc(lastMgr())}" aria-label="Tu nombre" style="flex:1 1 200px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0">`;
   const forms = `<div class="two" style="margin-top:16px">
     <form class="panel" id="fCreate"><h3>Crear liga</h3><p class="note">Ponle nombre: "Los del cole", "Familia García"…</p>
+      <div class="filters" style="margin:8px 0 0">${mgrInput('mgrCreate')}</div>
       <div class="filters" style="margin:8px 0 0"><input type="search" id="newLeague" placeholder="Nombre de la liga" maxlength="40" aria-label="Nombre de la liga" style="flex:1 1 200px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0"><button class="btn primary" type="submit">Crear</button></div></form>
     <form class="panel" id="fJoin"><h3>Unirme con código</h3><p class="note">Te lo pasa quien creó la liga.</p>
+      <div class="filters" style="margin:8px 0 0">${mgrInput('mgrJoin')}</div>
       <div class="filters" style="margin:8px 0 0"><input type="search" id="joinCode" placeholder="ABC123" maxlength="8" value="${esc(ui.joinCode||'')}" aria-label="Código de la liga" style="flex:1 1 140px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);text-transform:uppercase;font-family:var(--f-mono);min-width:0"><button class="btn primary" type="submit">Unirme</button></div></form>
   </div>`;
   let detail = '';
@@ -901,7 +937,7 @@ function viewLeagues(){
   if (v) {
     const lg = L.leagues[v] || {};
     const rows = Object.entries(L.members).map(([uid, d]) => { const e = d.teams?.[v]; const t = leagueTotals(e, lg); const s = latestSquad(e);
-      return { uid, name: e?.name || 'Equipo', mgr: L.names[uid]?.name || 'Mánager', avatar: L.names[uid]?.avatarUrl, t, full: s && squadIds(s).length === 10 && s.coach, value: s ? marketValue(sanitize(s)) : 0 }; })
+      return { uid, name: e?.name || 'Equipo', mgr: e?.mgr || L.names[uid]?.name || 'Mánager', avatar: L.names[uid]?.avatarUrl, t, full: s && squadIds(s).length === 10 && s.coach, value: s ? marketValue(sanitize(s)) : 0 }; })
       .sort((a,b)=>b.t.tot-a.t.tot || b.value-a.value);
     const scored = D.meta.rounds.filter(j => j >= (lg.start||1));
     detail = `<div class="panel" style="margin-top:16px">
@@ -911,12 +947,12 @@ function viewLeagues(){
           <button class="btn" data-act="copycode" data-code="${v}">Copiar invitación</button><button class="btn ghost" data-act="leaveliga" data-code="${v}">Salir</button></div></div>
       <div id="leaveConfirm"></div>
       <div class="tablewrap"><table class="rank"><thead><tr><th class="l">#</th><th class="l">Equipo</th>${scored.map(j=>`<th>J${j}</th>`).join('')}<th>Valor</th><th>Total</th></tr></thead><tbody>
-      ${rows.length ? rows.map((r,i)=>`<tr class="${r.uid===L.me?'me':''}"><td class="l">${i+1}</td><td class="l"><span class="withface">${r.avatar?`<img class="face" src="${esc(r.avatar)}" alt="" style="--fs:28px">`:''}<span><b data-txt="${i}">${esc(r.name)}</b>${r.full?'':' <span class="chip">incompleto</span>'}<br><span class="note">${esc(r.mgr)}${r.uid===L.me?' (tú)':''}</span></span></span></td>${r.t.per.map(x=>`<td class="num">${fmt(x.pts)}</td>`).join('')}<td class="num">${money(r.value)}</td><td class="num"><b>${fmt(r.t.tot)}</b></td></tr>`).join('')
+      ${rows.length ? rows.map((r,i)=>`<tr class="${r.uid===L.me?'me':''}"><td class="l">${i+1}</td><td class="l"><span class="withface">${r.avatar?`<img class="face" src="${esc(r.avatar)}" alt="" style="--fs:28px">`:''}<span><button class="pname" data-act="member" data-uid="${esc(r.uid)}" data-code="${v}">${esc(r.name)}</button>${r.full?'':' <span class="chip">incompleto</span>'}<br><span class="note">${esc(r.mgr)}${r.uid===L.me?' (tú)':''}</span></span></span></td>${r.t.per.map(x=>`<td class="num">${fmt(x.pts)}</td>`).join('')}<td class="num">${money(r.value)}</td><td class="num"><b>${fmt(r.t.tot)}</b></td></tr>`).join('')
         : `<tr><td colspan="${4+scored.length}" class="note" style="text-align:center">Cargando equipos…</td></tr>`}
       </tbody></table></div>
       <p class="note" style="margin-top:10px">Para invitar: ${L.mode==='web' ? 'pásale el enlace de esta web y el código' : 'comparte este juego con esa persona (con acceso de Colaborador) y pásale el código'} <b class="num">${v}</b>. Lo pone en "Mis ligas → Unirme con código".</p></div>`;
   }
-  return head + nameBox + noWrite + `<div class="bench-row" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${cards}${practiceCard}</div>${codes.length?'':'<p class="note">Todavía no estás en ninguna liga. Crea una o únete con un código.</p>'}` + forms + detail;
+  return head + noWrite + `<div class="bench-row" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${cards}${practiceCard}</div>${codes.length?'':'<p class="note">Todavía no estás en ninguna liga. Crea una o únete con un código.</p>'}` + forms + detail;
 }
 
 

@@ -24,7 +24,7 @@ Solo cuentan los partidos terminados (estado 1 y sin directo): un partido en jue
 Hay tareas programadas que lo ejecutan los sábados a las 11:00, 12:30 y 16:00 (hora de España) y publican el juego si hay cambios.
 
 ## Ligas privadas
-En "Mis ligas" cada persona crea ligas con nombre o se une con un código de 6 letras, y tiene un equipo distinto en cada liga
+En "Mis ligas" cada persona escribe su nombre y crea ligas o se une con un código de 6 letras (en la web, sin email: cuenta anónima guardada en su navegador). En la clasificación, al pulsar un equipo se ve su plantilla y sus puntos por jornada, y tiene un equipo distinto en cada liga
 (además del modo práctica, que se guarda solo en su navegador). Los equipos de las ligas se guardan en la base de datos del artifact:
 `ligas/<CODIGO>` y `equipos/<id de usuario>`. Cada persona solo puede modificar su propio equipo.
 Un cambio de plantilla cuenta a partir de la primera jornada que aún no ha empezado.
