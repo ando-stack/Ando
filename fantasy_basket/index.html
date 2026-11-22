@@ -206,7 +206,7 @@ dialog::backdrop{background:rgba(10,8,5,.55)}
     <button role="tab" data-tab="equipo" aria-selected="true">Mi equipo</button>
     <button role="tab" data-tab="mercado" aria-selected="false">Mercado</button>
     <button role="tab" data-tab="jornadas" aria-selected="false">Jornadas</button>
-    <button role="tab" data-tab="liga" aria-selected="false">Liga</button>
+    <button role="tab" data-tab="liga" aria-selected="false">Clasificación</button>
     <button role="tab" data-tab="reglas" aria-selected="false">Reglas</button>
   </div></nav>
 </header>
@@ -508,20 +508,11 @@ function viewRounds(){
 }
 
 function viewLeague(){
-  const managers = BOT_NAMES.map((n,i)=>({ name:n, s:autoTeam(1000+i*7919), bot:true }));
-  managers.push({ name: state.name || 'Mi equipo', s: state, bot:false });
-  const rows = managers.map(m => ({...m, per: D.meta.rounds.map(j=>roundScore(m.s,j).total), tot: seasonScore(m.s), val: spent(m.s)})).sort((a,b)=>b.tot-a.tot);
   const stand = [...D.standing].sort((a,b)=>a.pos-b.pos);
-  return `<div class="section-head"><div><div class="eyebrow">Simulación con las actas J1–J${D.meta.lastRound}</div><h2>Liga fantasy</h2>
-    <p class="sub">Tu plantilla actual contra 7 mánagers rivales con el mismo presupuesto. Pulsa un rival para ver su equipo.</p></div></div>
-    <div class="two">
-      <div class="tablewrap"><table class="rank"><thead><tr><th class="l">#</th><th class="l">Mánager</th>${D.meta.rounds.map(j=>`<th>J${j}</th>`).join('')}<th>Total</th></tr></thead><tbody>
-      ${rows.map((r,i)=>`<tr class="${r.bot?'':'me'}"><td class="l">${i+1}</td><td class="l">${r.bot?`<button class="pname" data-act="bot" data-b="${BOT_NAMES.indexOf(r.name)}">${esc(r.name)}</button>`:`<b>${esc(r.name)}</b> <span class="note">(tú)</span>`}</td>${r.per.map(v=>`<td class="num">${fmt(v)}</td>`).join('')}<td class="num"><b>${fmt(r.tot)}</b></td></tr>`).join('')}
-      </tbody></table></div>
-      <div><div class="tablewrap"><table><thead><tr><th class="l">#</th><th class="l">Clasificación real</th><th>PJ</th><th>V</th><th>D</th><th>PF</th><th>PC</th><th>Pts</th></tr></thead><tbody>
-        ${stand.map(s=>`<tr><td class="l num">${s.pos}</td><td class="l">${chip(s.t)} ${esc(T[s.t].n)}</td><td class="num">${s.pj}</td><td class="num">${s.v}</td><td class="num">${s.p}</td><td class="num">${s.pf}</td><td class="num">${s.pc}</td><td class="num"><b>${s.pts}</b></td></tr>`).join('')}
-      </tbody></table></div></div>
-    </div>`;
+  return `<div class="section-head"><div><div class="eyebrow">${esc(D.meta.competition)} · tras la jornada ${D.meta.lastRound}</div><h2>Clasificación</h2></div></div>
+    <div class="tablewrap"><table><thead><tr><th class="l">#</th><th class="l">Equipo</th><th>PJ</th><th>V</th><th>D</th><th>PF</th><th>PC</th><th>Dif.</th><th>Pts</th></tr></thead><tbody>
+      ${stand.map(s=>`<tr><td class="l num">${s.pos}</td><td class="l">${chip(s.t)} ${esc(T[s.t].n)}</td><td class="num">${s.pj}</td><td class="num">${s.v}</td><td class="num">${s.p}</td><td class="num">${s.pf}</td><td class="num">${s.pc}</td><td class="num">${s.pf-s.pc>0?'+':''}${s.pf-s.pc}</td><td class="num"><b>${s.pts}</b></td></tr>`).join('')}
+    </tbody></table></div>`;
 }
 
 function viewRules(){
