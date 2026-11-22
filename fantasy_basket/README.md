@@ -16,12 +16,11 @@ Todos los jugadores, entrenadores y estadísticas salen de las plantillas y las 
 
 ## Actualizar tras cada jornada
 ```bash
-cd fantasy_basket/scraper
-node crawl.js 629   # visita la competición, los 10 equipos y las actas nuevas
-python3 build.py    # une actas y plantillas -> dataset.json
-python3 price.py    # puntos fantasy y precios -> ../data.json
-python3 fotos.py    # fotos de jugadores y entrenadores (las que haya en la federación)
+fantasy_basket/scraper/actualizar.sh
 ```
+Descarga la competición, los equipos y las actas nuevas, recalcula puntos y precios, baja las fotos y escribe `data.json`.
+Solo cuentan los partidos terminados (estado 1 y sin directo): un partido en juego no suma.
+Hay tareas programadas que lo ejecutan los sábados a las 11:00, 12:30 y 16:00 (hora de España) y publican el juego si hay cambios.
 
 ## Ligas privadas
 En "Mis ligas" cada persona crea ligas con nombre o se une con un código de 6 letras, y tiene un equipo distinto en cada liga

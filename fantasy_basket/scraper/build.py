@@ -34,6 +34,7 @@ def find(tid,name,uuid,mid):
 games=[]
 for m in matches:
     sf=glob.glob(f"raw/match{m['idMatch']}__v1_frb_matches_*_stats.json")
+    if str(m.get('state'))!='1' or m.get('isLive'): sf=[]  # partido sin terminar: no cuenta
     g={'id':m['idMatch'],'j':int(m['numMatchDay']),'date':m['matchDay'],'home':m['idLocalTeam'],'away':m['idVisitorTeam'],
        'hs':int(m['localScore']) if sf else None,'as':int(m['visitorScore']) if sf else None,'field':m['nameField']}
     games.append(g)

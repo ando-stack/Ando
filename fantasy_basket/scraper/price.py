@@ -36,7 +36,7 @@ for tid, t in d['teams'].items():
         cf[g['j']] = coach_fp(my, th)
     ph = [coach_price(sum(v for j, v in cf.items() if j <= r) / max(1, len(team_games(tid, r)))) for r in rounds]
     teams[tid] = {'id': tid, 'n': t['name'], 's': SHORT.get(t['name'], t['name'][:3]), 'club': t['club'],
-                  'coach': (t['coach'] or ['Sin entrenador'])[0]  # solo el entrenador principal, 'cf': cf, 'cp': ph[-1], 'cph': ph}
+                  'coach': (t['coach'] or ['Sin entrenador'])[0], 'cf': cf, 'cp': ph[-1], 'cph': ph}  # solo el entrenador principal
 
 players = []
 for p in d['players'].values():
