@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <title>Fantasy Cadete A1</title>
+<meta name="robots" content="noindex, nofollow">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -646,10 +647,11 @@ function bind(root){
     else if (a==='reset') { $('#confirmReset').innerHTML = `<div class="actions"><span class="note">¿Vaciar toda la plantilla?</span><button class="btn sm primary" data-act="doreset">Sí, vaciar</button><button class="btn sm" data-act="noreset">No</button></div>`; bind($('#confirmReset')); }
     else if (a==='doreset') { const n = state.name; state = emptyState(); state.name = n; save(); render(); }
     else if (a==='noreset') { $('#confirmReset').innerHTML=''; }
+    else if (a==='logout') { SB.client && SB.client.auth.signOut(); }
     else if (a==='playpractice') { switchCtx(null); ui.tab='equipo'; render(); toast('Modo práctica'); }
     else if (a==='ligaview') { ui.ligaView = el.dataset.code; render(); }
     else if (a==='playliga') { switchCtx(el.dataset.code); ui.tab='equipo'; render(); toast(`Jugando: ${L.leagues[el.dataset.code]?.name||''}`); }
-    else if (a==='copycode') { const c = el.dataset.code, txt = `Únete a mi liga "${L.leagues[c]?.name||''}" del Fantasy A1. Abre el juego, ve a "Mis ligas" y pon el código ${c}`;
+    else if (a==='copycode') { const c = el.dataset.code, txt = L.mode === 'web' ? `Únete a mi liga "${L.leagues[c]?.name||''}" del Fantasy A1: ${location.origin + location.pathname}#unirse-${c}` : `Únete a mi liga "${L.leagues[c]?.name||''}" del Fantasy A1. Abre el juego, ve a "Mis ligas" y pon el código ${c}`;
       const done = () => toast('Invitación copiada'); try { navigator.clipboard.writeText(txt).then(done, () => toast('Código: ' + c)); } catch(err) { toast('Código: ' + c); } }
     else if (a==='leaveliga') { $('#leaveConfirm').innerHTML = `<div class="actions" style="margin:0 0 10px"><span class="note">¿Salir de la liga? Se borra tu equipo en ella.</span><button class="btn sm primary" data-act="doleave" data-code="${el.dataset.code}">Sí, salir</button><button class="btn sm" data-act="noleave">No</button></div>`; bind($('#leaveConfirm')); }
     else if (a==='doleave') { leaveLeague(el.dataset.code); }
@@ -662,6 +664,8 @@ function bind(root){
   const ts = $('#teamSel', root); if (ts) ts.addEventListener('change', () => { ui.team = ts.value; ui.limit = 40; render(); });
   const ss = $('#sortSel', root); if (ss) ss.addEventListener('change', () => { ui.sort = ss.value; ui.dir = -1; render(); });
   const fc = $('#fCreate', root); if (fc) fc.addEventListener('submit', e => { e.preventDefault(); createLeague($('#newLeague').value); });
+  const fl = $('#fLogin', root); if (fl) fl.addEventListener('submit', e => { e.preventDefault(); const em = $('#loginEmail'); if (em) sbLogin(em.value); });
+  const fn = $('#fName', root); if (fn) fn.addEventListener('submit', e => { e.preventDefault(); sbSaveName($('#myName').value); });
   const fj = $('#fJoin', root); if (fj) fj.addEventListener('submit', e => { e.preventDefault(); ui.joinCode = ''; joinLeague($('#joinCode').value); });
   const tn = $('#teamName', root); if (tn) tn.addEventListener('change', () => { state.name = tn.value.trim() || 'Mi equipo'; save(); render(); });
 }
@@ -776,9 +780,81 @@ function softRender(){ // no repintar mientras alguien escribe en un campo
 }
 document.addEventListener('focusout', () => { if (L.dirty) { L.dirty = false; setTimeout(render, 0); } });
 
+/* ---------- modo web (Netlify): ligas con Supabase ---------- */
+// Imita la parte de la base de datos de Claude que usan las ligas: doc().get/set/update/onSnapshot y
+// collection('equipos').where('ligas','array-contains',code).onSnapshot. Se refresca cada 15 s y tras cada escritura.
+const SB = { client:null, session:null, cfg:null, names:{} };
+const isClaude = () => !!(window.claude && typeof window.claude.use === 'function');
+function loadScript(src){ return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+const deepMerge = (a, b) => { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object' && !Array.isArray(a[k])) deepMerge(a[k], b[k]); else a[k] = b[k]; } return a; };
+function makeSupabaseBackend(sb, uid, email){
+  const listeners = new Set();
+  const refreshAll = () => listeners.forEach(fn => fn());
+  setInterval(refreshAll, 15000);
+  const snap = (id, data) => ({ id, exists: !!data, data: () => data ? JSON.parse(JSON.stringify(data)) : undefined, metadata:{ fromCache:false, hasPendingWrites:false } });
+  async function read(col, id){
+    if (col === 'ligas') { const { data, error } = await sb.from('ligas').select('*').eq('code', id).maybeSingle(); if (error) throw error;
+      return data ? { name:data.name, owner:data.owner, created:data.created, start:data.start } : null; }
+    const { data, error } = await sb.from('equipos').select('*').eq('id', id).maybeSingle(); if (error) throw error;
+    if (data && data.nombre) SB.names[id] = data.nombre;
+    return data ? { ligas:data.ligas || [], teams:data.teams || {} } : null;
+  }
+  async function write(col, id, d){
+    let r;
+    if (col === 'ligas') r = await sb.from('ligas').upsert({ code:id, name:d.name, owner:d.owner, created:d.created, start:d.start });
+    else r = await sb.from('equipos').upsert({ id, ligas:d.ligas || [], teams:d.teams || {}, nombre: SB.names[id] || (email||'').split('@')[0] });
+    if (r.error) throw { code:'invalid_argument', message:r.error.message };
+    setTimeout(refreshAll, 50);
+  }
+  const doc = path => { const [col, id] = path.split('/'); return {
+    get: async () => snap(id, await read(col, id)),
+    set: d => write(col, id, d),
+    update: async patch => { const cur = await read(col, id); if (!cur) throw { code:'invalid_argument' }; return write(col, id, deepMerge(cur, patch)); },
+    onSnapshot: (next, err) => { const fn = () => read(col, id).then(d => next(snap(id, d)), e => err && err(e)); listeners.add(fn); fn(); return () => listeners.delete(fn); },
+  }; };
+  const collection = () => ({ where: (f, op, code) => ({ onSnapshot: (next, err) => {
+    const fn = () => sb.from('equipos').select('*').contains('ligas', [code]).then(({ data, error }) => {
+      if (error) { err && err(error); return; }
+      (data||[]).forEach(r => { if (r.nombre) SB.names[r.id] = r.nombre; });
+      const docs = (data||[]).map(r => snap(r.id, { ligas:r.ligas || [], teams:r.teams || {} }));
+      next({ docs, size:docs.length, empty:!docs.length, metadata:{ fromCache:false } }); });
+    listeners.add(fn); fn(); return () => listeners.delete(fn); } }) });
+  const user = {
+    id: async () => uid, can: async () => true,
+    name: async () => SB.names[uid] || (email||'').split('@')[0],
+    profiles: async ids => Object.fromEntries([].concat(ids).map(i => [i, { id:i, name: SB.names[i] || '', avatarUrl:'' }])),
+  };
+  return { db:{ doc, collection }, user };
+}
+async function initSupabase(){
+  try { SB.cfg = await (await fetch('config.json', { cache:'no-store' })).json(); } catch(e) { SB.cfg = null; }
+  if (!SB.cfg || !SB.cfg.supabaseUrl || !SB.cfg.supabaseKey) { L.err = 'Las ligas todavía no están configuradas en esta web.'; L.ready = true; render(); return null; }
+  if (!window.supabase) await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js');
+  SB.client = window.supabase.createClient(SB.cfg.supabaseUrl, SB.cfg.supabaseKey);
+  const { data } = await SB.client.auth.getSession(); SB.session = data.session;
+  SB.client.auth.onAuthStateChange((ev, session) => { const had = !!SB.session; SB.session = session; if (!!session !== had) location.reload(); });
+  if (!SB.session) { L.needLogin = true; L.ready = true; render(); return null; }
+  const u = SB.session.user; const { data: row } = await SB.client.from('equipos').select('nombre').eq('id', u.id).maybeSingle();
+  if (row && row.nombre) SB.names[u.id] = row.nombre;
+  return makeSupabaseBackend(SB.client, u.id, u.email);
+}
+async function sbLogin(email){
+  email = (email||'').trim(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast('Escribe un email válido'); return; }
+  const { error } = await SB.client.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.origin + location.pathname } });
+  if (error) { toast('No se pudo enviar el email: ' + error.message); return; }
+  L.sentTo = email; render();
+}
+async function sbSaveName(n){
+  n = (n||'').trim().slice(0,30); if (!n) return;
+  SB.names[L.me] = n; const doc = clone(L.myDoc || { ligas:[], teams:{} });
+  try { await L.db.doc('equipos/'+L.me).set(doc); toast('Nombre guardado'); } catch(e) { toast('No se pudo guardar el nombre'); }
+}
+
 async function initLeagues(){
   try {
-    const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
+    let db, user;
+    if (isClaude()) [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
+    else { L.mode = 'web'; const be = await initSupabase(); if (!be) return; db = be.db; user = be.user; }
     L.db = db; L.user = user;
     if (!db || !user) { L.err = 'Las ligas necesitan que abras el juego con tu cuenta de Claude.'; L.ready = true; render(); return; }
     L.me = await user.id(); L.canWrite = await user.can('data.write');
@@ -801,8 +877,13 @@ function viewLeagues(){
   const head = `<div class="section-head"><div><div class="eyebrow">Con amigos, familia, el equipo…</div><h2>Mis ligas</h2>
     <p class="sub">Crea una liga, pasa el código a quien quieras y cada uno hace su equipo. En cada liga tienes un equipo distinto.</p></div></div>`;
   if (!L.ready) return head + '<p class="loading">Cargando ligas…</p>';
+  if (L.needLogin) return head + `<form class="panel" id="fLogin" style="max-width:560px"><h3>Entra para jugar en ligas</h3>
+    ${L.sentTo ? `<p>Te hemos enviado un enlace a <b>${esc(L.sentTo)}</b>. Ábrelo desde este mismo dispositivo para entrar.</p>` : `<p class="note">Te mandamos un enlace al email, sin contraseña.</p>
+    <div class="filters" style="margin:8px 0 0"><input type="email" id="loginEmail" placeholder="tu@email.com" aria-label="Email" autocomplete="email" style="flex:1 1 220px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0"><button class="btn primary" type="submit">Enviar enlace</button></div>`}
+    <p class="note" style="margin-top:10px">Sin entrar puedes jugar en modo práctica.</p></form>`;
   if (L.err) return head + `<div class="panel"><p style="margin:0">${esc(L.err)}</p><p class="note">Mientras tanto puedes jugar en modo práctica.</p></div>`;
   const codes = L.myDoc?.ligas || [];
+  const nameBox = L.mode === 'web' ? `<form class="panel" id="fName" style="margin-bottom:16px"><div class="filters" style="margin:0"><label class="eyebrow" for="myName">Tu nombre en las ligas</label><input type="search" id="myName" maxlength="30" value="${esc(SB.names[L.me]||'')}" placeholder="Cómo te verán los demás" style="flex:1 1 200px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0"><button class="btn" type="submit">Guardar</button><button class="btn ghost" type="button" data-act="logout">Salir de la cuenta</button></div></form>` : '';
   const noWrite = L.canWrite === false ? `<div class="panel" style="margin-bottom:16px"><b>Solo puedes mirar.</b><p class="note" style="margin:4px 0 0">Para crear o unirte a ligas necesitas acceso de Colaborador al juego. Pídeselo a quien te lo compartió.</p></div>` : '';
   const cards = codes.map(c => { const lg = L.leagues[c]; const e = L.myDoc.teams?.[c];
     return `<button class="card" data-act="ligaview" data-code="${c}" style="padding:12px">
@@ -833,9 +914,9 @@ function viewLeagues(){
       ${rows.length ? rows.map((r,i)=>`<tr class="${r.uid===L.me?'me':''}"><td class="l">${i+1}</td><td class="l"><span class="withface">${r.avatar?`<img class="face" src="${esc(r.avatar)}" alt="" style="--fs:28px">`:''}<span><b data-txt="${i}">${esc(r.name)}</b>${r.full?'':' <span class="chip">incompleto</span>'}<br><span class="note">${esc(r.mgr)}${r.uid===L.me?' (tú)':''}</span></span></span></td>${r.t.per.map(x=>`<td class="num">${fmt(x.pts)}</td>`).join('')}<td class="num">${money(r.value)}</td><td class="num"><b>${fmt(r.t.tot)}</b></td></tr>`).join('')
         : `<tr><td colspan="${4+scored.length}" class="note" style="text-align:center">Cargando equipos…</td></tr>`}
       </tbody></table></div>
-      <p class="note" style="margin-top:10px">Para invitar: comparte este juego con esa persona (con acceso de Colaborador) y pásale el código <b class="num">${v}</b>. Lo pone en "Mis ligas → Unirme con código".</p></div>`;
+      <p class="note" style="margin-top:10px">Para invitar: ${L.mode==='web' ? 'pásale el enlace de esta web y el código' : 'comparte este juego con esa persona (con acceso de Colaborador) y pásale el código'} <b class="num">${v}</b>. Lo pone en "Mis ligas → Unirme con código".</p></div>`;
   }
-  return head + noWrite + `<div class="bench-row" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${cards}${practiceCard}</div>${codes.length?'':'<p class="note">Todavía no estás en ninguna liga. Crea una o únete con un código.</p>'}` + forms + detail;
+  return head + nameBox + noWrite + `<div class="bench-row" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${cards}${practiceCard}</div>${codes.length?'':'<p class="note">Todavía no estás en ninguna liga. Crea una o únete con un código.</p>'}` + forms + detail;
 }
 
 

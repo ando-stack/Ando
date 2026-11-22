@@ -28,3 +28,13 @@ En "Mis ligas" cada persona crea ligas con nombre o se une con un código de 6 l
 (además del modo práctica, que se guarda solo en su navegador). Los equipos de las ligas se guardan en la base de datos del artifact:
 `ligas/<CODIGO>` y `equipos/<id de usuario>`. Cada persona solo puede modificar su propio equipo.
 Un cambio de plantilla cuenta a partir de la primera jornada que aún no ha empezado.
+
+## Publicar en Netlify (web pública)
+1. **Supabase** (ligas): crea un proyecto gratis en supabase.com → *SQL Editor* → pega `supabase.sql` → *Run*.
+   En *Authentication → URL Configuration* pon la dirección de Netlify como *Site URL* y en *Redirect URLs*.
+   Copia *Project URL* y la clave *anon / publishable* (*Project Settings → API*) en `config.json`. Esa clave es pública por diseño; nunca pongas la *service_role*.
+2. **Netlify**: *Add new site → Import an existing project → GitHub* → repositorio `ando-stack/Ando`,
+   rama `claude/friendly-albattani-fi5ypz`, *Base directory* `fantasy_basket`, *Build command* vacío, *Publish directory* `fantasy_basket`.
+3. Cada vez que las tareas de los sábados suben un `data.json` nuevo a la rama, Netlify vuelve a publicar solo.
+
+La web lleva `noindex` (meta, cabecera y robots.txt) para que los buscadores no la listen; quien tenga el enlace la puede abrir.
