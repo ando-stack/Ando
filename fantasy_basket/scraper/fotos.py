@@ -14,7 +14,7 @@ for f in glob.glob('raw/team*__FCBQWeb_getTeamCard*'):
     d = json.load(open(f))['messageData']; tid = d['team']['idSignedTeam']; coach_imgs = []; coach_names = []
     for p in d['players']:
         lt = p['licenseTypeName'] or ''; url = p.get('photoUrl')
-        if 'ENTREN' in lt:
+        if 'ENTREN' in lt and not coach_names:  # solo el entrenador principal
             coach_names.append(p['name'] + ' ' + p['surname']); i = len(coach_imgs)
             if url:
                 fetch(url, f'{DL}/c{tid}_{i}'); square(f'{DL}/c{tid}_{i}', f'{OUT}/entrenador_{tid}_{i}.jpg', 200); coach_imgs.append(f'fotos/entrenador_{tid}_{i}.jpg')
