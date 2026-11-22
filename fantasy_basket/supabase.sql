@@ -35,3 +35,8 @@ create policy "equipos leer"   on public.equipos for select to authenticated usi
 create policy "equipos crear"  on public.equipos for insert to authenticated with check (id = auth.uid());
 create policy "equipos editar" on public.equipos for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 create policy "equipos borrar" on public.equipos for delete to authenticated using (id = auth.uid());
+
+-- Permisos para usuarios con cuenta (las reglas de arriba siguen limitando qué filas puede tocar cada uno).
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.ligas   to authenticated;
+grant select, insert, update, delete on public.equipos to authenticated;
