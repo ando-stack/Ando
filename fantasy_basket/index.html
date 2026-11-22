@@ -201,8 +201,7 @@ dialog::backdrop{background:rgba(10,8,5,.55)}
 <header class="board">
   <div class="wrap">
     <div class="brand"><b>Fantasy <i>A1</i></b><span id="compLabel">Cadete Masculino · La Rioja</span></div>
-    <label class="ctxpick" for="ctxSel"><small>Jugando en</small><select id="ctxSel" aria-label="Liga activa"><option value="">Modo práctica</option></select></label>
-    <div class="meters">
+    <div class="meters" style="margin-left:auto">
       <div class="meter"><small>Presupuesto</small><span class="num" id="mBudget">—</span></div>
       <div class="meter"><small>Plantilla</small><span class="num" id="mCount">0/11</span></div>
       <div class="meter"><small id="mPtsLbl">Puntos</small><span class="num" id="mPts">0</span></div>
@@ -337,8 +336,6 @@ function render(){
   $('#mCount').textContent = `${squadIds(state).length + (state.coach?1:0)}/11`;
   if (ctx.code) { const lg = L.leagues[ctx.code]; $('#mPts').textContent = fmt(leagueTotals(myEntry(), lg).tot); $('#mPtsLbl').textContent = 'Puntos en la liga'; }
   else { $('#mPts').textContent = fmt(seasonScore(state)); $('#mPtsLbl').textContent = `Puntos J1–J${D.meta.lastRound}`; }
-  const cs = $('#ctxSel'); const codes = L.myDoc?.ligas || [];
-  cs.innerHTML = '<option value="">Modo práctica</option>' + codes.map(c=>`<option value="${c}" ${ctx.code===c?'selected':''}>${esc(L.leagues[c]?.name||c)}</option>`).join('');
   watchMembers();
   const app = $('#app');
   app.innerHTML = ({equipo:viewTeam, mercado:viewMarket, jornadas:viewRounds, liga:viewLeague, ligas:viewLeagues, reglas:viewRules})[ui.tab]();
@@ -634,6 +631,7 @@ function bind(root){
     else if (a==='reset') { $('#confirmReset').innerHTML = `<div class="actions"><span class="note">¿Vaciar toda la plantilla?</span><button class="btn sm primary" data-act="doreset">Sí, vaciar</button><button class="btn sm" data-act="noreset">No</button></div>`; bind($('#confirmReset')); }
     else if (a==='doreset') { const n = state.name; state = emptyState(); state.name = n; save(); render(); }
     else if (a==='noreset') { $('#confirmReset').innerHTML=''; }
+    else if (a==='playpractice') { switchCtx(null); ui.tab='equipo'; render(); toast('Modo práctica'); }
     else if (a==='ligaview') { ui.ligaView = el.dataset.code; render(); }
     else if (a==='playliga') { switchCtx(el.dataset.code); ui.tab='equipo'; render(); toast(`Jugando: ${L.leagues[el.dataset.code]?.name||''}`); }
     else if (a==='copycode') { const c = el.dataset.code, txt = `Únete a mi liga "${L.leagues[c]?.name||''}" del Fantasy A1. Abre el juego, ve a "Mis ligas" y pon el código ${c}`;
@@ -795,6 +793,7 @@ function viewLeagues(){
     return `<button class="card" data-act="ligaview" data-code="${c}" style="padding:12px">
       <div class="eyebrow">Código ${c}</div><div class="nm" style="font-size:17px;min-height:0;margin-top:4px">${esc(lg?.name || 'Liga')}</div>
       <div class="meta note"><span>Tu equipo: <b>${esc(e?.name||'—')}</b></span>${ctx.code===c?'<span class="chip">Jugando</span>':''}</div></button>`; }).join('');
+  const practiceCard = `<button class="card" data-act="playpractice" style="padding:12px"><div class="eyebrow">Solo tú</div><div class="nm" style="font-size:17px;min-height:0;margin-top:4px">Modo práctica</div><div class="meta note"><span>Equipo guardado en este navegador</span>${ctx.code?'':'<span class="chip">Jugando</span>'}</div></button>`;
   const forms = `<div class="two" style="margin-top:16px">
     <form class="panel" id="fCreate"><h3>Crear liga</h3><p class="note">Ponle nombre: "Los del cole", "Familia García"…</p>
       <div class="filters" style="margin:8px 0 0"><input type="search" id="newLeague" placeholder="Nombre de la liga" maxlength="40" aria-label="Nombre de la liga" style="flex:1 1 200px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0"><button class="btn primary" type="submit">Crear</button></div></form>
@@ -821,10 +820,9 @@ function viewLeagues(){
       </tbody></table></div>
       <p class="note" style="margin-top:10px">Para invitar: comparte este juego con esa persona (con acceso de Colaborador) y pásale el código <b class="num">${v}</b>. Lo pone en "Mis ligas → Unirme con código".</p></div>`;
   }
-  return head + noWrite + (codes.length ? `<div class="bench-row" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${cards}</div>` : '<div class="panel"><p style="margin:0">Todavía no estás en ninguna liga. Crea una o únete con un código.</p></div>') + forms + detail;
+  return head + noWrite + `<div class="bench-row" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${cards}${practiceCard}</div>${codes.length?'':'<p class="note">Todavía no estás en ninguna liga. Crea una o únete con un código.</p>'}` + forms + detail;
 }
 
-$('#ctxSel').addEventListener('change', e => { switchCtx(e.target.value); toast(e.target.value ? `Jugando: ${L.leagues[e.target.value]?.name||''}` : 'Modo práctica'); });
 
 /* ---------- boot ---------- */
 fetch('data.json').then(r => r.json()).then(data => {
