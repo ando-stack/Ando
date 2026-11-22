@@ -22,3 +22,9 @@ python3 build.py    # une actas y plantillas -> dataset.json
 python3 price.py    # puntos fantasy y precios -> ../data.json
 python3 fotos.py    # fotos de jugadores y entrenadores (las que haya en la federación)
 ```
+
+## Ligas privadas
+En "Mis ligas" cada persona crea ligas con nombre o se une con un código de 6 letras, y tiene un equipo distinto en cada liga
+(además del modo práctica, que se guarda solo en su navegador). Los equipos de las ligas se guardan en la base de datos del artifact:
+`ligas/<CODIGO>` y `equipos/<id de usuario>`. Cada persona solo puede modificar su propio equipo.
+Un cambio de plantilla cuenta a partir de la primera jornada que aún no ha empezado.

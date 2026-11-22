@@ -51,7 +51,12 @@ header.board{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backgro
 .brand b{white-space:nowrap;font-family:var(--f-display);font-weight:900;font-size:28px;letter-spacing:.02em;text-transform:uppercase;line-height:1}
 .brand b i{font-style:normal;color:var(--accent)}
 .brand span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;white-space:nowrap}
-.meters{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap}
+.meters{display:flex;gap:18px;flex-wrap:wrap}
+.ctxpick{margin-left:auto;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ctxpick small{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.ctxpick select{background:rgba(255,255,255,.08);color:var(--navy-ink);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 8px;font-weight:600;max-width:220px}
+.ctxpick option{color:var(--ink);background:var(--surface)}
+@media (max-width:560px){.ctxpick{margin-left:0;flex:1 1 100%}.ctxpick select{max-width:100%}}
 .meter{display:flex;flex-direction:column;align-items:flex-end;line-height:1.05}
 .meter small{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
 .meter .num{font-size:20px;font-weight:600}
@@ -196,6 +201,7 @@ dialog::backdrop{background:rgba(10,8,5,.55)}
 <header class="board">
   <div class="wrap">
     <div class="brand"><b>Fantasy <i>A1</i></b><span id="compLabel">Cadete Masculino · La Rioja</span></div>
+    <label class="ctxpick" for="ctxSel"><small>Jugando en</small><select id="ctxSel" aria-label="Liga activa"><option value="">Modo práctica</option></select></label>
     <div class="meters">
       <div class="meter"><small>Presupuesto</small><span class="num" id="mBudget">—</span></div>
       <div class="meter"><small>Plantilla</small><span class="num" id="mCount">0/11</span></div>
@@ -206,6 +212,7 @@ dialog::backdrop{background:rgba(10,8,5,.55)}
     <button role="tab" data-tab="equipo" aria-selected="true">Mi equipo</button>
     <button role="tab" data-tab="mercado" aria-selected="false">Mercado</button>
     <button role="tab" data-tab="jornadas" aria-selected="false">Jornadas</button>
+    <button role="tab" data-tab="ligas" aria-selected="false">Mis ligas</button>
     <button role="tab" data-tab="liga" aria-selected="false">Clasificación</button>
     <button role="tab" data-tab="reglas" aria-selected="false">Reglas</button>
   </div></nav>
@@ -244,7 +251,7 @@ function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = fals
 /* ---------- state ---------- */
 const emptyState = () => ({ name:'Mi equipo', starters:[null,null,null,null,null], bench:[null,null,null,null,null], coach:null, captain:null });
 function load(){ try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && s.starters) return s; } catch(e){} return emptyState(); }
-function save(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){} }
+function save(){ if (ctx.code) { writeMyLeagueTeam(); return; } try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){} }
 const squadIds = s => [...s.starters, ...s.bench].filter(Boolean);
 const spent = s => squadIds(s).reduce((a,id)=>a+(P[id]?.p||0),0) + (s.coach ? T[s.coach].cp : 0);
 const perTeam = (s, tid) => squadIds(s).filter(id => P[id]?.t === tid).length;
@@ -328,9 +335,13 @@ function render(){
   const left = D.meta.budget - spent(state);
   const mb = $('#mBudget'); mb.textContent = money(left); mb.classList.toggle('neg', left < 0);
   $('#mCount').textContent = `${squadIds(state).length + (state.coach?1:0)}/11`;
-  $('#mPts').textContent = fmt(seasonScore(state)); $('#mPtsLbl').textContent = `Puntos J1–J${D.meta.lastRound}`;
+  if (ctx.code) { const lg = L.leagues[ctx.code]; $('#mPts').textContent = fmt(leagueTotals(myEntry(), lg).tot); $('#mPtsLbl').textContent = 'Puntos en la liga'; }
+  else { $('#mPts').textContent = fmt(seasonScore(state)); $('#mPtsLbl').textContent = `Puntos J1–J${D.meta.lastRound}`; }
+  const cs = $('#ctxSel'); const codes = L.myDoc?.ligas || [];
+  cs.innerHTML = '<option value="">Modo práctica</option>' + codes.map(c=>`<option value="${c}" ${ctx.code===c?'selected':''}>${esc(L.leagues[c]?.name||c)}</option>`).join('');
+  watchMembers();
   const app = $('#app');
-  app.innerHTML = ({equipo:viewTeam, mercado:viewMarket, jornadas:viewRounds, liga:viewLeague, reglas:viewRules})[ui.tab]();
+  app.innerHTML = ({equipo:viewTeam, mercado:viewMarket, jornadas:viewRounds, liga:viewLeague, ligas:viewLeagues, reglas:viewRules})[ui.tab]();
   bind(app);
 }
 
@@ -357,7 +368,7 @@ function viewTeam(){
   return `
   <div class="team-grid">
     <section>
-      <div class="teamname"><label class="eyebrow" for="teamName">Nombre del equipo</label><input id="teamName" value="${esc(state.name)}" maxlength="32"></div>
+      <div class="teamname"><label class="eyebrow" for="teamName">Nombre del equipo</label><input id="teamName" value="${esc(state.name)}" maxlength="32">${ctx.code?`<span class="chip">Liga: ${esc(L.leagues[ctx.code]?.name||ctx.code)}</span><span class="note">Los cambios cuentan desde la J${effRound()}</span>`:`<span class="note">Modo práctica · solo en este navegador</span>`}</div>
       <div class="court" aria-label="Quinteto titular">
         <svg viewBox="0 0 500 400" preserveAspectRatio="none" aria-hidden="true">
           <rect x="0" y="0" width="500" height="400" fill="var(--court)"/>
@@ -623,6 +634,13 @@ function bind(root){
     else if (a==='reset') { $('#confirmReset').innerHTML = `<div class="actions"><span class="note">¿Vaciar toda la plantilla?</span><button class="btn sm primary" data-act="doreset">Sí, vaciar</button><button class="btn sm" data-act="noreset">No</button></div>`; bind($('#confirmReset')); }
     else if (a==='doreset') { const n = state.name; state = emptyState(); state.name = n; save(); render(); }
     else if (a==='noreset') { $('#confirmReset').innerHTML=''; }
+    else if (a==='ligaview') { ui.ligaView = el.dataset.code; render(); }
+    else if (a==='playliga') { switchCtx(el.dataset.code); ui.tab='equipo'; render(); toast(`Jugando: ${L.leagues[el.dataset.code]?.name||''}`); }
+    else if (a==='copycode') { const c = el.dataset.code, txt = `Únete a mi liga "${L.leagues[c]?.name||''}" del Fantasy A1. Abre el juego, ve a "Mis ligas" y pon el código ${c}`;
+      const done = () => toast('Invitación copiada'); try { navigator.clipboard.writeText(txt).then(done, () => toast('Código: ' + c)); } catch(err) { toast('Código: ' + c); } }
+    else if (a==='leaveliga') { $('#leaveConfirm').innerHTML = `<div class="actions" style="margin:0 0 10px"><span class="note">¿Salir de la liga? Se borra tu equipo en ella.</span><button class="btn sm primary" data-act="doleave" data-code="${el.dataset.code}">Sí, salir</button><button class="btn sm" data-act="noleave">No</button></div>`; bind($('#leaveConfirm')); }
+    else if (a==='doleave') { leaveLeague(el.dataset.code); }
+    else if (a==='noleave') { $('#leaveConfirm').innerHTML=''; }
   }));
   root.querySelectorAll('[data-sort]').forEach(th => th.addEventListener('click', () => { const k = th.dataset.sort; ui.dir = ui.sort===k ? -ui.dir : (k==='n'?1:-1); ui.sort = k; render(); }));
   root.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { ui.mode = b.dataset.mode; render(); }));
@@ -630,10 +648,183 @@ function bind(root){
   const q = $('#q', root); if (q) q.addEventListener('input', () => { ui.q = q.value; ui.limit = 40; const pos = q.selectionStart; render(); const n = $('#q'); n.focus(); n.setSelectionRange(pos,pos); });
   const ts = $('#teamSel', root); if (ts) ts.addEventListener('change', () => { ui.team = ts.value; ui.limit = 40; render(); });
   const ss = $('#sortSel', root); if (ss) ss.addEventListener('change', () => { ui.sort = ss.value; ui.dir = -1; render(); });
+  const fc = $('#fCreate', root); if (fc) fc.addEventListener('submit', e => { e.preventDefault(); createLeague($('#newLeague').value); });
+  const fj = $('#fJoin', root); if (fj) fj.addEventListener('submit', e => { e.preventDefault(); ui.joinCode = ''; joinLeague($('#joinCode').value); });
   const tn = $('#teamName', root); if (tn) tn.addEventListener('change', () => { state.name = tn.value.trim() || 'Mi equipo'; save(); render(); });
 }
 document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => { ui.tab = b.dataset.tab; if (ui.tab !== 'mercado') ui.pick = null; render(); }));
 $('#dlg').addEventListener('click', e => { if (e.target.id === 'dlg') $('#dlg').close(); });
+
+/* ---------- ligas privadas (db compartida) ---------- */
+// equipos/<uid> = { ligas:[CODE...], teams:{ CODE:{ name, squads:{ "<jornada>": squad } } } }
+// ligas/<CODE>  = { name, owner:<uid>, created, start:<primera jornada que puntúa> }
+const L = { db:null, user:null, me:null, ready:false, canWrite:null, myDoc:null, leagues:{}, members:{}, names:{}, subs:{}, memberUnsub:null, err:'', pending:false, queued:false };
+const ctx = { code:null };
+const clone = o => JSON.parse(JSON.stringify(o));
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const newCode = () => Array.from({length:6},()=>CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)]).join('');
+
+function effRound(){ // primera jornada que todavía no ha empezado: los cambios cuentan desde ahí
+  const now = Date.now();
+  for (let r = D.meta.lastRound + 1; r <= D.meta.totalRounds; r++) {
+    const starts = D.games.filter(g => g.j === r).map(g => new Date(g.date.replace(' ','T')).getTime()).filter(x => !isNaN(x));
+    if (!starts.length || Math.min(...starts) > now) return r;
+  }
+  return D.meta.totalRounds + 1;
+}
+function squadFor(entry, j){
+  if (!entry || !entry.squads) return null;
+  const ks = Object.keys(entry.squads).map(Number).filter(k => k <= j).sort((a,b)=>b-a);
+  return ks.length ? entry.squads[ks[0]] : null;
+}
+function latestSquad(entry){
+  if (!entry || !entry.squads) return null;
+  const ks = Object.keys(entry.squads).map(Number).sort((a,b)=>b-a);
+  return ks.length ? entry.squads[ks[0]] : null;
+}
+function leagueTotals(entry, lg){
+  const per = D.meta.rounds.filter(j => j >= (lg?.start||1)).map(j => { const s = squadFor(entry, j); return { j, pts: s ? roundScore(s, j).total : 0 }; });
+  return { per, tot: Math.round(per.reduce((a,x)=>a+x.pts,0)*10)/10 };
+}
+const myEntry = () => L.myDoc?.teams?.[ctx.code];
+const sanitize = s => { const o = Object.assign(emptyState(), s||{}); o.starters = (o.starters||[]).slice(0,5).map(id=>P[id]?id:null); while (o.starters.length<5) o.starters.push(null);
+  o.bench = (o.bench||[]).slice(0,5).map(id=>P[id]?id:null); while (o.bench.length<5) o.bench.push(null);
+  if (o.coach && !T[o.coach]) o.coach = null; if (o.captain && !P[o.captain]) o.captain = null; return o; };
+
+function switchCtx(code){
+  ctx.code = code || null;
+  try { localStorage.setItem(STORE_KEY+'.ctx', ctx.code||''); } catch(e){}
+  if (ctx.code) { const e = myEntry(); state = sanitize(latestSquad(e) || { name: e?.name || 'Mi equipo' }); state.name = e?.name || state.name; }
+  else state = load();
+  watchMembers(); render();
+}
+async function writeMyLeagueTeam(){ // una escritura a la vez sobre mi documento
+  if (!ctx.code || !L.db || !L.me) return;
+  if (L.pending) { L.queued = true; return; }
+  L.pending = true;
+  try {
+    const r = effRound(), code = ctx.code, sq = clone(state); delete sq.name;
+    await L.db.doc('equipos/' + L.me).update({ teams: { [code]: { name: state.name, squads: { [r]: sq } } } });
+  } catch(e) { toast('No se pudo guardar en la liga: ' + (e.code === 'invalid_argument' ? 'no tienes permiso para escribir' : 'inténtalo de nuevo')); }
+  L.pending = false;
+  if (L.queued) { L.queued = false; writeMyLeagueTeam(); }
+}
+async function createLeague(name){
+  name = (name||'').trim().slice(0,40); if (!name) { toast('Ponle un nombre a la liga'); return; }
+  let code, tries = 0;
+  do { code = newCode(); tries++; } while ((await L.db.doc('ligas/'+code).get()).exists && tries < 5);
+  try {
+    await L.db.doc('ligas/'+code).set({ name, owner: L.me, created: Date.now(), start: effRound() });
+    await joinLeague(code, true);
+    toast(`Liga creada: ${name}`);
+  } catch(e) { toast('No se pudo crear la liga. Necesitas acceso de Colaborador o superior.'); }
+}
+async function joinLeague(code, silent){
+  code = (code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (code.length !== 6) { toast('El código tiene 6 caracteres'); return; }
+  const lg = await L.db.doc('ligas/'+code).get();
+  if (!lg.exists) { toast('No existe ninguna liga con ese código'); return; }
+  const doc = clone(L.myDoc || { ligas:[], teams:{} });
+  doc.ligas = doc.ligas || []; doc.teams = doc.teams || {};
+  if (!doc.ligas.includes(code)) doc.ligas.push(code);
+  if (!doc.teams[code]) doc.teams[code] = { name: 'Equipo de ' + ((await L.user.name()) || 'mánager').split(' ')[0], squads: {} };
+  try { await L.db.doc('equipos/'+L.me).set(doc); L.myDoc = doc; watchLeagueDocs(); ui.ligaView = code; switchCtx(code); ui.tab = 'equipo'; render();
+    if (!silent) toast(`Te has unido a ${lg.data().name}. Ahora haz tu equipo.`); }
+  catch(e) { toast('No se pudo unir. Necesitas acceso de Colaborador o superior al juego.'); }
+}
+async function leaveLeague(code){
+  const doc = clone(L.myDoc || {}); doc.ligas = (doc.ligas||[]).filter(c => c !== code); if (doc.teams) delete doc.teams[code];
+  try { await L.db.doc('equipos/'+L.me).set(doc); L.myDoc = doc; if (ctx.code === code) switchCtx(null); ui.ligaView = null; render(); toast('Has salido de la liga'); }
+  catch(e) { toast('No se pudo salir de la liga'); }
+}
+function watchLeagueDocs(){
+  const codes = L.myDoc?.ligas || [];
+  for (const c of codes) if (!L.subs[c]) L.subs[c] = L.db.doc('ligas/'+c).onSnapshot(s => { L.leagues[c] = s.exists ? s.data() : null; softRender(); }, () => {});
+  for (const c of Object.keys(L.subs)) if (!codes.includes(c)) { L.subs[c](); delete L.subs[c]; delete L.leagues[c]; }
+}
+let watchingCode = null;
+function watchMembers(){
+  const code = ui.tab === 'ligas' && ui.ligaView ? ui.ligaView : ctx.code;
+  if (!L.db || code === watchingCode) return;
+  if (L.memberUnsub) { L.memberUnsub(); L.memberUnsub = null; }
+  watchingCode = code; L.members = {};
+  if (!code) return;
+  L.memberUnsub = L.db.collection('equipos').where('ligas', 'array-contains', code).onSnapshot(snap => {
+    L.members = {}; snap.docs.forEach(d => L.members[d.id] = d.data());
+    const ids = Object.keys(L.members);
+    if (L.user && ids.length) L.user.profiles(ids).then(ps => { L.names = Object.assign({}, L.names, ps); softRender(); });
+    softRender();
+  }, () => {});
+}
+function softRender(){ // no repintar mientras alguien escribe en un campo
+  const a = document.activeElement;
+  if (a && a.matches && a.matches('#app input, #app select') ) { L.dirty = true; return; }
+  render();
+}
+document.addEventListener('focusout', () => { if (L.dirty) { L.dirty = false; setTimeout(render, 0); } });
+
+async function initLeagues(){
+  try {
+    const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
+    L.db = db; L.user = user;
+    if (!db || !user) { L.err = 'Las ligas necesitan que abras el juego con tu cuenta de Claude.'; L.ready = true; render(); return; }
+    L.me = await user.id(); L.canWrite = await user.can('data.write');
+    if (!L.me) { L.err = 'Inicia sesión en Claude para crear o unirte a ligas.'; L.ready = true; render(); return; }
+    const timer = setTimeout(() => { if (!L.ready) { L.err = 'No se pueden cargar las ligas ahora mismo.'; L.ready = true; render(); } }, 10000);
+    let first = true;
+    db.doc('equipos/'+L.me).onSnapshot(s => {
+      L.myDoc = s.exists ? s.data() : { ligas:[], teams:{} };
+      if (!s.metadata.fromCache) clearTimeout(timer);
+      L.ready = true; watchLeagueDocs();
+      if (first) { first = false; let saved = ''; try { saved = localStorage.getItem(STORE_KEY+'.ctx') || ''; } catch(e){}
+        if (saved && (L.myDoc.ligas||[]).includes(saved)) { switchCtx(saved); return; } }
+      if (ctx.code && !(L.myDoc.ligas||[]).includes(ctx.code)) { switchCtx(null); return; }
+      softRender();
+    }, () => { clearTimeout(timer); L.err = 'No se pueden cargar las ligas.'; L.ready = true; render(); });
+  } catch(e) { L.err = 'Las ligas no están disponibles aquí.'; L.ready = true; render(); }
+}
+
+function viewLeagues(){
+  const head = `<div class="section-head"><div><div class="eyebrow">Con amigos, familia, el equipo…</div><h2>Mis ligas</h2>
+    <p class="sub">Crea una liga, pasa el código a quien quieras y cada uno hace su equipo. En cada liga tienes un equipo distinto.</p></div></div>`;
+  if (!L.ready) return head + '<p class="loading">Cargando ligas…</p>';
+  if (L.err) return head + `<div class="panel"><p style="margin:0">${esc(L.err)}</p><p class="note">Mientras tanto puedes jugar en modo práctica.</p></div>`;
+  const codes = L.myDoc?.ligas || [];
+  const noWrite = L.canWrite === false ? `<div class="panel" style="margin-bottom:16px"><b>Solo puedes mirar.</b><p class="note" style="margin:4px 0 0">Para crear o unirte a ligas necesitas acceso de Colaborador al juego. Pídeselo a quien te lo compartió.</p></div>` : '';
+  const cards = codes.map(c => { const lg = L.leagues[c]; const e = L.myDoc.teams?.[c];
+    return `<button class="card" data-act="ligaview" data-code="${c}" style="padding:12px">
+      <div class="eyebrow">Código ${c}</div><div class="nm" style="font-size:17px;min-height:0;margin-top:4px">${esc(lg?.name || 'Liga')}</div>
+      <div class="meta note"><span>Tu equipo: <b>${esc(e?.name||'—')}</b></span>${ctx.code===c?'<span class="chip">Jugando</span>':''}</div></button>`; }).join('');
+  const forms = `<div class="two" style="margin-top:16px">
+    <form class="panel" id="fCreate"><h3>Crear liga</h3><p class="note">Ponle nombre: "Los del cole", "Familia García"…</p>
+      <div class="filters" style="margin:8px 0 0"><input type="search" id="newLeague" placeholder="Nombre de la liga" maxlength="40" aria-label="Nombre de la liga" style="flex:1 1 200px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0"><button class="btn primary" type="submit">Crear</button></div></form>
+    <form class="panel" id="fJoin"><h3>Unirme con código</h3><p class="note">Te lo pasa quien creó la liga.</p>
+      <div class="filters" style="margin:8px 0 0"><input type="search" id="joinCode" placeholder="ABC123" maxlength="8" value="${esc(ui.joinCode||'')}" aria-label="Código de la liga" style="flex:1 1 140px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);text-transform:uppercase;font-family:var(--f-mono);min-width:0"><button class="btn primary" type="submit">Unirme</button></div></form>
+  </div>`;
+  let detail = '';
+  const v = ui.ligaView && codes.includes(ui.ligaView) ? ui.ligaView : null;
+  if (v) {
+    const lg = L.leagues[v] || {};
+    const rows = Object.entries(L.members).map(([uid, d]) => { const e = d.teams?.[v]; const t = leagueTotals(e, lg); const s = latestSquad(e);
+      return { uid, name: e?.name || 'Equipo', mgr: L.names[uid]?.name || 'Mánager', avatar: L.names[uid]?.avatarUrl, t, full: s && squadIds(s).length === 10 && s.coach, value: s ? spent(sanitize(s)) : 0 }; })
+      .sort((a,b)=>b.t.tot-a.t.tot || b.value-a.value);
+    const scored = D.meta.rounds.filter(j => j >= (lg.start||1));
+    detail = `<div class="panel" style="margin-top:16px">
+      <div class="section-head" style="margin-bottom:8px"><div><div class="eyebrow">Liga · código <span class="num">${v}</span></div><h2>${esc(lg.name||'Liga')}</h2>
+        <p class="sub">${scored.length ? `Puntúan las jornadas ${scored.map(j=>'J'+j).join(', ')}.` : `Empieza a puntuar en la jornada ${lg.start}. Los equipos se cierran cuando empieza cada jornada.`}</p></div>
+        <div class="actions" style="margin:0">${ctx.code===v?'<span class="chip">Estás jugando esta liga</span>':`<button class="btn primary" data-act="playliga" data-code="${v}">Jugar esta liga</button>`}
+          <button class="btn" data-act="copycode" data-code="${v}">Copiar invitación</button><button class="btn ghost" data-act="leaveliga" data-code="${v}">Salir</button></div></div>
+      <div id="leaveConfirm"></div>
+      <div class="tablewrap"><table class="rank"><thead><tr><th class="l">#</th><th class="l">Equipo</th>${scored.map(j=>`<th>J${j}</th>`).join('')}<th>Valor</th><th>Total</th></tr></thead><tbody>
+      ${rows.length ? rows.map((r,i)=>`<tr class="${r.uid===L.me?'me':''}"><td class="l">${i+1}</td><td class="l"><span class="withface">${r.avatar?`<img class="face" src="${esc(r.avatar)}" alt="" style="--fs:28px">`:''}<span><b data-txt="${i}">${esc(r.name)}</b>${r.full?'':' <span class="chip">incompleto</span>'}<br><span class="note">${esc(r.mgr)}${r.uid===L.me?' (tú)':''}</span></span></span></td>${r.t.per.map(x=>`<td class="num">${fmt(x.pts)}</td>`).join('')}<td class="num">${money(r.value)}</td><td class="num"><b>${fmt(r.t.tot)}</b></td></tr>`).join('')
+        : `<tr><td colspan="${4+scored.length}" class="note" style="text-align:center">Cargando equipos…</td></tr>`}
+      </tbody></table></div>
+      <p class="note" style="margin-top:10px">Para invitar: comparte este juego con esa persona (con acceso de Colaborador) y pásale el código <b class="num">${v}</b>. Lo pone en "Mis ligas → Unirme con código".</p></div>`;
+  }
+  return head + noWrite + (codes.length ? `<div class="bench-row" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${cards}</div>` : '<div class="panel"><p style="margin:0">Todavía no estás en ninguna liga. Crea una o únete con un código.</p></div>') + forms + detail;
+}
+
+$('#ctxSel').addEventListener('change', e => { switchCtx(e.target.value); toast(e.target.value ? `Jugando: ${L.leagues[e.target.value]?.name||''}` : 'Modo práctica'); });
 
 /* ---------- boot ---------- */
 fetch('data.json').then(r => r.json()).then(data => {
@@ -643,7 +834,8 @@ fetch('data.json').then(r => r.json()).then(data => {
   state.starters = state.starters.map(id => P[id] ? id : null); state.bench = state.bench.map(id => P[id] ? id : null);
   if (state.coach && !T[state.coach]) state.coach = null; if (state.captain && !P[state.captain]) state.captain = null;
   $('#compLabel').textContent = `${D.meta.competition} · ${D.meta.season}`;
-  render();
+  const h = location.hash.match(/^#unirse-([A-Za-z0-9]{6})$/); if (h) { ui.tab = 'ligas'; ui.joinCode = h[1].toUpperCase(); }
+  render(); initLeagues();
 }).catch(() => { $('#app').innerHTML = '<p class="loading">No se pudieron cargar los datos (data.json).</p>'; });
 })();
 </script>
