@@ -249,18 +249,22 @@ const valColor = v => v >= 18 ? 'background:color-mix(in srgb,var(--good) 22%,tr
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(()=>t.hidden = true, 2200); }
 
 /* ---------- state ---------- */
-const emptyState = () => ({ name:'Mi equipo', starters:[null,null,null,null,null], bench:[null,null,null,null,null], coach:null, captain:null });
+const emptyState = () => ({ name:'Mi equipo', starters:[null,null,null,null,null], bench:[null,null,null,null,null], coach:null, captain:null, buy:{}, bank:0 });
+// buy = precio al que se fichó cada uno; bank = ganancias o pérdidas de las ventas
+function withMoney(s){ s.buy = s.buy || {}; s.bank = +s.bank || 0; [...s.starters, ...s.bench].forEach(id => { if (id && P[id] && s.buy[id] == null) s.buy[id] = P[id].p; }); if (s.coach && s.buy.coach == null && T[s.coach]) s.buy.coach = T[s.coach].cp; return s; }
 function load(){ try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && s.starters) return s; } catch(e){} return emptyState(); }
 function save(){ if (ctx.code) { writeMyLeagueTeam(); return; } try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){} }
 const squadIds = s => [...s.starters, ...s.bench].filter(Boolean);
-const spent = s => squadIds(s).reduce((a,id)=>a+(P[id]?.p||0),0) + (s.coach ? T[s.coach].cp : 0);
+const spent = s => squadIds(s).reduce((a,id)=>a+(s.buy?.[id] ?? P[id]?.p ?? 0),0) + (s.coach ? (s.buy?.coach ?? T[s.coach].cp) : 0);
+const available = s => D.meta.budget + (+s.bank||0) - spent(s);
+const marketValue = s => squadIds(s).reduce((a,id)=>a+(P[id]?.p||0),0) + (s.coach ? T[s.coach].cp : 0);
 const perTeam = (s, tid) => squadIds(s).filter(id => P[id]?.t === tid).length;
 
 function canAdd(s, id){
   if (squadIds(s).includes(id)) return 'Ya está en tu plantilla';
   const p = P[id];
   if (perTeam(s, p.t) >= 3) return `Máximo 3 jugadores de ${T[p.t].s}`;
-  if (spent(s) + p.p > D.meta.budget + 1e-9) return 'No te llega el presupuesto';
+  if (p.p > available(s) + 1e-9) return 'No te llega el presupuesto';
   return '';
 }
 function addPlayer(id, slot){
@@ -272,6 +276,7 @@ function addPlayer(id, slot){
   }
   if (!target) { toast('Plantilla completa: vende a alguien primero'); return false; }
   (target.kind==='s' ? state.starters : state.bench)[target.i] = id;
+  state.buy = state.buy || {}; state.buy[id] = P[id].p;
   if (!state.captain && target.kind==='s') state.captain = id;
   save(); toast(`Fichado: ${short(P[id])} (${money(P[id].p)})`); return true;
 }
@@ -279,11 +284,14 @@ function sell(id){
   state.starters = state.starters.map(x => x===id ? null : x);
   state.bench = state.bench.map(x => x===id ? null : x);
   if (state.captain === id) state.captain = state.starters.find(Boolean) || null;
-  save(); toast(`Vendido: ${short(P[id])} (+${money(P[id].p)})`);
+  const paid = state.buy?.[id] ?? P[id].p, diff = Math.round((P[id].p - paid)*10)/10;
+  state.bank = Math.round(((+state.bank||0) + diff)*10)/10; if (state.buy) delete state.buy[id];
+  save(); toast(`Vendido: ${short(P[id])} por ${money(P[id].p)}` + (diff ? ` (${diff>0?'ganas':'pierdes'} ${money(Math.abs(diff))})` : ''));
 }
 function setCoach(tid){
-  const cur = state.coach ? T[state.coach].cp : 0;
-  if (spent(state) - cur + T[tid].cp > D.meta.budget + 1e-9) { toast('No te llega el presupuesto'); return false; }
+  const paid = state.coach ? (state.buy?.coach ?? T[state.coach].cp) : 0, back = state.coach ? T[state.coach].cp : 0;
+  if (T[tid].cp > available(state) + back + 1e-9) { toast('No te llega el presupuesto'); return false; } // vender al actual libera su precio de hoy
+  state.bank = Math.round(((+state.bank||0) + back - paid)*10)/10; state.buy = state.buy || {}; state.buy.coach = T[tid].cp;
   state.coach = tid; save(); toast(`Entrenador: ${title(T[tid].coach)}`); return true;
 }
 function swap(id){ // move between starters and bench
@@ -308,9 +316,9 @@ const seasonScore = s => D.meta.rounds.reduce((a,j)=>a+roundScore(s,j).total,0);
 /* ---------- auto team (also used by rival managers) ---------- */
 function rng(seed){ return () => { seed = (seed*1664525 + 1013904223) % 4294967296; return seed/4294967296; }; }
 function autoTeam(seed, base){
-  const r = rng(seed); const s = base ? JSON.parse(JSON.stringify(base)) : emptyState();
+  const r = rng(seed); const s = withMoney(base ? JSON.parse(JSON.stringify(base)) : emptyState());
   const budget = D.meta.budget;
-  if (!s.coach) { const cs = Object.values(T).filter(t => t.cp <= 6.6).sort((a,b)=> (b.cp*(0.6+r()) ) - (a.cp*(0.6+r()))); s.coach = cs[Math.floor(r()*3)].id; }
+  if (!s.coach) { const cs = Object.values(T).filter(t => t.cp <= 6.6).sort((a,b)=> (b.cp*(0.6+r()) ) - (a.cp*(0.6+r()))); s.coach = cs[Math.floor(r()*3)].id; s.buy.coach = T[s.coach].cp; }
   const pool = D.players.filter(p => p.gp > 0).map(p => ({p, w: (Math.max(0.5,p.avg) / Math.max(0.6,p.p)) * (0.55 + r()*0.9) + p.avg*0.04*r()}));
   // pick a couple of stars first, then value
   const stars = D.players.filter(p => p.p >= 8).sort(()=>r()-0.5).slice(0, 1 + Math.floor(r()*2));
@@ -319,8 +327,9 @@ function autoTeam(seed, base){
     const ids = squadIds(s); if (ids.length >= 10) break;
     if (ids.includes(p.id) || perTeam(s, p.t) >= 3) continue;
     const left = 10 - ids.length - 1;
-    if (spent(s) + p.p + left*0.5 > budget) continue;
+    if (p.p + left*0.5 > available(s)) continue;
     const si = s.starters.indexOf(null); if (si >= 0) s.starters[si] = p.id; else s.bench[s.bench.indexOf(null)] = p.id;
+    s.buy[p.id] = p.p;
   }
   // best five as starters, captain = best
   const all = squadIds(s).sort((a,b)=>P[b].avg-P[a].avg);
@@ -332,7 +341,7 @@ function autoTeam(seed, base){
 /* ---------- views ---------- */
 function render(){
   document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === ui.tab)));
-  const left = D.meta.budget - spent(state);
+  const left = available(state);
   const mb = $('#mBudget'); mb.textContent = money(left); mb.classList.toggle('neg', left < 0);
   $('#mCount').textContent = `${squadIds(state).length + (state.coach?1:0)}/11`;
   if (ctx.code) { const lg = L.leagues[ctx.code]; $('#mPts').textContent = fmt(leagueTotals(myEntry(), lg).tot); $('#mPtsLbl').textContent = 'Puntos en la liga'; }
@@ -356,9 +365,9 @@ function playerCard(id, slot){
 }
 
 function viewTeam(){
-  const left = D.meta.budget - spent(state), ids = squadIds(state);
+  const left = available(state), ids = squadIds(state), mv = marketValue(state), gain = Math.round((mv - spent(state))*10)/10;
   const full = ids.length === 10 && state.coach && state.starters.every(Boolean);
-  const pct = Math.min(100, spent(state)/D.meta.budget*100);
+  const pct = Math.min(100, spent(state)/(D.meta.budget + (+state.bank||0))*100);
   const tCount = {}; ids.forEach(id => tCount[P[id].t] = (tCount[P[id].t]||0)+1);
   const last = D.meta.lastRound, lastScore = roundScore(state, last);
   const coachT = state.coach ? T[state.coach] : null;
@@ -405,8 +414,10 @@ function viewTeam(){
         <div class="eyebrow">Caja</div>
         <dl class="kv" style="margin-top:8px">
           <dt>Presupuesto inicial</dt><dd class="num">${money(D.meta.budget)}</dd>
-          <dt>Invertido</dt><dd class="num">${money(spent(state))}</dd>
+          ${state.bank ? `<dt>Ganancias por ventas</dt><dd class="num ${state.bank>0?'up':'down'}">${state.bank>0?'+':''}${money(state.bank)}</dd>` : ''}
+          <dt>Invertido (precio de compra)</dt><dd class="num">${money(spent(state))}</dd>
           <dt>Disponible</dt><dd class="num ${left<0?'down':''}">${money(left)}</dd>
+          <dt>Valor de mercado de tu plantilla</dt><dd class="num">${money(mv)} ${gain ? `<span class="${gain>0?'up':'down'}">(${gain>0?'+':''}${fmt(gain)})</span>` : ''}</dd>
         </dl>
         <div class="bar"><i class="${left<0?'over':''}" style="width:${pct}%"></i></div>
         <ul class="checks">
@@ -448,7 +459,7 @@ function marketRows(){
 function viewMarket(){
   const owned = new Set(squadIds(state));
   const teamOpts = Object.values(T).sort((a,b)=>a.n.localeCompare(b.n)).map(t=>`<option value="${t.id}" ${ui.team===t.id?'selected':''}>${esc(t.n)}</option>`).join('');
-  const pickBanner = ui.pick ? `<div class="picking"><span>Eligiendo para <b>${ui.pick.kind==='s'?'el quinteto':'el banquillo'}</b> · Disponible <b class="num">${money(D.meta.budget-spent(state))}</b></span><button class="btn sm" data-act="cancelpick">Cancelar</button></div>` : '';
+  const pickBanner = ui.pick ? `<div class="picking"><span>Eligiendo para <b>${ui.pick.kind==='s'?'el quinteto':'el banquillo'}</b> · Disponible <b class="num">${money(available(state))}</b></span><button class="btn sm" data-act="cancelpick">Cancelar</button></div>` : '';
   const head = (k, label, cls='') => `<th class="sortable ${cls} ${ui.sort===k?'sorted':''}" data-sort="${k}" aria-sort="${ui.sort===k?(ui.dir<0?'descending':'ascending'):'none'}">${label}${ui.sort===k?(ui.dir<0?' ▼':' ▲'):''}</th>`;
   let body;
   if (ui.mode === 'coaches') {
@@ -532,7 +543,7 @@ function viewRules(){
       <p>Ficha <b>10 jugadores</b>: 5 en el quinteto titular y 5 en el banquillo, más <b>1 entrenador</b>.</p>
       <p>Máximo <b>3 jugadores del mismo equipo</b>. El entrenador no cuenta para ese límite.</p>
       <p>Elige un <b>capitán</b> del quinteto: puntúa doble.</p>
-      <p>Vender devuelve el precio actual del jugador.</p></div>
+      <p>Fichas al precio del momento y vendes al precio actual: si ha subido, ganas la diferencia y la puedes gastar; si ha bajado, la pierdes.</p></div>
     <div class="panel"><h3>Puntos de jugador</h3>
       <table style="width:100%"><tbody>
         <tr><th class="l" colspan="2">Rendimiento individual · el que más pesa</th></tr>
@@ -556,10 +567,10 @@ function viewRules(){
         <tr><td class="l">Margen final (cada 5 pts)</td><td class="num">±1 (tope ±6)</td></tr>
       </tbody></table></div>
     <div class="panel"><h3>Precios</h3>
-      <p>Media fantasy = puntos fantasy totales ÷ partidos de su equipo.</p>
-      <p>Precio jugador = 0,5 + 0,33·media + 0,0045·media², mínimo 0,5 M. Así los jugadores top valen más que proporcionalmente.</p>
+      <p>Valor = mitad media de toda la temporada + mitad media de los 3 últimos partidos de su equipo (no jugar cuenta 0). Así el precio sigue la forma del momento.</p>
+      <p>Precio jugador = 0,5 + 0,33·valor + 0,0045·valor², mínimo 0,5 M. Así los jugadores top valen más que proporcionalmente.</p>
       <p>Precio entrenador = 0,5 + 0,38·media, mínimo 0,5 M.</p>
-      <p>Los precios se recalculan tras cada jornada. La tendencia compara con la jornada anterior.</p></div>
+      <p>Los precios se recalculan con cada acta nueva y pueden subir o bajar. La tendencia ▲▼ compara con la jornada anterior.</p></div>
     <div class="panel"><h3>Datos</h3>
       <p>${D.players.length} jugadores y ${Object.keys(T).length} entrenadores, con los nombres tal como aparecen en las plantillas y en las ${D.games.filter(g=>g.hs!=null).length} actas publicadas de ${esc(D.meta.competition)}.</p>
       <p class="note">Última acta: ${new Date(D.meta.updated).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}. Las actas solo registran tiros, tiros libres, faltas, minutos y +/−, así que no hay rebotes ni asistencias.</p></div>
@@ -582,6 +593,7 @@ function openPlayer(id){
   <div class="mbody">
     <div class="stats">
       <div class="stat"><small>Precio</small><b>${money(p.p)}</b></div>
+      ${owned && state.buy?.[id] != null ? (()=>{ const d = Math.round((p.p - state.buy[id])*10)/10; return `<div class="stat"><small>Lo fichaste a</small><b>${money(state.buy[id])}</b> ${d?`<span class="${d>0?'up':'down'}">${d>0?'+':''}${fmt(d)}</span>`:''}</div>`; })() : ''}
       <div class="stat"><small>Media fantasy</small><b>${fmt(p.avg)}</b></div>
       <div class="stat"><small>Puntos/partido</small><b>${p.gp?fmt(p.tot.pts/gp):'—'}</b></div>
       <div class="stat"><small>Minutos</small><b>${p.gp?fmt(p.tot.min/gp):'—'}</b></div>
@@ -690,13 +702,13 @@ function leagueTotals(entry, lg){
 const myEntry = () => L.myDoc?.teams?.[ctx.code];
 const sanitize = s => { const o = Object.assign(emptyState(), s||{}); o.starters = (o.starters||[]).slice(0,5).map(id=>P[id]?id:null); while (o.starters.length<5) o.starters.push(null);
   o.bench = (o.bench||[]).slice(0,5).map(id=>P[id]?id:null); while (o.bench.length<5) o.bench.push(null);
-  if (o.coach && !T[o.coach]) o.coach = null; if (o.captain && !P[o.captain]) o.captain = null; return o; };
+  if (o.coach && !T[o.coach]) o.coach = null; if (o.captain && !P[o.captain]) o.captain = null; return withMoney(o); };
 
 function switchCtx(code){
   ctx.code = code || null;
   try { localStorage.setItem(STORE_KEY+'.ctx', ctx.code||''); } catch(e){}
   if (ctx.code) { const e = myEntry(); state = sanitize(latestSquad(e) || { name: e?.name || 'Mi equipo' }); state.name = e?.name || state.name; }
-  else state = load();
+  else state = withMoney(load());
   watchMembers(); render();
 }
 async function writeMyLeagueTeam(){ // una escritura a la vez sobre mi documento
@@ -808,7 +820,7 @@ function viewLeagues(){
   if (v) {
     const lg = L.leagues[v] || {};
     const rows = Object.entries(L.members).map(([uid, d]) => { const e = d.teams?.[v]; const t = leagueTotals(e, lg); const s = latestSquad(e);
-      return { uid, name: e?.name || 'Equipo', mgr: L.names[uid]?.name || 'Mánager', avatar: L.names[uid]?.avatarUrl, t, full: s && squadIds(s).length === 10 && s.coach, value: s ? spent(sanitize(s)) : 0 }; })
+      return { uid, name: e?.name || 'Equipo', mgr: L.names[uid]?.name || 'Mánager', avatar: L.names[uid]?.avatarUrl, t, full: s && squadIds(s).length === 10 && s.coach, value: s ? marketValue(sanitize(s)) : 0 }; })
       .sort((a,b)=>b.t.tot-a.t.tot || b.value-a.value);
     const scored = D.meta.rounds.filter(j => j >= (lg.start||1));
     detail = `<div class="panel" style="margin-top:16px">
@@ -830,7 +842,7 @@ function viewLeagues(){
 /* ---------- boot ---------- */
 fetch('data.json').then(r => r.json()).then(data => {
   D = data; D.players.forEach(p => P[p.id] = p); T = D.teams;
-  state = load();
+  state = withMoney(load());
   // drop ids that no longer exist after a data update
   state.starters = state.starters.map(id => P[id] ? id : null); state.bench = state.bench.map(id => P[id] ? id : null);
   if (state.coach && !T[state.coach]) state.coach = null; if (state.captain && !P[state.captain]) state.captain = null;

@@ -26,6 +26,15 @@ def coach_price(avg):
 
 played = [g for g in d['games'] if g['hs'] is not None]
 rounds = sorted({g['j'] for g in played})
+def form_value(fp_by_round, team_rounds, recent=3):
+    """50% media de la temporada + 50% media de los últimos `recent` partidos del equipo (no jugar = 0)."""
+    if not team_rounds: return 0.0
+    team_rounds = sorted(team_rounds)
+    season = sum(fp_by_round.get(j, 0) for j in team_rounds) / len(team_rounds)
+    last = team_rounds[-recent:]
+    form = sum(fp_by_round.get(j, 0) for j in last) / len(last)
+    return 0.5 * season + 0.5 * form
+
 def team_games(tid, upto): return [g for g in played if g['j'] <= upto and tid in (g['home'], g['away'])]
 
 teams = {}
@@ -34,7 +43,7 @@ for tid, t in d['teams'].items():
     for g in team_games(tid, 99):
         my, th = (g['hs'], g['as']) if g['home'] == tid else (g['as'], g['hs'])
         cf[g['j']] = coach_fp(my, th)
-    ph = [coach_price(sum(v for j, v in cf.items() if j <= r) / max(1, len(team_games(tid, r)))) for r in rounds]
+    ph = [coach_price(form_value(cf, [g['j'] for g in team_games(tid, r)])) for r in rounds]
     teams[tid] = {'id': tid, 'n': t['name'], 's': SHORT.get(t['name'], t['name'][:3]), 'club': t['club'],
                   'coach': (t['coach'] or ['Sin entrenador'])[0], 'cf': cf, 'cp': ph[-1], 'cph': ph}  # solo el entrenador principal
 
@@ -43,9 +52,8 @@ for p in d['players'].values():
     for g in p['games']: g['fp'] = fp(g)
     gl = [g for g in p['games'] if g['fp'] is not None]
     hist = []
-    for r in rounds:
-        tg = len(team_games(p['team'], r)) or 1
-        hist.append(player_price(sum(g['fp'] for g in gl if g['j'] <= r) / tg))
+    for r in rounds:  # precio = mitad media de temporada + mitad forma de los 3 últimos partidos de su equipo
+        hist.append(player_price(form_value({g['j']: g['fp'] for g in gl}, [g['j'] for g in team_games(p['team'], r)])))
     n = len(gl); tg = len(team_games(p['team'], 99)) or 1
     tot = collections.Counter()
     for g in gl:

@@ -12,7 +12,8 @@ Todos los jugadores, entrenadores y estadísticas salen de las plantillas y las 
 - Puntos de jugador: +1 por punto, +0,5 extra por triple, −0,5 por tiro fallado (campo o TL), −0,5 por falta,
   −3 si le eliminan, +1 titular, +1 cada 10 min, ±1 cada 5 de +/− (tope ±4), +2 si gana su equipo.
 - Entrenador: +10 victoria, −2 derrota, ±1 cada 5 puntos de margen (tope ±6).
-- Precio jugador = 0,5 + 0,33·media + 0,0045·media² (mínimo 0,5 M), con media = puntos fantasy ÷ partidos de su equipo.
+- Precio jugador = 0,5 + 0,33·v + 0,0045·v² (mínimo 0,5 M), con v = mitad media de temporada + mitad media de los 3 últimos partidos de su equipo.
+- Se ficha al precio del momento y se vende al actual: la diferencia se gana o se pierde.
 
 ## Actualizar tras cada jornada
 ```bash
