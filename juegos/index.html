@@ -66,6 +66,7 @@ header.top .in{max-width:1040px;margin:0 auto;display:flex;gap:12px;align-items:
 .mode.story{background:var(--c4);color:#fff;border-color:var(--ink)}
 .mode.free{background:var(--c3);color:#fff}
 .mode.duel{background:var(--c1);color:#fff}
+.mode.isla{background:var(--c7);color:#fff}
 .mode.daily{background:var(--c5);color:#1a2333}
 .mode p{margin:0;font-size:.95rem;opacity:.95}
 .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
@@ -636,6 +637,7 @@ home(){
     </div>
    </div>
    <div class="modes">
+    <a class="mode isla" href="isla.html" style="text-decoration:none"><span class="ico">🏝️</span><h3>Isla Recreo</h3><p>Aventura: explora el mapa, construye el pueblo y cumple misiones.</p></a>
     <button class="mode story" data-v="historia"><span class="ico">📖</span><h3>Modo Historia</h3><p>La biblioteca del aula 404 te necesita. 8 capítulos con estrellas que se guardan.</p></button>
     <button class="mode free" data-v="libre"><span class="ico">🕹️</span><h3>Modo Libre</h3><p>Todos los juegos desbloqueados, elige dificultad y bate tu récord.</p></button>
     <button class="mode daily" id="dailyBtn"><span class="ico">📅</span><h3>Reto del día</h3><p>${dg.icon} ${dg.name}: consigue ${d.goal} ${dg.unit}. ${done?'✅ Hecho hoy':'Premio: 50 🪙'}</p></button>

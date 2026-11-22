@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Isla Recreo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Layout: el mundo ocupa toda la pantalla; paneles flotantes tipo "madera y papel" en las esquinas. Un solo look (isla al atardecer), sin tema claro. */
+:root{
+  --panel:#1d2b3aee; --panel-solid:#1d2b3a; --ink:#f4efe2; --ink-soft:#b9c3cf; --line:#3a5068;
+  --wood:#c98a4b; --leaf:#5fbf5a; --sun:#ffcf4a; --sea:#3d8fd6; --bad:#ff6b5e; --good:#62d48a;
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:#123049;color:var(--ink);font-family:var(--f-body);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+canvas#world{position:fixed;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+.hud{position:fixed;z-index:3;pointer-events:none}
+.hud>*{pointer-events:auto}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:14px;backdrop-filter:blur(4px)}
+#quest{top:calc(10px + env(safe-area-inset-top,0px));left:max(10px,env(safe-area-inset-left,0px));max-width:min(330px,calc(100vw - 20px));padding:10px 12px}
+#quest .k{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sun);font-weight:800}
+#quest b{font-family:var(--f-display);font-size:1.05rem;display:block;margin:2px 0}
+#quest span{font-size:.9rem;color:var(--ink-soft)}
+#quest .prog{color:var(--ink);font-weight:800}
+#inv{top:calc(10px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.items{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;padding:6px 8px;max-width:calc(100vw - 20px)}
+.it{display:inline-flex;align-items:center;gap:3px;font-weight:800;font-variant-numeric:tabular-nums;padding:2px 6px;border-radius:8px;font-size:.95rem}
+.it.flash{background:#ffcf4a44}
+#mini{border-radius:10px;border:2px solid var(--line);background:#0b1b2b;display:block}
+#clock{font-size:.85rem;padding:3px 10px;font-weight:800}
+#controls{bottom:calc(12px + env(safe-area-inset-bottom,0px));right:max(12px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:repeat(2,auto);gap:8px;justify-items:end}
+.cbtn{width:62px;height:62px;border-radius:50%;border:3px solid #0008;background:var(--wood);color:#2a1606;font-family:var(--f-display);font-weight:800;font-size:1.4rem;box-shadow:0 4px 0 #0007;display:grid;place-items:center;line-height:1}
+.cbtn small{display:block;font-size:.58rem;font-family:var(--f-body)}
+.cbtn.main{width:78px;height:78px;background:var(--sun);font-size:1.7rem}
+.cbtn.on{background:var(--leaf)}
+#pad{bottom:calc(14px + env(safe-area-inset-bottom,0px));left:max(14px,env(safe-area-inset-left,0px));display:none;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,58px);gap:4px}
+#pad button{border-radius:14px;border:2px solid #0006;background:#ffffff2a;font-size:1.4rem;color:#fff;touch-action:none}
+#pad button:active{background:#ffffff55}
+@media (pointer:coarse){#pad{display:grid}}
+#keys{bottom:calc(12px + env(safe-area-inset-bottom,0px));left:max(12px,env(safe-area-inset-left,0px));padding:8px 12px;font-size:.82rem;color:var(--ink-soft);line-height:1.5}
+#keys kbd{background:#ffffff1f;border-radius:5px;padding:0 5px;font-family:inherit;color:var(--ink);font-weight:800}
+@media (pointer:coarse){#keys{display:none}}
+#buildbar{left:50%;transform:translateX(-50%);bottom:calc(100px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;padding:8px;max-width:calc(100vw - 24px);overflow-x:auto}
+@media (pointer:fine){#buildbar{bottom:calc(14px + env(safe-area-inset-bottom,0px))}}
+.bi{flex:none;min-width:76px;border:2px solid var(--line);border-radius:12px;background:#ffffff10;padding:6px;display:grid;gap:2px;justify-items:center;font-size:.78rem;font-weight:800}
+.bi .e{font-size:1.5rem;line-height:1.1}
+.bi .c{color:var(--ink-soft);font-weight:600;font-size:.72rem;white-space:nowrap}
+.bi.sel{border-color:var(--sun);background:#ffcf4a2a}
+.bi.no{opacity:.45}
+#dialog{left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));width:min(640px,calc(100vw - 24px));padding:14px 16px;display:flex;gap:14px;z-index:6}
+#dialog .av{font-size:2.6rem;line-height:1;flex:none}
+#dialog .who{font-family:var(--f-display);font-weight:800;color:var(--sun)}
+#dialog p{margin:4px 0 10px;font-size:1.05rem;line-height:1.5}
+#dialog .opts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:2px solid #0008;background:var(--ink);color:#1d2b3a;border-radius:10px;padding:8px 14px;font-weight:800;box-shadow:0 3px 0 #0006}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--line);box-shadow:none}
+.btn.go{background:var(--sun)}
+.btn:active{transform:translateY(2px)}
+.overlay{position:fixed;inset:0;z-index:8;display:grid;place-items:center;padding:16px;background:#0b1622cc;overflow:auto}
+.card{background:var(--panel-solid);border:2px solid var(--line);border-radius:20px;padding:22px;width:min(520px,100%);display:grid;gap:14px}
+.card h2{font-family:var(--f-display);margin:0;font-size:1.6rem}
+.title{font-family:var(--f-display);font-weight:800;font-size:clamp(2.6rem,10vw,4.6rem);line-height:.95;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.title em{font-style:normal;color:var(--sun)}
+.sub{color:var(--ink-soft);margin:0;line-height:1.5}
+.slotcard{border:2px solid var(--line);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.slotcard .meta{color:var(--ink-soft);font-size:.9rem}
+.field{display:grid;gap:6px}
+.field input,.field textarea{font:inherit;border:2px solid var(--line);border-radius:10px;padding:10px;background:#0b1b2b;color:var(--ink);width:100%}
+.avs{display:flex;gap:6px;flex-wrap:wrap}
+.avs button{width:50px;height:50px;font-size:1.7rem;border-radius:12px;border:2px solid var(--line);background:#0b1b2b}
+.avs button[aria-pressed="true"]{border-color:var(--sun);background:#ffcf4a33}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.ql{display:grid;gap:8px;max-height:50vh;overflow:auto}
+.qi{border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.qi.done{opacity:.6}
+.qi.cur{border-color:var(--sun)}
+#fish .bar{position:relative;height:34px;border-radius:10px;background:#0b1b2b;border:2px solid var(--line);overflow:hidden}
+#fish .zone{position:absolute;top:0;bottom:0;background:var(--good)}
+#fish .needle{position:absolute;top:-2px;bottom:-2px;width:6px;background:var(--sun);border-radius:3px}
+.toast{position:fixed;left:50%;top:calc(80px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:9;background:var(--panel-solid);border:2px solid var(--sun);padding:8px 16px;border-radius:12px;font-weight:800;pointer-events:none;text-align:center;max-width:90vw}
+@media (max-width:560px){#quest{max-width:calc(100vw - 150px);font-size:.9rem} .items{max-width:140px} #mini{width:112px;height:auto}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="world" aria-label="Mapa de la isla"></canvas>
+
+<div class="hud panel" id="quest" hidden></div>
+<div class="hud" id="inv" hidden><div class="panel items" id="items"></div><canvas id="mini" width="128" height="92" aria-label="Minimapa"></canvas><div class="panel" id="clock"></div></div>
+<div class="hud" id="pad" hidden>
+  <span></span><button data-d="u" aria-label="Arriba">▲</button><span></span>
+  <button data-d="l" aria-label="Izquierda">◀</button><span></span><button data-d="r" aria-label="Derecha">▶</button>
+  <span></span><button data-d="d" aria-label="Abajo">▼</button><span></span>
+</div>
+<div class="hud panel" id="keys" hidden><kbd>WASD</kbd>/<kbd>flechas</kbd> moverse · <kbd>Espacio</kbd> acción<br><kbd>B</kbd> construir · <kbd>M</kbd> misiones · <kbd>Esc</kbd> menú</div>
+<div class="hud" id="controls" hidden>
+  <button class="cbtn" id="bMenu" aria-label="Menú">☰</button>
+  <button class="cbtn" id="bQuest" aria-label="Misiones">📜</button>
+  <button class="cbtn" id="bBuild" aria-label="Construir">🔨</button>
+  <button class="cbtn main" id="bAct" aria-label="Acción">✋<small>acción</small></button>
+</div>
+<div class="hud panel" id="buildbar" hidden></div>
+<div class="hud panel" id="dialog" hidden></div>
+<div id="ov"></div>
+
+<script>
+"use strict";
+const $=(s,e=document)=>e.querySelector(s), $$=(s,e=document)=>[...e.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function toast(m,ms=2200){document.querySelectorAll('.toast').forEach(x=>x.remove());const t=document.createElement('div');t.className='toast';t.innerHTML=m;document.body.appendChild(t);setTimeout(()=>t.remove(),ms)}
+
+/* ---------------- sonido ---------------- */
+let AC=null,SOUND=true;
+try{SOUND=localStorage.getItem('isla-sound')!=='0'}catch(e){}
+function beep(f=440,d=.08,type='sine',v=.06){if(!SOUND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d+.02)}catch(e){}}
+const sfx={chop:()=>beep(180,.07,'square',.04),get:()=>{beep(660,.06);setTimeout(()=>beep(990,.08),60)},build:()=>{beep(300,.06,'triangle');setTimeout(()=>beep(450,.08,'triangle'),70)},no:()=>beep(140,.15,'sawtooth',.03),
+  quest:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.14,'triangle',.07),i*110)),talk:()=>beep(520,.04,'triangle',.04)};
+
+/* ---------------- mundo ---------------- */
+const W=64,H=46;
+function hash(x,y,s){let h=(Math.imul(x,374761393)+Math.imul(y,668265263)+Math.imul(s,1442695041))|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return (h>>>0)/4294967296}
+function noise(x,y,sc,s){const fx=x/sc,fy=y/sc,x0=Math.floor(fx),y0=Math.floor(fy),tx=fx-x0,ty=fy-y0;const sm=t=>t*t*(3-2*t);
+  const a=hash(x0,y0,s),b=hash(x0+1,y0,s),c=hash(x0,y0+1,s),d=hash(x0+1,y0+1,s);const u=sm(tx),v=sm(ty);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v}
+const riverX=y=>40+2.5*Math.sin(y/4);
+const BASE=new Array(W*H);
+const SPOT={};
+(function gen(){
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const dx=(x-32)/29,dy=(y-23)/20,d=Math.sqrt(dx*dx+dy*dy);const e=1-d+(noise(x,y,6,1)-.5)*.45;
+    let t=e<.05?'agua':e<.13?'arena':'hierba';
+    const rx=riverX(y);
+    if(Math.abs(x-rx)<1.6&&e>-.2)t='agua';
+    if(t==='hierba'){const r=hash(x,y,7);const east=x>rx+1.6;
+      if(east&&y<18){if(noise(x,y,4,3)>.7)t='acantilado';else if(r<.16)t='roca';else if(r<.24)t='arbol';else if(r<.27)t='flores'}
+      else{const th=(x<27&&y<21)?.42:.64;if(noise(x,y,5,2)>th&&r<.72)t='arbol';else if(r<.022)t='roca';else if(r<.06)t='flores';else if(r<.085)t='arbusto'}}
+    BASE[y*W+x]=t;
+  }
+  const set=(x,y,t)=>{if(x>=0&&y>=0&&x<W&&y<H)BASE[y*W+x]=t};
+  const get=(x,y)=>BASE[y*W+x];
+  const clear=(cx,cy,r)=>{for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++){if(x<0||y<0||x>=W||y>=H)continue;if((x-cx)**2+(y-cy)**2<=r*r+1&&get(x,y)!=='agua')set(x,y,get(x,y)==='arena'?'arena':'hierba')}};
+  const findLand=(x,y,ok=()=>true)=>{for(let r=0;r<20;r++)for(let j=-r;j<=r;j++)for(let i=-r;i<=r;i++){const X=x+i,Y=y+j;if(X<1||Y<1||X>=W-1||Y>=H-1)continue;if(BASE[Y*W+X]!=='agua'&&ok(X,Y))return {x:X,y:Y}}return {x,y}};
+  // pueblo
+  const V={x:15,y:30};clear(V.x,V.y,6);
+  for(let x=V.x-6;x<=V.x+6;x++)if(get(x,V.y)!=='agua')set(x,V.y,'camino');
+  for(let y=V.y-5;y<=V.y+5;y++)if(get(V.x,y)!=='agua')set(V.x,y,'camino');
+  for(let k=0;k<10;k++){const a=k/10*Math.PI*2+.3,r=7.5+hash(k,1,5)*2.5;const x=Math.round(V.x+Math.cos(a)*r),y=Math.round(V.y+Math.sin(a)*r);if(get(x,y)==='hierba'||get(x,y)==='arbol')set(x,y,'roca')}
+  for(let k=0;k<6;k++){const x=V.x-4+k*2,y=V.y+4+(k%2);if(get(x,y)==='hierba')set(x,y,'arbusto')}
+  set(V.x-3,V.y+2,'tablon');
+  SPOT.marisa={x:V.x-1,y:V.y-1};SPOT.leo={x:V.x+3,y:V.y-2};SPOT.tablon={x:V.x-3,y:V.y+2};
+  // faro
+  let fx=0;const fy=26;for(let x=W-1;x>40;x--)if(get(x,fy)!=='agua'){fx=x;break}
+  fx=fx-1;clear(fx-1,fy,3);set(fx,fy,'faro');SPOT.faro={x:fx,y:fy};
+  SPOT.tomas=findLand(fx-3,fy+1,(x,y)=>x>riverX(y)+2&&get(x,y)==='hierba');
+  // búho
+  SPOT.buho=findLand(10,10,(x,y)=>x<riverX(y)-3);clear(SPOT.buho.x,SPOT.buho.y,2);
+  // gato
+  SPOT.michi=findLand(51,9,(x,y)=>x>riverX(y)+3);clear(SPOT.michi.x,SPOT.michi.y,1);
+  // pescadora
+  SPOT.nina=findLand(19,41,(x,y)=>get(x,y)==='arena');
+  SPOT.start=findLand(13,38,(x,y)=>get(x,y)==='arena'&&x<riverX(y)-3);
+  clear(SPOT.start.x,SPOT.start.y,1);
+})();
+
+/* ---------------- datos del juego ---------------- */
+const ITEMS={madera:'🪵',piedra:'🪨',bayas:'🍓',flores:'🌸',peces:'🐟'};
+const ITEM_N={madera:'madera',piedra:'piedra',bayas:'bayas',flores:'flores',peces:'peces'};
+const BUILD={
+  camino:{n:'Camino',e:'🟫',cost:{piedra:1},on:'land',walk:true},
+  valla:{n:'Valla',e:'🚧',cost:{madera:1},on:'land'},
+  banco:{n:'Banco',e:'🪑',cost:{madera:2},on:'land'},
+  casa:{n:'Casa',e:'🏠',cost:{madera:8,piedra:4},on:'land'},
+  huerto:{n:'Huerto',e:'🌱',cost:{madera:2,bayas:1},on:'land'},
+  arbolito:{n:'Plantar árbol',e:'🌳',cost:{bayas:1},on:'land'},
+  puente:{n:'Puente',e:'🌉',cost:{madera:3},on:'water',walk:true},
+  farol:{n:'Farol',e:'🏮',cost:{madera:2,piedra:1},on:'land'},
+  muro:{n:'Muro',e:'🧱',cost:{piedra:2},on:'land'},
+  jardin:{n:'Jardín',e:'🌷',cost:{flores:2},on:'land'},
+  quitar:{n:'Quitar',e:'🧹',cost:{}},
+  // solo modo libre
+  t_hierba:{n:'Hierba',e:'🟩',cost:{},on:'any',paint:'hierba',free:1},
+  t_arena:{n:'Arena',e:'🟨',cost:{},on:'any',paint:'arena',free:1},
+  t_agua:{n:'Agua',e:'🟦',cost:{},on:'any',paint:'agua',free:1},
+  t_arbol:{n:'Árbol',e:'🌲',cost:{},on:'any',paint:'arbol',free:1},
+  t_roca:{n:'Roca',e:'⛰️',cost:{},on:'any',paint:'roca',free:1},
+  t_flores:{n:'Flores',e:'🌼',cost:{},on:'any',paint:'flores',free:1},
+};
+const BUILT=new Set(['camino','valla','banco','casa','huerto','brote','puente','farol','muro','jardin']);
+const WALK=new Set(['hierba','arena','camino','flores','tocon','grava','puente','brote']);
+const LAND_OK=new Set(['hierba','arena','grava','tocon']);
+
+const NPCS={
+  marisa:{n:'Abuela Marisa',e:'👵'},leo:{n:'Leo el carpintero',e:'🧔'},nina:{n:'Nina la pescadora',e:'👧'},
+  buho:{n:'Profe Búho',e:'🦉'},tomas:{n:'Tomás el farero',e:'👨‍🦳'},michi:{n:'Michi',e:'🐈'}
+};
+const QUIZ=[
+ ['¿Cuántos lados tiene un pentágono?',['5','6','4','8']],
+ ['¿Qué planeta está más cerca del Sol?',['Mercurio','Venus','Marte','Tierra']],
+ ['¿Cuánto es 9 × 7?',['63','56','72','49']],
+ ['¿Qué parte de la planta hace la fotosíntesis, sobre todo?',['Las hojas','Las raíces','Las semillas','La corteza']],
+ ['¿Cuál es el plural de "pez"?',['Peces','Pezes','Pezs','Pez']],
+ ['¿Qué animal es un anfibio?',['La rana','El delfín','La serpiente','El águila']],
+ ['¿Cuántos minutos tiene una hora?',['60','100','30','90']],
+ ['¿Cuál es la capital de Portugal?',['Lisboa','Oporto','Madrid','Faro']],
+ ['¿Qué estado del agua es el hielo?',['Sólido','Líquido','Gaseoso','Plasma']],
+ ['¿Cuál es el antónimo de "rápido"?',['Lento','Veloz','Ligero','Fuerte']],
+ ['¿Cuánto es la mitad de 90?',['45','40','50','35']],
+ ['¿Qué océano baña la costa este de América del Sur?',['Atlántico','Pacífico','Índico','Ártico']],
+ ['¿Qué instrumento sirve para ver cosas muy lejanas?',['El telescopio','El microscopio','El termómetro','La brújula']],
+ ['¿Cuántos días tiene un año bisiesto?',['366','365','360','364']],
+ ['¿Qué palabra es un adjetivo?',['Bonito','Saltar','Casa','Ayer']],
+ ['¿Hacia dónde señala la aguja de una brújula?',['Al norte','Al sur','Al este','Al oeste']],
+ ['¿Cuánto es 3/4 de 100?',['75','34','25','70']],
+ ['¿Qué animal pone huevos?',['La gallina','La vaca','El perro','El caballo']],
+];
+
+const QUESTS=[
+ {id:'lena',giver:'marisa',t:'Leña para la hoguera',goal:{have:{madera:5}},obj:'Corta árboles y consigue 5 de madera',
+  intro:'¡Un náufrago! Bienvenido a Isla Recreo. La tormenta de anoche destrozó el pueblo. Lo primero es encender una hoguera. Ponte delante de un árbol y pulsa Espacio (o ✋) para cortarlo. Tráeme 5 de madera.',
+  done:'¡Qué bien huele la hoguera! Toma unas monedas. Ahora necesitamos algo más grande…',reward:{coins:10}},
+ {id:'casa',giver:'marisa',t:'Un techo para todos',goal:{build:{casa:1}},obj:'Construye una casa (🔨): 8 madera y 4 piedra',
+  intro:'Nadie tiene dónde dormir. Pulsa B (o 🔨), elige Casa y colócala en un sitio libre del pueblo. Las piedras grises de alrededor dan piedra.',
+  done:'¡Una casa nueva! Esta noche dormiremos calentitos. Leo, el carpintero, quería hablar contigo.',reward:{coins:20}},
+ {id:'huerto',giver:'leo',t:'El huerto del pueblo',goal:{build:{huerto:1}},obj:'Construye un huerto (2 madera y 1 baya)',unlock:['huerto','arbolito'],
+  intro:'¡Hola! Soy Leo. Si queremos comer todos los días necesitamos un huerto. Te enseño a hacerlo: necesitas 2 de madera y 1 baya. Las bayas salen de los arbustos con puntitos rojos. Ah, y ahora también puedes plantar árboles.',
+  done:'¡Perfecto! Cuando el huerto tenga frutos rojos, pulsa acción delante para cosecharlo. Nina, en la playa del sur, necesita ayuda.',reward:{coins:15,items:{bayas:2}}},
+ {id:'pesca',giver:'nina',t:'Pescado fresco',goal:{fish:3},obj:'Pesca 3 peces mirando al agua',give:{caña:1},
+  intro:'¡Hola! Me llamo Nina. Te regalo mi caña de repuesto 🎣. Ponte frente al agua, pulsa acción y, cuando la aguja pase por la zona verde, pulsa otra vez. ¡Tráeme 3 peces!',
+  done:'¡Menudos peces! El Profe Búho vive en el bosque del noroeste. Dicen que tiene los planos de un puente.',reward:{coins:20}},
+ {id:'buho',giver:'buho',t:'El examen del Búho',goal:{quiz:3},obj:'Acierta 3 preguntas del Profe Búho',
+  intro:'Uh, uh. Así que buscas mis planos del puente. Solo se los doy a quien sabe cosas. Acierta 3 preguntas y serán tuyos.',
+  done:'Uh, uh. Bien razonado. Aquí tienes los planos del puente: ya puedes construir puentes sobre el agua (3 madera cada tramo).',reward:{coins:15},unlock:['puente']},
+ {id:'rio',giver:'marisa',t:'Al otro lado del río',goal:{reach:'east'},obj:'Construye un puente y cruza el río hacia el este',
+  intro:'¿Ves el río que parte la isla en dos? Al otro lado está el viejo faro, apagado desde la tormenta. Construye un puente tramo a tramo y cruza. Allí vive Tomás, el farero.',
+  done:'¡Has cruzado el río! Busca a Tomás cerca del faro, en la costa este.',reward:{coins:20},auto:true},
+ {id:'michi',giver:'tomas',t:'¿Dónde está Michi?',goal:{flag:'michi'},obj:'Encuentra a Michi en las montañas del norte y vuelve con Tomás',
+  intro:'¡Un visitante! Perdona, estoy preocupado: mi gato Michi se escapó durante la tormenta hacia las montañas del norte. ¿Me ayudas a encontrarlo? Mira el minimapa para orientarte.',
+  done:'¡Michi! ¡Gracias, gracias! Ahora sí podemos pensar en arreglar el faro.',reward:{coins:25,items:{bayas:3}}},
+ {id:'material',giver:'tomas',t:'Material para el faro',goal:{have:{piedra:10,madera:6}},obj:'Trae 10 de piedra y 6 de madera',
+  intro:'El faro necesita reparaciones. En las montañas hay mucha piedra. Tráeme 10 de piedra y 6 de madera.',
+  done:'¡Con esto arreglo la escalera! Te enseño a hacer farolas, muros y jardines para que el pueblo quede precioso.',reward:{coins:20},unlock:['farol','muro','jardin']},
+ {id:'luz',giver:'tomas',t:'Ilumina la isla',goal:{build:{farol:3}},obj:'Construye 3 faroles en la isla',
+  intro:'Último paso: la luz del faro se enciende con la energía de la isla. Construye 3 faroles donde quieras y vuelve aquí cuando anochezca… o cuando quieras.',
+  done:'¡Lo has conseguido! Mira el faro…',reward:{coins:50},final:true},
+];
+const STORY_END='El faro vuelve a brillar sobre el mar. Los barcos ya pueden volver a Isla Recreo y en el pueblo celebran una fiesta en tu honor. La historia ha terminado, pero la isla es tuya: sigue construyendo y mira el tablón del pueblo para hacer encargos.';
+
+/* ---------------- estado y guardado ---------------- */
+let S=null;const KEYS={historia:'isla-recreo-historia',libre:'isla-recreo-libre'};
+function blank(mode,name,avatar){return {v:1,mode,name,avatar,x:SPOT.start.x,y:SPOT.start.y,dir:'u',inv:{madera:0,piedra:0,bayas:0,flores:0,peces:0},tools:{},coins:0,
+  mods:{},q:{i:0,state:'accept',base:{},quizOk:0},flags:{},counts:{built:{},fish:0,encargos:0,steps:0},recipes:['camino','valla','banco','casa','quitar'],explored:'',time:.15,encargo:null,created:Date.now()}}
+function saveGame(){if(!S)return;try{S.explored=packExplored();localStorage.setItem(KEYS[S.mode],JSON.stringify(S))}catch(e){}}
+function loadSlot(mode){try{const d=JSON.parse(localStorage.getItem(KEYS[mode]));return d&&d.v?d:null}catch(e){return null}}
+let EXPL=new Uint8Array(W*H);
+function packExplored(){let s='';for(let i=0;i<EXPL.length;i++)s+=String.fromCharCode(EXPL[i]);return btoa(s)}
+function unpackExplored(b){EXPL=new Uint8Array(W*H);try{const s=atob(b||'');for(let i=0;i<s.length&&i<EXPL.length;i++)EXPL[i]=s.charCodeAt(i)}catch(e){}}
+const isFree=()=>S&&S.mode==='libre';
+
+/* ---------------- tiles ---------------- */
+const key=(x,y)=>x+','+y;
+function tile(x,y){if(x<0||y<0||x>=W||y>=H)return 'agua';const m=S.mods[key(x,y)];return m?m.t:BASE[y*W+x]}
+function setTile(x,y,t,extra){const b=BASE[y*W+x];if(t===b&&!extra){delete S.mods[key(x,y)];return}S.mods[key(x,y)]=Object.assign({t},extra||{})}
+function groundOf(x,y){const b=BASE[y*W+x];return b==='arena'?'arena':b==='agua'?'agua':'hierba'}
+function npcAt(x,y){for(const id of activeNpcs())if(npcPos(id).x===x&&npcPos(id).y===y)return id;return null}
+function activeNpcs(){const l=['marisa','leo','nina','buho','tomas'];if(!isFree()&&!S.flags.michi)l.push('michi');if(S.flags.michi)l.push('michi');return isFree()?[]:l}
+function npcPos(id){if(id==='michi'&&S.flags.michi){const t=SPOT.tomas;return {x:t.x+1,y:t.y}}return SPOT[id]}
+function walkable(x,y){const t=tile(x,y);return WALK.has(t)&&!npcAt(x,y)}
+
+/* ---------------- canvas ---------------- */
+const cv=$('#world'),g=cv.getContext('2d');let VW=0,VH=0,T=36,DPR=1;
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);VW=innerWidth;VH=innerHeight;cv.width=VW*DPR;cv.height=VH*DPR;g.setTransform(DPR,0,0,DPR,0,0);T=Math.round(clamp(Math.min(VW,VH)/13,30,48))}
+addEventListener('resize',resize);resize();
+const dark=document.createElement('canvas'),dg=dark.getContext('2d');
+
+/* ---------------- jugador ---------------- */
+const P={px:0,py:0,fromX:0,fromY:0,t:1,moving:false};
+const DIRS={u:[0,-1],d:[0,1],l:[-1,0],r:[1,0]};
+let held=[];let mode='play';// play | build | dialog | menu | fish
+function facing(){const d=DIRS[S.dir];return {x:S.x+d[0],y:S.y+d[1]}}
+function tryMove(dir){S.dir=dir;const d=DIRS[dir];const nx=S.x+d[0],ny=S.y+d[1];
+  if(walkable(nx,ny)){P.fromX=S.x;P.fromY=S.y;S.x=nx;S.y=ny;P.t=0;P.moving=true;S.counts.steps++;reveal();checkAuto()}}
+function reveal(){for(let j=-6;j<=6;j++)for(let i=-7;i<=7;i++){const x=S.x+i,y=S.y+j;if(x>=0&&y>=0&&x<W&&y<H&&i*i+j*j<=45)EXPL[y*W+x]=1}}
+
+/* ---------------- inventario ---------------- */
+function has(cost){if(isFree())return true;return Object.entries(cost).every(([k,n])=>(S.inv[k]||0)>=n)}
+function pay(cost){if(isFree())return;for(const[k,n]of Object.entries(cost))S.inv[k]-=n}
+function give(k,n=1){if(isFree())return;S.inv[k]=(S.inv[k]||0)+n;renderInv(k)}
+const costTxt=c=>Object.entries(c).map(([k,n])=>n+ITEMS[k]).join(' ')||'gratis';
+
+/* ---------------- acciones ---------------- */
+const now=()=>Date.now();
+function act(){
+  if(mode==='dialog'){const b=$('#dialog .opts button');b&&b.click();return}
+  if(mode==='build')return place();
+  if(mode!=='play')return;
+  const f=facing();const id=npcAt(f.x,f.y);
+  if(id)return talk(id);
+  const t=tile(f.x,f.y);
+  switch(t){
+    case 'arbol':sfx.chop();give('madera',hashR()<.3?2:1);setTile(f.x,f.y,'tocon',{until:now()+90000,back:'arbol'});sfx.get();break;
+    case 'roca':sfx.chop();give('piedra');setTile(f.x,f.y,'grava',{until:now()+150000,back:'roca'});sfx.get();break;
+    case 'acantilado':sfx.chop();give('piedra',2);setTile(f.x,f.y,'grava');sfx.get();break;
+    case 'arbusto':give('bayas');setTile(f.x,f.y,'arbusto_v',{until:now()+60000,back:'arbusto'});sfx.get();break;
+    case 'flores':give('flores');setTile(f.x,f.y,'hierba',{until:now()+90000,back:'flores'});sfx.get();break;
+    case 'huerto':{const m=S.mods[key(f.x,f.y)];if(m&&m.ready<=now()){give('bayas',2);m.ready=now()+45000;sfx.get();toast('Cosechas 2 🍓')}else toast('Todavía está creciendo 🌱');break}
+    case 'agua':if(S.tools.caña||isFree())startFish();else toast('Necesitas una caña de pescar 🎣');break;
+    case 'tablon':tablon();break;
+    case 'faro':talkFaro();break;
+    case 'casa':toast(pick(['Huele a sopa casera 🍲','Alguien ronca dentro 😴','Una casa preciosa 🏠']));break;
+    case 'banco':toast('Te sientas a descansar un momento 🪑');break;
+    default:sfx.no();
+  }
+  saveGame();
+}
+let rs=1;const hashR=()=>{rs=(rs*16807)%2147483647;return rs/2147483647};
+
+/* ---------------- construcción ---------------- */
+let sel='camino';
+function recipes(){return isFree()?Object.keys(BUILD):S.recipes.filter(r=>BUILD[r])}
+function toggleBuild(on){if(mode==='dialog'||mode==='menu'||mode==='fish')return;mode=(on??mode!=='build')?'build':'play';$('#bBuild').classList.toggle('on',mode==='build');renderBuild()}
+function renderBuild(){const bb=$('#buildbar');bb.hidden=mode!=='build';if(bb.hidden)return;const rs=recipes();if(!rs.includes(sel))sel=rs[0];
+  bb.innerHTML=rs.map((r,i)=>{const b=BUILD[r];return `<button class="bi ${r===sel?'sel':''} ${has(b.cost)?'':'no'}" data-r="${r}"><span class="e">${b.e}</span>${b.n}<span class="c">${i<9?'['+(i+1)+'] ':''}${isFree()?'':costTxt(b.cost)}</span></button>`}).join('');
+  $$('.bi',bb).forEach(b=>b.onclick=()=>{sel=b.dataset.r;renderBuild()})}
+function place(){const f=facing();const b=BUILD[sel];const t=tile(f.x,f.y);
+  if(npcAt(f.x,f.y)||(f.x===S.x&&f.y===S.y))return sfx.no();
+  if(sel==='quitar'){
+    if(!BUILT.has(t)&&!(isFree()&&t!==BASE[f.y*W+f.x]))return toast('Aquí no hay nada construido'),sfx.no();
+    const rec=BUILD[t==='brote'?'arbolito':t];if(rec&&!isFree())for(const[k,n]of Object.entries(rec.cost)){const r=Math.floor(n/2);if(r)give(k,r)}
+    setTile(f.x,f.y,groundOf(f.x,f.y));sfx.chop();saveGame();return renderBuild()}
+  if(b.paint){setTile(f.x,f.y,b.paint);sfx.build();return saveGame()}
+  if(b.on==='water'&&t!=='agua')return toast('El puente va sobre el agua'),sfx.no();
+  if(b.on==='land'&&!LAND_OK.has(t))return toast('Necesitas un hueco libre de hierba o arena'),sfx.no();
+  if(!has(b.cost))return toast('Te falta material: '+costTxt(b.cost)),sfx.no();
+  pay(b.cost);
+  const nt=sel==='arbolito'?'brote':sel;const extra=sel==='huerto'?{ready:now()+30000}:sel==='arbolito'?{until:now()+60000,back:'arbol'}:null;
+  setTile(f.x,f.y,nt,extra);S.counts.built[sel]=(S.counts.built[sel]||0)+1;sfx.build();renderInv();renderBuild();renderQuest();saveGame();
+}
+
+/* ---------------- diálogo ---------------- */
+function dialog(who,av,text,opts){mode='dialog';const d=$('#dialog');d.hidden=false;sfx.talk();
+  opts=opts||[{t:'Vale',f:()=>{}}];
+  d.innerHTML=`<div class="av">${av}</div><div style="flex:1;min-width:0"><div class="who">${esc(who)}</div><p>${text}</p><div class="opts">${opts.map((o,i)=>`<button class="btn ${o.cls||''}" data-i="${i}">${opts.length>1?(i+1)+'. ':''}${o.t}</button>`).join('')}</div></div>`;
+  $$('.opts button',d).forEach(b=>b.onclick=()=>{d.hidden=true;mode='play';opts[+b.dataset.i].f&&opts[+b.dataset.i].f()});}
+function chain(list,end){if(!list.length)return end&&end();const [w,a,t]=list[0];dialog(w,a,t,[{t:'Seguir',f:()=>chain(list.slice(1),end)}])}
+
+/* ---------------- misiones ---------------- */
+const Q=()=>QUESTS[S.q.i];
+function progress(q){const g=q.goal;
+  if(g.have){const parts=Object.entries(g.have).map(([k,n])=>`${Math.min(S.inv[k]||0,n)}/${n} ${ITEMS[k]}`);return {txt:parts.join(' · '),ok:Object.entries(g.have).every(([k,n])=>(S.inv[k]||0)>=n)}}
+  if(g.build){const [k,n]=Object.entries(g.build)[0];const c=(S.counts.built[k]||0)-(S.q.base[k]||0);return {txt:`${Math.min(c,n)}/${n} ${BUILD[k].e}`,ok:c>=n}}
+  if(g.fish){const c=S.counts.fish-(S.q.base.fish||0);return {txt:`${Math.min(c,g.fish)}/${g.fish} 🐟`,ok:c>=g.fish}}
+  if(g.quiz)return {txt:`${S.q.quizOk}/${g.quiz} aciertos`,ok:S.q.quizOk>=g.quiz};
+  if(g.reach)return {txt:'',ok:S.x>riverX(S.y)+2};
+  if(g.flag)return {txt:S.flags[g.flag]?'¡Encontrado!':'',ok:!!S.flags[g.flag]};
+  return {txt:'',ok:false};
+}
+function accept(){const q=Q();S.q.state='active';S.q.quizOk=0;S.q.base={...S.counts.built,fish:S.counts.fish};
+  if(q.unlock&&q.id==='huerto')q.unlock.forEach(r=>!S.recipes.includes(r)&&S.recipes.push(r));
+  if(q.give&&q.give.caña)S.tools.caña=1;renderQuest();saveGame();checkAuto()}
+function complete(){const q=Q();
+  if(q.goal.have)for(const[k,n]of Object.entries(q.goal.have))S.inv[k]-=n;
+  S.coins+=q.reward.coins||0;if(q.reward.items)for(const[k,n]of Object.entries(q.reward.items))S.inv[k]=(S.inv[k]||0)+n;
+  if(q.unlock)q.unlock.forEach(r=>!S.recipes.includes(r)&&S.recipes.push(r));
+  sfx.quest();S.q.i++;S.q.state='accept';renderInv();renderQuest();saveGame();
+  toast(`✅ Misión completada: ${q.t}<br>+${q.reward.coins} 🪙`,2800);
+  return q;
+}
+function talk(id){const n=NPCS[id];const q=Q();
+  if(id==='michi'&&!S.flags.michi){
+    if(q&&q.id==='michi'&&S.q.state==='active'){S.flags.michi=1;sfx.get();renderQuest();saveGame();return dialog('Michi',n.e,'¡Miau! (Michi se frota contra tus piernas y te sigue. Vuelve con Tomás.)')}
+    return dialog('Michi',n.e,'Miau… (parece perdido. ¿De quién será?)')}
+  if(q&&q.giver===id){
+    if(S.q.state==='accept')return dialog(n.n,n.e,q.intro,[{t:'¡Acepto!',cls:'go',f:accept}]);
+    const p=progress(q);
+    if(q.goal.quiz&&!p.ok)return quiz(id);
+    if(p.ok&&!q.auto){const done=complete();
+      if(done.final)return chain([[n.n,n.e,done.done]],()=>{S.flags.faroLit=1;S.time=.5;saveGame();chain([['Isla Recreo','🏝️',STORY_END]],()=>{})});
+      return dialog(n.n,n.e,done.done,[{t:'¡Genial!',f:()=>{const nq=Q();if(nq&&nq.giver===id)talk(id)}}])}
+    return dialog(n.n,n.e,'Recuerda: '+q.obj.toLowerCase()+'. '+(p.txt?'Llevas '+p.txt+'.':''))}
+  // charla normal
+  const lines={
+    marisa:['Este pueblo era precioso antes de la tormenta. Con tu ayuda volverá a serlo.','El tablón de la plaza tiene encargos de los vecinos. ¡Se ganan monedas!','Si construyes caminos, el pueblo parece una ciudad de verdad.'],
+    leo:['Un buen carpintero siempre lleva madera de sobra.','Los árboles que cortas vuelven a crecer con el tiempo. La isla es generosa.'],
+    nina:['Los peces pican más en el mar abierto… o eso dice mi abuelo.','¿Sabías que el agua del mar es salada porque arrastra minerales de las rocas?'],
+    buho:['Uh, uh. Pregúntame cuando quieras: aprender nunca cansa.','La isla tiene 64 casillas de ancho. Lo he medido yo.'],
+    tomas:['Un faro avisa a los barcos de que hay rocas cerca.','Michi y yo vigilamos el mar todas las noches.'],
+    michi:['¡Miau!','Prrrr…']};
+  if(id==='leo'&&S.q.i>2)return dialog(n.n,n.e,'¿Quieres comprar material? Tengo madera y piedra de sobra.',[
+    {t:'5 🪵 por 8 🪙',f:()=>buy('madera',5,8)},{t:'5 🪨 por 10 🪙',f:()=>buy('piedra',5,10)},{t:'Nada, gracias',cls:'alt'}]);
+  if(id==='buho'&&S.q.i>4)return dialog(n.n,n.e,'¿Una pregunta extra? Si aciertas, te doy 5 monedas.',[{t:'¡Venga!',cls:'go',f:()=>quiz('buho',true)},{t:'Ahora no',cls:'alt'}]);
+  dialog(n.n,n.e,pick(lines[id]));
+}
+function buy(k,n,c){if(S.coins<c)return toast('No tienes monedas suficientes'),sfx.no();S.coins-=c;give(k,n);sfx.get();renderInv();saveGame()}
+function quiz(id,extra){const n=NPCS[id];const [q,ans]=pick(QUIZ);const opts=shuffle(ans.map((t,i)=>({t,ok:i===0})));
+  dialog(n.n,n.e,q,opts.map(o=>({t:esc(o.t),f:()=>{
+    if(o.ok){sfx.get();if(extra){S.coins+=5;renderInv();saveGame();return dialog(n.n,n.e,'¡Correcto! Toma 5 monedas.')}
+      S.q.quizOk++;renderQuest();saveGame();const p=progress(Q());
+      if(p.ok)return talk(id);return dialog(n.n,n.e,`¡Correcto! Llevas ${S.q.quizOk} de 3.`,[{t:'Otra',cls:'go',f:()=>quiz(id)}])}
+    sfx.no();dialog(n.n,n.e,`Uh, uh… No. La respuesta era «${esc(ans[0])}».`,[{t:'Otra',f:()=>quiz(id,extra)},{t:'Luego',cls:'alt'}])}})));
+}
+function checkAuto(){const q=Q();if(!q||S.q.state!=='active'||!q.auto)return;if(progress(q).ok){const d=complete();dialog('Isla Recreo','🏝️',d.done)}}
+function talkFaro(){if(S.flags.faroLit)return toast('El faro brilla con fuerza 🗼✨');toast('El faro está apagado y lleno de grietas 🗼')}
+
+/* ---------------- tablón de encargos ---------------- */
+function newEncargo(){const r=Math.random();
+  if(r<.6){const k=pick(['madera','piedra','bayas','flores','peces']);const n=k==='peces'?2:k==='flores'?3:4+Math.floor(Math.random()*4);return {k,n,c:n*3+5}}
+  const b=pick(['camino','valla','banco','jardin','farol'].filter(x=>isFree()||S.recipes.includes(x)));const n=b==='camino'?5:2;return {b,n,base:S.counts.built[b]||0,c:n*4+6}}
+function tablon(){if(isFree())return toast('En modo libre no hay encargos: ¡construye lo que quieras!');
+  if(!S.encargo)S.encargo=newEncargo();const e=S.encargo;
+  const txt=e.k?`Un vecino necesita ${e.n} ${ITEMS[e.k]} ${ITEM_N[e.k]}. Recompensa: ${e.c} 🪙.`:`Hay que construir ${e.n} × ${BUILD[e.b].e} ${BUILD[e.b].n.toLowerCase()}. Llevas ${Math.min(e.n,(S.counts.built[e.b]||0)-e.base)}. Recompensa: ${e.c} 🪙.`;
+  const ok=e.k?(S.inv[e.k]||0)>=e.n:(S.counts.built[e.b]||0)-e.base>=e.n;
+  dialog('Tablón del pueblo','📋',txt+` (Encargos hechos: ${S.counts.encargos})`,[
+    ...(ok?[{t:'Entregar',cls:'go',f:()=>{if(e.k)S.inv[e.k]-=e.n;S.coins+=e.c;S.counts.encargos++;S.encargo=null;sfx.quest();renderInv();saveGame();toast('¡Encargo cumplido! +'+e.c+' 🪙')}}]:[]),
+    {t:'Otro encargo',cls:'alt',f:()=>{S.encargo=newEncargo();saveGame();tablon()}},{t:'Cerrar',cls:'alt'}]);
+}
+
+/* ---------------- pesca ---------------- */
+function startFish(){mode='fish';const z=20+Math.random()*55,w=isFree()?22:16;let pos=0,dir=1,raf;
+  $('#ov').innerHTML=`<div class="overlay" id="fish"><div class="card"><h2>🎣 ¡Pica algo!</h2><p class="sub">Pulsa cuando la aguja esté en la zona verde.</p><div class="bar"><div class="zone" style="left:${z}%;width:${w}%"></div><div class="needle"></div></div><div class="row"><button class="btn go" id="pull">¡Tirar! (Espacio)</button><button class="btn alt" id="nofish">Dejarlo</button></div></div></div>`;
+  const nd=$('#fish .needle');const sp=1.1+Math.random()*.6;
+  const loop=()=>{pos+=dir*sp;if(pos>=98||pos<=0)dir*=-1;nd.style.left=pos+'%';raf=requestAnimationFrame(loop)};loop();
+  const end=()=>{cancelAnimationFrame(raf);$('#ov').innerHTML='';mode='play'};
+  $('#pull').onclick=()=>{const ok=pos+3>=z&&pos+3<=z+w;end();if(ok){give('peces');S.counts.fish++;sfx.quest();toast('¡Has pescado un pez! 🐟');renderQuest();saveGame()}else{sfx.no();toast('Se escapó… ¡prueba otra vez!')}};
+  $('#nofish').onclick=end;FISH_PULL=()=>$('#pull')&&$('#pull').click();
+}
+let FISH_PULL=null;
+
+/* ---------------- HUD ---------------- */
+function renderInv(flash){
+  const items=Object.entries(ITEMS).map(([k,e])=>`<span class="it ${flash===k?'flash':''}" title="${ITEM_N[k]}">${e} ${isFree()?'∞':S.inv[k]||0}</span>`).join('');
+  $('#items').innerHTML=items+`<span class="it" title="monedas">🪙 ${S.coins}</span>`+(S.tools.caña?'<span class="it" title="caña">🎣</span>':'');
+  if(mode==='build')renderBuild();
+}
+function renderQuest(){const el=$('#quest');el.hidden=false;
+  if(isFree()){el.innerHTML=`<div class="k">Modo libre</div><b>Construye tu isla</b><span>Material infinito. Pulsa B para construir o pintar el terreno.</span>`;return}
+  const q=Q();if(!q){el.innerHTML=`<div class="k">Historia completada ✨</div><b>Isla de ${esc(S.name)}</b><span>Encargos del tablón: ${S.counts.encargos}. ¡Sigue construyendo!</span>`;return}
+  const n=NPCS[q.giver];
+  if(S.q.state==='accept'){el.innerHTML=`<div class="k">Misión ${S.q.i+1} de ${QUESTS.length}</div><b>${q.t}</b><span>Habla con ${n.e} ${n.n} (busca el ❗)</span>`;return}
+  const p=progress(q);el.innerHTML=`<div class="k">Misión ${S.q.i+1} de ${QUESTS.length}</div><b>${q.t}</b><span>${q.obj}</span>${p.txt?`<br><span class="prog">${p.txt}</span>`:''}${p.ok&&!q.auto?`<br><span class="prog" style="color:var(--good)">¡Listo! Vuelve con ${n.e} ${n.n}</span>`:''}`;
+}
+function renderMini(){const m=$('#mini'),c=m.getContext('2d');c.fillStyle='#0b1b2b';c.fillRect(0,0,128,92);
+  const col={agua:'#2f74b5',arena:'#e3cd93',hierba:'#6fb552',arbol:'#2e7a33',roca:'#9aa1ab',acantilado:'#70757e',camino:'#c9a66b',casa:'#e0533f',faro:'#ffffff',puente:'#a0682f',farol:'#ffcf4a',huerto:'#7a5230'};
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!EXPL[y*W+x]&&!isFree())continue;const t=tile(x,y);c.fillStyle=col[t]||col[groundOf(x,y)]||'#6fb552';c.fillRect(x*2,y*2,2,2)}
+  if(!isFree()){const q=Q();if(q&&q.id==='michi'&&!S.flags.michi&&S.q.state==='active'){c.fillStyle='#ff6b5e';c.fillRect(SPOT.michi.x*2-2,SPOT.michi.y*2-2,4,4)}
+    if(q){const p=npcPos(q.giver);c.fillStyle='#ffcf4a';c.beginPath();c.arc(p.x*2+1,p.y*2+1,2.5,0,7);c.fill()}}
+  c.fillStyle='#fff';c.fillRect(S.x*2-1,S.y*2-1,4,4);
+}
+
+/* ---------------- dibujo ---------------- */
+function rr(x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,r)}
+function drawGround(t,x,y,sx,sy,tm){
+  if(t==='agua'){g.fillStyle='#3d8fd6';g.fillRect(sx,sy,T+1,T+1);g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=2;const o=Math.sin(tm/700+x*.7+y*.4)*T*.12;g.beginPath();g.moveTo(sx+T*.2+o,sy+T*.5);g.quadraticCurveTo(sx+T*.35+o,sy+T*.38,sx+T*.5+o,sy+T*.5);g.stroke();return}
+  if(t==='arena'){g.fillStyle=(x+y)%2?'#ecd7a0':'#e8d199';g.fillRect(sx,sy,T+1,T+1);return}
+  g.fillStyle=hash(x,y,3)<.5?'#7cc35b':'#77bd56';g.fillRect(sx,sy,T+1,T+1);
+  if(hash(x,y,4)<.25){g.fillStyle='#69ad4b';g.fillRect(sx+T*.3,sy+T*.6,2,5);g.fillRect(sx+T*.38,sy+T*.55,2,6)}
+}
+function drawTile(x,y,sx,sy,tm){
+  const t=tile(x,y);const gr=t==='puente'?'agua':groundOf(x,y);
+  if(t==='agua'||t==='arena'||t==='hierba'){drawGround(t,x,y,sx,sy,tm);return}
+  drawGround(gr==='agua'&&t!=='puente'?'hierba':gr,x,y,sx,sy,tm);
+  const c=sx+T/2,m=sy+T/2,h=hash(x,y,9);
+  switch(t){
+   case 'arbol':g.fillStyle='rgba(0,0,0,.18)';g.beginPath();g.ellipse(c,sy+T*.88,T*.32,T*.1,0,0,7);g.fill();
+     g.fillStyle='#7a4a24';g.fillRect(c-T*.07,m,T*.14,T*.38);
+     g.fillStyle=h<.5?'#2f7d32':'#357f2c';g.beginPath();g.arc(c,m-T*.08,T*.36,0,7);g.fill();
+     g.fillStyle='#4caf50';g.beginPath();g.arc(c-T*.1,m-T*.18,T*.16,0,7);g.fill();break;
+   case 'tocon':g.fillStyle='#8a5a2e';g.beginPath();g.ellipse(c,m+T*.15,T*.17,T*.11,0,0,7);g.fill();g.strokeStyle='#c89458';g.lineWidth=1.5;g.beginPath();g.ellipse(c,m+T*.15,T*.08,T*.05,0,0,7);g.stroke();break;
+   case 'brote':g.strokeStyle='#2f7d32';g.lineWidth=3;g.beginPath();g.moveTo(c,m+T*.25);g.lineTo(c,m-T*.05);g.stroke();g.fillStyle='#4caf50';g.beginPath();g.ellipse(c-T*.1,m-T*.05,T*.1,T*.05,-.5,0,7);g.ellipse(c+T*.1,m-T*.1,T*.1,T*.05,.5,0,7);g.fill();break;
+   case 'roca':g.fillStyle='rgba(0,0,0,.18)';g.beginPath();g.ellipse(c,sy+T*.82,T*.36,T*.1,0,0,7);g.fill();
+     g.fillStyle='#9aa1ab';g.beginPath();g.moveTo(sx+T*.15,sy+T*.8);g.lineTo(sx+T*.25,sy+T*.35);g.lineTo(sx+T*.55,sy+T*.2);g.lineTo(sx+T*.85,sy+T*.45);g.lineTo(sx+T*.88,sy+T*.8);g.closePath();g.fill();
+     g.fillStyle='#c3c8cf';g.beginPath();g.moveTo(sx+T*.28,sy+T*.4);g.lineTo(sx+T*.55,sy+T*.25);g.lineTo(sx+T*.6,sy+T*.5);g.closePath();g.fill();break;
+   case 'grava':g.fillStyle='#9aa1ab';for(let i=0;i<4;i++){g.beginPath();g.arc(sx+T*(.25+hash(x,y,20+i)*.5),sy+T*(.3+hash(x,y,30+i)*.45),T*.05,0,7);g.fill()}break;
+   case 'acantilado':g.fillStyle='#6b7079';g.fillRect(sx,sy,T+1,T+1);g.fillStyle='#868b95';g.beginPath();g.moveTo(sx,sy+T);g.lineTo(sx+T*.35,sy+T*.2);g.lineTo(sx+T*.7,sy+T);g.fill();g.fillStyle='#5a5e66';g.beginPath();g.moveTo(sx+T*.45,sy+T);g.lineTo(sx+T*.75,sy+T*.4);g.lineTo(sx+T,sy+T);g.fill();break;
+   case 'flores':['#ff6fa1','#fff36b','#ffffff','#b28cff'].forEach((cl,i)=>{g.fillStyle=cl;g.beginPath();g.arc(sx+T*(.2+hash(x,y,40+i)*.6),sy+T*(.2+hash(x,y,50+i)*.6),T*.07,0,7);g.fill()});break;
+   case 'arbusto':case 'arbusto_v':g.fillStyle='#3e9440';g.beginPath();g.arc(c-T*.12,m+T*.05,T*.22,0,7);g.arc(c+T*.14,m+T*.08,T*.2,0,7);g.arc(c,m-T*.1,T*.22,0,7);g.fill();
+     if(t==='arbusto'){g.fillStyle='#e8344a';[[-.15,0],[.12,-.08],[.05,.15],[-.02,-.2]].forEach(([a,b])=>{g.beginPath();g.arc(c+a*T,m+b*T,T*.055,0,7);g.fill()})}break;
+   case 'camino':g.fillStyle='#d2b07a';g.fillRect(sx,sy,T+1,T+1);g.fillStyle='#bd9a62';g.beginPath();g.arc(sx+T*h,sy+T*hash(x,y,11),T*.06,0,7);g.fill();break;
+   case 'valla':g.fillStyle='#a8692f';g.fillRect(sx+T*.12,sy+T*.3,T*.1,T*.55);g.fillRect(sx+T*.78,sy+T*.3,T*.1,T*.55);g.fillRect(sx,sy+T*.42,T,T*.08);g.fillRect(sx,sy+T*.65,T,T*.08);break;
+   case 'banco':g.fillStyle='#8a5a2e';g.fillRect(sx+T*.15,sy+T*.6,T*.08,T*.25);g.fillRect(sx+T*.77,sy+T*.6,T*.08,T*.25);g.fillStyle='#b97a3d';g.fillRect(sx+T*.08,sy+T*.5,T*.84,T*.12);g.fillRect(sx+T*.08,sy+T*.3,T*.84,T*.1);break;
+   case 'casa':g.fillStyle='rgba(0,0,0,.2)';g.fillRect(sx+T*.12,sy+T*.85,T*.8,T*.08);g.fillStyle='#f1e3c6';g.fillRect(sx+T*.14,sy+T*.42,T*.72,T*.46);
+     g.fillStyle='#c0392b';g.beginPath();g.moveTo(sx+T*.04,sy+T*.46);g.lineTo(c,sy+T*.06);g.lineTo(sx+T*.96,sy+T*.46);g.fill();
+     g.fillStyle='#7a4a24';g.fillRect(c-T*.08,sy+T*.6,T*.16,T*.28);g.fillStyle=nightAmt()>.15?'#ffd75e':'#9fd3f0';g.fillRect(sx+T*.22,sy+T*.52,T*.14,T*.12);g.fillRect(sx+T*.64,sy+T*.52,T*.14,T*.12);break;
+   case 'huerto':{g.fillStyle='#7a5230';rr(sx+T*.06,sy+T*.1,T*.88,T*.8,4);g.fill();const m2=S.mods[key(x,y)];const ready=m2&&m2.ready<=now();
+     for(let i=0;i<3;i++){g.fillStyle='#5e3e22';g.fillRect(sx+T*.12,sy+T*(.22+i*.25),T*.76,T*.05);g.fillStyle='#4caf50';for(let j=0;j<3;j++){g.beginPath();g.arc(sx+T*(.25+j*.25),sy+T*(.2+i*.25),T*.06,0,7);g.fill();if(ready){g.fillStyle='#e8344a';g.beginPath();g.arc(sx+T*(.27+j*.25),sy+T*(.24+i*.25),T*.045,0,7);g.fill();g.fillStyle='#4caf50'}}}break}
+   case 'puente':g.fillStyle='#a8692f';g.fillRect(sx,sy+T*.08,T+1,T*.84);g.fillStyle='#8a5424';for(let i=1;i<4;i++)g.fillRect(sx,sy+T*(.08+i*.21),T+1,2);g.fillStyle='#6d401a';g.fillRect(sx,sy+T*.04,T+1,T*.06);g.fillRect(sx,sy+T*.9,T+1,T*.06);break;
+   case 'farol':g.fillStyle='#2b2b33';g.fillRect(c-T*.04,sy+T*.3,T*.08,T*.6);g.fillStyle='#ffcf4a';g.beginPath();g.arc(c,sy+T*.25,T*.13,0,7);g.fill();g.strokeStyle='#2b2b33';g.lineWidth=2;g.stroke();break;
+   case 'muro':g.fillStyle='#8d939c';g.fillRect(sx,sy+T*.2,T+1,T*.7);g.strokeStyle='#6b7079';g.lineWidth=1.5;for(let i=0;i<3;i++){g.beginPath();g.moveTo(sx,sy+T*(.2+i*.233));g.lineTo(sx+T,sy+T*(.2+i*.233));g.stroke()}break;
+   case 'jardin':g.fillStyle='#7a5230';rr(sx+T*.1,sy+T*.45,T*.8,T*.4,4);g.fill();['#ff6fa1','#fff36b','#b28cff'].forEach((cl,i)=>{g.fillStyle='#3e9440';g.fillRect(sx+T*(.24+i*.24),sy+T*.3,2,T*.2);g.fillStyle=cl;g.beginPath();g.arc(sx+T*(.25+i*.24),sy+T*.28,T*.1,0,7);g.fill()});break;
+   case 'tablon':g.fillStyle='#7a4a24';g.fillRect(sx+T*.2,sy+T*.5,T*.08,T*.4);g.fillRect(sx+T*.72,sy+T*.5,T*.08,T*.4);g.fillStyle='#b97a3d';g.fillRect(sx+T*.1,sy+T*.15,T*.8,T*.45);g.fillStyle='#fff8e1';g.fillRect(sx+T*.2,sy+T*.22,T*.22,T*.28);g.fillRect(sx+T*.52,sy+T*.25,T*.26,T*.22);break;
+   case 'faro':{g.fillStyle='#f4f4f4';g.beginPath();g.moveTo(sx+T*.2,sy+T*.95);g.lineTo(sx+T*.32,sy-T*.9);g.lineTo(sx+T*.68,sy-T*.9);g.lineTo(sx+T*.8,sy+T*.95);g.fill();
+     g.fillStyle='#d9473b';g.fillRect(sx+T*.25,sy+T*.35,T*.5,T*.2);g.fillRect(sx+T*.29,sy-T*.35,T*.42,T*.2);g.fillStyle='#333';g.fillRect(sx+T*.26,sy-T*1.15,T*.48,T*.27);
+     g.fillStyle=S.flags.faroLit?'#ffe066':'#5a6470';g.fillRect(sx+T*.32,sy-T*1.1,T*.36,T*.18);g.fillStyle='#d9473b';g.beginPath();g.moveTo(sx+T*.22,sy-T*1.15);g.lineTo(c,sy-T*1.45);g.lineTo(sx+T*.78,sy-T*1.15);g.fill();break}
+  }
+}
+function drawBubble(sx,sy,ch,col){g.fillStyle=col;rr(sx+T*.3,sy-T*.55,T*.4,T*.42,8);g.fill();g.fillStyle='#1d2b3a';g.font=`800 ${T*.32}px ${getComputedStyle(document.body).fontFamily}`;g.textAlign='center';g.textBaseline='middle';g.fillText(ch,sx+T*.5,sy-T*.33)}
+function nightAmt(){const b=.5+.5*Math.cos(S.time*Math.PI*2);return clamp((.38-b)*1.7,0,.62)}
+let last=performance.now(),acc=0,miniT=0,saveT=0,regrowT=0;
+function frame(tm){const dt=Math.min(.05,(tm-last)/1000);last=tm;
+  if(S){
+    // movimiento
+    if(P.moving){P.t+=dt/0.13;if(P.t>=1){P.t=1;P.moving=false}}
+    if(!P.moving&&mode!=='dialog'&&mode!=='menu'&&mode!=='fish'&&held.length)tryMove(held[held.length-1]);
+    const k=P.moving?P.t:1;P.px=P.fromX+(S.x-P.fromX)*k;P.py=P.fromY+(S.y-P.fromY)*k;if(!P.moving){P.px=S.x;P.py=S.y}
+    S.time=(S.time+dt/300)%1;
+    // cámara
+    let cx=P.px*T+T/2-VW/2,cy=P.py*T+T/2-VH/2;cx=clamp(cx,-T*2,W*T-VW+T*2);cy=clamp(cy,-T*2,H*T-VH+T*2);
+    g.fillStyle='#2f74b5';g.fillRect(0,0,VW,VH);
+    const x0=Math.floor(cx/T)-1,y0=Math.floor(cy/T)-1,x1=x0+Math.ceil(VW/T)+3,y1=y0+Math.ceil(VH/T)+3;
+    for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const sx=Math.round(x*T-cx),sy=Math.round(y*T-cy);if(x<0||y<0||x>=W||y>=H){drawGround('agua',x,y,sx,sy,tm);continue}if(tile(x,y)!=='faro')drawTile(x,y,sx,sy,tm);else drawGround(groundOf(x,y),x,y,sx,sy,tm)}
+    // objetivo
+    const f=facing();const fsx=f.x*T-cx,fsy=f.y*T-cy;
+    g.save();g.setLineDash([5,4]);g.lineWidth=2.5;g.strokeStyle=mode==='build'?'#ffcf4a':'rgba(255,255,255,.55)';rr(fsx+2,fsy+2,T-4,T-4,6);g.stroke();g.restore();
+    if(mode==='build'){g.globalAlpha=.6;g.font=`${T*.6}px sans-serif`;g.textAlign='center';g.textBaseline='middle';g.fillText(BUILD[sel].e,fsx+T/2,fsy+T/2);g.globalAlpha=1}
+    // npcs y jugador ordenados por y
+    const ents=activeNpcs().map(id=>({id,...npcPos(id)}));ents.push({id:'yo',x:P.px,y:P.py});
+    const faro=SPOT.faro;ents.push({id:'faro',x:faro.x,y:faro.y});
+    ents.sort((a,b)=>a.y-b.y);
+    const q=!isFree()&&Q();
+    for(const e of ents){const sx=e.x*T-cx,sy=e.y*T-cy;
+      if(e.id==='faro'){drawTile(e.x,e.y,Math.round(sx),Math.round(sy),tm);continue}
+      const bob=e.id==='yo'&&P.moving?Math.sin(P.t*Math.PI)*-T*.08:Math.sin(tm/400+e.x)*T*.02;
+      g.fillStyle='rgba(0,0,0,.22)';g.beginPath();g.ellipse(sx+T/2,sy+T*.86,T*.3,T*.1,0,0,7);g.fill();
+      g.font=`${T*.78}px sans-serif`;g.textAlign='center';g.textBaseline='middle';
+      g.fillText(e.id==='yo'?S.avatar:NPCS[e.id].e,sx+T/2,sy+T*.48+bob);
+      if(q&&e.id===q.giver){if(S.q.state==='accept')drawBubble(sx,sy,'!','#ffcf4a');else if(progress(q).ok&&!q.auto)drawBubble(sx,sy,'?','#62d48a')}
+      if(q&&q.id==='michi'&&e.id==='michi'&&!S.flags.michi&&S.q.state==='active')drawBubble(sx,sy,'!','#ff8a7a');
+    }
+    // noche
+    const na=nightAmt();
+    if(na>0){if(dark.width!==cv.width||dark.height!==cv.height){dark.width=cv.width;dark.height=cv.height}
+      dg.setTransform(DPR,0,0,DPR,0,0);dg.globalCompositeOperation='source-over';dg.clearRect(0,0,VW,VH);dg.fillStyle=`rgba(8,16,48,${na})`;dg.fillRect(0,0,VW,VH);
+      dg.globalCompositeOperation='destination-out';
+      const light=(x,y,r,a=1)=>{const gr=dg.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,`rgba(0,0,0,${a})`);gr.addColorStop(1,'rgba(0,0,0,0)');dg.fillStyle=gr;dg.beginPath();dg.arc(x,y,r,0,7);dg.fill()};
+      light(P.px*T+T/2-cx,P.py*T+T/2-cy,T*2.4,.8);
+      for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(x<0||y<0||x>=W||y>=H)continue;const t=tile(x,y);
+        if(t==='farol')light(x*T+T/2-cx,y*T+T*.25-cy,T*3.4);else if(t==='casa')light(x*T+T/2-cx,y*T+T*.6-cy,T*1.3,.7)}
+      if(S.flags.faroLit){light(faro.x*T+T/2-cx,faro.y*T-T-cy,T*9);const a=tm/1200;dg.beginPath();dg.moveTo(faro.x*T+T/2-cx,faro.y*T-T-cy);dg.arc(faro.x*T+T/2-cx,faro.y*T-T-cy,T*16,a,a+.35);dg.fillStyle='rgba(0,0,0,.6)';dg.fill()}
+      g.drawImage(dark,0,0,VW,VH);
+    }
+    // temporizadores
+    miniT+=dt;saveT+=dt;regrowT+=dt;
+    if(miniT>.5){miniT=0;renderMini();$('#clock').textContent=(na>.15?'🌙 Noche':'☀️ Día')+' · '+(isFree()?'Modo libre':S.name)}
+    if(regrowT>1){regrowT=0;const n=now();let ch=false;for(const[k,m]of Object.entries(S.mods)){if(m.until&&m.until<=n){const[x,y]=k.split(',').map(Number);
+      if((x===S.x&&y===S.y)||npcAt(x,y))continue;setTile(x,y,m.back);ch=true}}if(ch)saveGame()}
+    if(saveT>5){saveT=0;saveGame()}
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------------- entrada ---------------- */
+const KEYMAP={ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r',w:'u',s:'d',a:'l',d:'r'};
+addEventListener('keydown',e=>{if(!S)return;if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;const k=e.key.length===1?e.key.toLowerCase():e.key;
+  if(mode==='fish'){if(k===' '||k==='Enter'||k==='e'){e.preventDefault();FISH_PULL&&FISH_PULL()}if(k==='Escape')$('#nofish')&&$('#nofish').click();return}
+  if(mode==='dialog'){const bs=$$('#dialog .opts button');if(k===' '||k==='Enter'){e.preventDefault();if(bs.length===1)bs[0].click()}const n=+k;if(n>=1&&n<=bs.length)bs[n-1].click();return}
+  if(mode==='menu'){if(k==='Escape')closeMenu();return}
+  const d=KEYMAP[k];if(d){e.preventDefault();if(!held.includes(d))held.push(d);if(!P.moving)tryMove(d);return}
+  if(k===' '||k==='e'||k==='Enter'){e.preventDefault();act()}
+  else if(k==='b')toggleBuild();
+  else if(k==='m')questLog();
+  else if(k==='Escape'){if(mode==='build')toggleBuild(false);else openMenu()}
+  else if(mode==='build'){const n=+k;const rs=recipes();if(n>=1&&n<=9&&rs[n-1]){sel=rs[n-1];renderBuild()}}
+});
+addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;const d=KEYMAP[k];if(d)held=held.filter(x=>x!==d)});
+addEventListener('blur',()=>held=[]);
+$$('#pad button').forEach(b=>{const d=b.dataset.d;
+  b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(!held.includes(d))held.push(d);if(!P.moving&&mode!=='dialog'&&mode!=='menu')tryMove(d)});
+  const up=()=>held=held.filter(x=>x!==d);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up)});
+$('#bAct').onclick=act;$('#bBuild').onclick=()=>toggleBuild();$('#bQuest').onclick=()=>questLog();$('#bMenu').onclick=()=>openMenu();
+// tocar el mapa: girarse hacia esa casilla y actuar si es adyacente
+cv.addEventListener('pointerdown',e=>{if(!S||mode==='dialog'||mode==='menu'||mode==='fish')return;
+  let cx=P.px*T+T/2-VW/2,cy=P.py*T+T/2-VH/2;cx=clamp(cx,-T*2,W*T-VW+T*2);cy=clamp(cy,-T*2,H*T-VH+T*2);
+  const x=Math.floor((e.clientX+cx)/T),y=Math.floor((e.clientY+cy)/T);const dx=x-S.x,dy=y-S.y;
+  if(Math.abs(dx)+Math.abs(dy)===1){const d=dx===1?'r':dx===-1?'l':dy===1?'d':'u';if(S.dir===d)act();else S.dir=d}
+  else if(dx||dy){tryMove(Math.abs(dx)>Math.abs(dy)?(dx>0?'r':'l'):(dy>0?'d':'u'))}});
+
+/* ---------------- menús ---------------- */
+function questLog(){if(mode==='dialog'||mode==='fish')return;if(isFree())return toast('En modo libre no hay misiones. ¡Crea tu propia isla!');
+  mode='menu';$('#ov').innerHTML=`<div class="overlay" id="ql"><div class="card"><h2>📜 Diario de misiones</h2><div class="ql">${QUESTS.map((q,i)=>{const done=i<S.q.i,cur=i===S.q.i;
+    return `<div class="qi ${done?'done':''} ${cur?'cur':''}"><b>${done?'✅':cur?'➡️':'🔒'} ${i+1}. ${i<=S.q.i?q.t:'???'}</b><br><span class="sub">${done?'Completada':cur?(S.q.state==='accept'?'Habla con '+NPCS[q.giver].n:q.obj):'Aún no disponible'}</span></div>`}).join('')}</div>
+    <p class="sub">Encargos del tablón: ${S.counts.encargos} · Pasos: ${S.counts.steps} · Peces: ${S.counts.fish}</p><button class="btn go" id="cl">Cerrar</button></div></div>`;
+  $('#cl').onclick=closeMenu;$('#cl').focus()}
+function openMenu(){if(mode==='dialog'||mode==='fish')return;if(mode==='build')toggleBuild(false);mode='menu';saveGame();
+  $('#ov').innerHTML=`<div class="overlay"><div class="card"><h2>☰ Menú</h2><p class="sub">La partida se guarda sola en este navegador.</p>
+   <div class="row"><button class="btn go" id="mResume">Seguir jugando</button><button class="btn alt" id="mSound">${SOUND?'🔊 Sonido sí':'🔇 Sonido no'}</button><button class="btn alt" id="mTitle">Pantalla de inicio</button></div>
+   <h2 style="font-size:1.15rem">Copia de seguridad</h2><p class="sub">Si el ordenador del cole borra los datos, copia este código y pégalo otro día en la pantalla de inicio.</p>
+   <div class="field"><textarea id="mCode" rows="3" readonly aria-label="Código de partida"></textarea></div><div class="row"><button class="btn" id="mCopy">📋 Copiar código</button></div>
+   <h2 style="font-size:1.15rem">Controles</h2><p class="sub">Teclado: WASD o flechas para moverte, Espacio para actuar (cortar, picar, hablar, pescar), B para construir y elegir con 1-9, M para misiones.<br>Pantalla táctil: cruceta, botón ✋ y toca la casilla de al lado para girarte o actuar.</p></div></div>`;
+  $('#mCode').value=exportCode();
+  $('#mResume').onclick=closeMenu;$('#mTitle').onclick=()=>{saveGame();closeMenu();title()};
+  $('#mSound').onclick=()=>{SOUND=!SOUND;try{localStorage.setItem('isla-sound',SOUND?'1':'0')}catch(e){}openMenu()};
+  $('#mCopy').onclick=()=>{const t=$('#mCode');navigator.clipboard.writeText(t.value).then(()=>toast('Código copiado'),()=>{t.select();toast('Selecciona y copia el texto')})};
+}
+function closeMenu(){$('#ov').innerHTML='';mode='play'}
+function exportCode(){S.explored=packExplored();return btoa(unescape(encodeURIComponent(JSON.stringify(S))))}
+
+/* ---------------- pantalla de inicio ---------------- */
+const AVS=['🧒','👧','🧑','👦','🧑‍🦱','👩‍🦰','🧑‍🚀','🥷','🦊','🐸'];
+function setHud(on){['#quest','#inv','#controls','#keys','#pad'].forEach(s=>$(s).hidden=!on);if(!on){$('#buildbar').hidden=true;$('#dialog').hidden=true}}
+function title(){S=null;setHud(false);mode='menu';const h=loadSlot('historia'),l=loadSlot('libre');
+  const meta=d=>d?`${d.avatar} ${esc(d.name)} · ${d.mode==='historia'?(d.q.i>=QUESTS.length?'historia completada':'misión '+(d.q.i+1)+' de '+QUESTS.length):'modo creativo'} · 🪙 ${d.coins}`:'Sin partida guardada';
+  $('#ov').innerHTML=`<div class="overlay" style="background:linear-gradient(#0b1622cc,#0b1622ee)"><div class="card" style="width:min(560px,100%)">
+   <h1 class="title">Isla <em>Recreo</em></h1>
+   <p class="sub">Naufragas en una isla tras una tormenta. Explora, corta árboles, pica piedra, pesca, construye el pueblo y cumple las misiones de sus habitantes hasta volver a encender el faro.</p>
+   <div class="slotcard"><div><b>📖 Historia</b><div class="meta">${meta(h)}</div></div><div class="row">${h?'<button class="btn go" id="cH">Continuar</button>':''}<button class="btn ${h?'alt':'go'}" id="nH">Nueva</button></div></div>
+   <div class="slotcard"><div><b>🏗️ Modo libre</b><div class="meta">${l?meta(l):'Material infinito, sin misiones: construye y pinta la isla a tu gusto.'}</div></div><div class="row">${l?'<button class="btn go" id="cL">Continuar</button>':''}<button class="btn ${l?'alt':'go'}" id="nL">Nueva</button></div></div>
+   <details><summary class="sub" style="cursor:pointer">Recuperar partida con código</summary><div class="field" style="margin-top:8px"><textarea id="imp" rows="3" placeholder="Pega aquí tu código" aria-label="Código"></textarea></div><button class="btn" id="impB" style="margin-top:8px">Recuperar</button></details>
+  </div></div>`;
+  if(h)$('#cH').onclick=()=>start(h);if(l)$('#cL').onclick=()=>start(l);
+  $('#nH').onclick=()=>newGame('historia',!!h);$('#nL').onclick=()=>newGame('libre',!!l);
+  $('#impB').onclick=()=>{try{const d=JSON.parse(decodeURIComponent(escape(atob($('#imp').value.trim()))));if(!d||!d.v||!KEYS[d.mode])throw 0;S=d;saveGame();start(d);toast('Partida recuperada')}catch(e){toast('Ese código no es válido. Revisa que esté completo.')}};
+}
+function newGame(m,overwrite){let av=AVS[0];
+  $('#ov').innerHTML=`<div class="overlay"><form class="card" id="nf"><h2>${m==='historia'?'📖 Nueva historia':'🏗️ Nuevo modo libre'}</h2>
+   ${overwrite?'<p class="sub" style="color:var(--bad)">Ya tienes una partida aquí. Si creas otra, se reemplazará.</p>':''}
+   <div class="field"><label for="nm">Tu nombre</label><input id="nm" maxlength="14" required autocomplete="off" placeholder="Ej.: Alex"></div>
+   <div class="field"><span>Personaje</span><div class="avs">${AVS.map(a=>`<button type="button" data-a="${a}" aria-pressed="${a===av}">${a}</button>`).join('')}</div></div>
+   <div class="row"><button class="btn go" type="submit">¡A la isla!</button><button class="btn alt" type="button" id="bk">Volver</button></div></form></div>`;
+  $$('.avs button').forEach(b=>b.onclick=()=>{av=b.dataset.a;$$('.avs button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  $('#bk').onclick=title;$('#nm').focus();
+  $('#nf').onsubmit=e=>{e.preventDefault();const n=$('#nm').value.trim();if(!n)return;const d=blank(m,n,av);if(m==='libre'){d.time=.1}start(d,true)};
+}
+function start(d,isNew){S=d;unpackExplored(S.explored);$('#ov').innerHTML='';mode='play';held=[];
+  P.fromX=S.x;P.fromY=S.y;P.moving=false;P.t=1;reveal();setHud(true);renderInv();renderQuest();renderMini();saveGame();
+  if(isNew&&S.mode==='historia'){const m=NPCS.marisa;chain([
+    ['Narrador','🌊',`La tormenta zarandeó tu barca toda la noche. Al amanecer, ${esc(S.name)}, despiertas en una playa desconocida.`],
+    ['Narrador','🏝️','A lo lejos ves un pueblecito con los tejados arrancados. Una señora te hace señas desde la plaza. El ❗ amarillo marca a quien tiene una misión para ti.']])}
+  else if(isNew)toast('Modo libre: pulsa B (o 🔨) para construir y pintar el terreno',3500);
+}
+addEventListener('beforeunload',saveGame);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame()});
+title();requestAnimationFrame(frame);
+</script>
+</body>
+</html>

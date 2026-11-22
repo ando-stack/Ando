@@ -2,7 +2,10 @@
 
 Web de minijuegos para clase. Es un único archivo (`index.html`): ábrelo con doble clic o súbelo a cualquier hosting estático (GitHub Pages, Netlify…). No necesita servidor ni instalación.
 
-## Modos
+## Isla Recreo (`isla.html`)
+Juego de aventura: te mueves por un mapa, cortas árboles, picas piedra, pescas, construyes (casas, caminos, puentes, huertos, faroles…) y cumples 9 misiones con historia hasta encender el faro. Tiene ciclo de día y noche, minimapa, tablón de encargos y modo libre creativo. Se guarda solo y tiene código de copia de seguridad.
+
+## Modos del arcade
 - **Modo Historia**: 8 capítulos («La biblioteca del aula 404»). Cada uno es un juego con objetivo; ganas de 1 a 3 estrellas y el final cambia según las estrellas.
 - **Modo Libre**: los 8 juegos desbloqueados, en fácil, normal o difícil, con récords.
 - **Reto del día**: un juego distinto cada día con premio de monedas.
