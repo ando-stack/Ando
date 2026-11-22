@@ -185,6 +185,9 @@ dialog::backdrop{background:rgba(10,8,5,.55)}
 .faces img{width:var(--fs,40px);height:var(--fs,40px);border-radius:50%;object-fit:cover;border:2px solid var(--tc,var(--line));background:var(--chip)}
 .faces img + img{margin-left:calc(var(--fs,40px) * -0.3)}
 .coachcard{display:flex;gap:10px;align-items:center}
+.face{width:var(--fs,32px);height:var(--fs,32px);border-radius:50%;object-fit:cover;border:2px solid var(--tc,var(--line));background:var(--chip);flex:none;vertical-align:middle}
+.withface{display:flex;gap:7px;align-items:center;min-width:0}
+.mhead .face{border-width:3px}
 .loading{padding:60px 0;text-align:center;color:var(--muted)}
 @media (max-width:560px){h2{font-size:25px}.brand b{font-size:23px}.meter .num{font-size:17px}.meters{gap:12px;margin-left:0}.card .nm{font-size:12px}.card{padding:6px}.card .jersey{font-size:17px}}
 @media (prefers-reduced-motion:no-preference){.card{transition:transform .12s ease}.card:hover{transform:translateY(-2px)}}
@@ -230,6 +233,7 @@ const pname = p => /^[A-ZÁÉÍÓÚÑ]\.( ?[A-ZÁÉÍÓÚÑ]\.)*$/.test(p.n.trim
 const short = p => { const n = pname(p); if (/\./.test(n)) return n; const w = n.split(' '); return w.length > 2 ? w[0] + ' ' + w[1] : n; };
 const tc = tid => TEAM_COLORS[Object.keys(T).indexOf(tid) % TEAM_COLORS.length];
 const faces = (t, size=40) => { const imgs = (t.cph_img||[]).map((src,i)=>src?`<img src="${src}" alt="${esc(title((t.coaches||[])[i]||''))}" loading="lazy">`:'').join(''); return imgs ? `<span class="faces" style="--fs:${size}px;--tc:${tc(t.id)}">${imgs}</span>` : ''; };
+const face = (p, size=32) => p.img ? `<img class="face" src="${p.img}" alt="" loading="lazy" style="--fs:${size}px;--tc:${tc(p.t)}">` : '';
 const chip = tid => `<span class="chip" style="--tc:${tc(tid)}"><span class="dot"></span>${esc(T[tid].s)}</span>`;
 const trend = arr => { if (arr.length < 2) return 0; return Math.round((arr[arr.length-1] - arr[arr.length-2])*10)/10; };
 const trendHtml = arr => { const t = trend(arr); return t > 0 ? `<span class="up">▲ ${fmt(t)}</span>` : t < 0 ? `<span class="down">▼ ${fmt(-t)}</span>` : `<span class="flat">=</span>`; };
@@ -336,7 +340,7 @@ function playerCard(id, slot){
   return `<button class="card" style="--tc:${tc(p.t)}" data-act="slot" data-id="${p.id}">
     ${state.captain===id?'<span class="cap" title="Capitán">C</span>':''}
     <span class="jersey">${esc(p.d||'')}</span>
-    <div class="nm">${esc(short(p))}</div>
+    <div class="withface">${face(p,34)}<div class="nm">${esc(short(p))}</div></div>
     <div class="meta">${chip(p.t)}<span class="num price">${fmt(p.p)}</span></div>
     <div class="meta note"><span>Media</span><span class="num">${fmt(p.avg)}</span></div>
   </button>`;
@@ -451,7 +455,7 @@ function viewMarket(){
       ${head('n','Jugador','l')}<th class="l">Equipo</th>${head('gp','PJ')}${head('min','Min')}${head('pts','Pts')}<th>T2</th>${head('t3','T3')}<th>TL</th>${head('fc','Faltas')}${head('avg','Media fantasy')}${head('p','Precio')}${head('tr','Tendencia')}<th></th></tr></thead><tbody>
       ${shown.map(p=>{ const gp = p.gp||1, o = owned.has(p.id), err = o ? '' : canAdd(state,p.id);
         return `<tr class="${o?'owned':''}">
-        <td class="l"><button class="pname" data-act="open" data-id="${p.id}">${esc(pname(p))}</button></td>
+        <td class="l"><span class="withface">${face(p,30)}<button class="pname" data-act="open" data-id="${p.id}">${esc(pname(p))}</button></span></td>
         <td class="l">${chip(p.t)}</td>
         <td class="num">${p.gp}</td><td class="num">${p.gp?fmt(p.tot.min/gp):'—'}</td><td class="num"><b>${p.gp?fmt(p.tot.pts/gp):'—'}</b></td>
         <td class="num">${p.gp?`${fmt(p.tot.t2m/gp)}/${fmt(p.tot.t2a/gp)}`:'—'}</td><td class="num">${p.gp?`${fmt(p.tot.t3m/gp)}/${fmt(p.tot.t3a/gp)}`:'—'}</td><td class="num">${p.gp?`${fmt(p.tot.ftm/gp)}/${fmt(p.tot.fta/gp)}`:'—'}</td><td class="num">${p.gp?fmt(p.tot.fc/gp):'—'}</td>
@@ -488,11 +492,11 @@ function viewRounds(){
     const bestCoach = Object.values(T).sort((a,b)=>(b.cf[j]??-99)-(a.cf[j]??-99))[0];
     const mine = roundScore(state, j);
     right = `<div class="panel"><div class="eyebrow">Quinteto ideal</div><h3 style="margin:4px 0 8px">Jornada ${j}</h3>
-      <ol class="ideal">${best.map(({p,fp})=>`<li><span><button class="pname" data-act="open" data-id="${p.id}">${esc(pname(p))}</button> ${chip(p.t)}</span><b class="num">${fmt(fp)}</b></li>`).join('')}
+      <ol class="ideal">${best.map(({p,fp})=>`<li><span>${face(p,26)} <button class="pname" data-act="open" data-id="${p.id}">${esc(pname(p))}</button> ${chip(p.t)}</span><b class="num">${fmt(fp)}</b></li>`).join('')}
       <li><span>${faces(bestCoach,28)}Entrenador: <b>${esc(title(bestCoach.coach))}</b> ${chip(bestCoach.id)}</span><b class="num">${fmt(bestCoach.cf[j])}</b></li></ol></div>
       <div class="panel"><div class="label-row"><div><div class="eyebrow">${esc(state.name)}</div><h3 style="margin-top:4px">Tus puntos J${j}</h3></div><div class="big num">${fmt(mine.total)}</div></div>
       ${mine.rows.length ? `<table class="breakdown"><thead><tr><th class="l">Jugador</th><th class="l">Rol</th><th>Acta</th><th>Puntos</th></tr></thead><tbody>
-        ${mine.rows.map(r=>`<tr><td class="l">${esc(short(P[r.id]))}</td><td class="l note">${r.role}</td><td class="num">${fmt(r.base)}</td><td class="num"><b>${fmt(r.pts)}</b></td></tr>`).join('')}
+        ${mine.rows.map(r=>`<tr><td class="l">${face(P[r.id],24)} ${esc(short(P[r.id]))}</td><td class="l note">${r.role}</td><td class="num">${fmt(r.base)}</td><td class="num"><b>${fmt(r.pts)}</b></td></tr>`).join('')}
         ${state.coach?`<tr><td class="l">${esc(title(T[state.coach].coach))}</td><td class="l note">Entrenador</td><td class="num">${fmt(mine.coach)}</td><td class="num"><b>${fmt(mine.coach)}</b></td></tr>`:''}
       </tbody></table>` : '<p class="note">Aún no tienes jugadores.</p>'}</div>`;
   } else {
@@ -565,14 +569,14 @@ function openPlayer(id){
   const p = P[id], gp = p.gp || 1, owned = squadIds(state).includes(id), starter = state.starters.includes(id);
   const err = owned ? '' : canAdd(state, id);
   const ph = p.ph; const w = 220, h = 54, mx = Math.max(...ph, 1), mn = Math.min(...ph, 0);
-  const pts = ph.map((v,i)=>[ph.length===1?w/2:i*(w-20)/(ph.length-1)+10, h-8-(v-mn)/(mx-mn||1)*(h-18)]);
+  const pts = ph.map((v,i)=>[ph.length===1?w/2:i*(w-20)/(ph.length-1)+10, h-8-(v-mn)/(mx-mn||1)*(h-26)]);
   const spark = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Evolución del precio">
     <line x1="10" y1="${h-8}" x2="${w-10}" y2="${h-8}" stroke="var(--line)"/>
     <polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="${pts.map(q=>q.join(',')).join(' ')}"/>
     ${pts.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="${i===pts.length-1?4.5:3}" fill="${i===pts.length-1?'var(--accent)':'var(--surface)'}" stroke="var(--accent)" stroke-width="2"/><text x="${q[0]}" y="${q[1]-8}" font-size="10" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${fmt(ph[i])}</text>`).join('')}
   </svg>`;
   const dlg = $('#dlg');
-  dlg.innerHTML = `<div class="mhead" style="--tc:${tc(p.t)}"><div class="jn">${esc(p.d||'·')}</div><div style="min-width:0"><div class="eyebrow" style="color:var(--navy-ink);opacity:.7">${esc(T[p.t].n)}</div><h2>${esc(pname(p))}</h2>${/^[0-9a-f-]{36}$/.test(p.id)?`<a href="https://competicionesfrb.owbasket.com/equipo/?id=${p.t}&player=${p.id}&season=2026" target="_blank" rel="noopener" style="color:var(--navy-ink);font-size:13px;opacity:.85">Ver ficha oficial en la federación ↗</a>`:''}</div><button class="close" data-act="close">Cerrar</button></div>
+  dlg.innerHTML = `<div class="mhead" style="--tc:${tc(p.t)}">${p.img?face(p,72):''}<div class="jn">${esc(p.d||'·')}</div><div style="min-width:0"><div class="eyebrow" style="color:var(--navy-ink);opacity:.7">${esc(T[p.t].n)}</div><h2>${esc(pname(p))}</h2>${/^[0-9a-f-]{36}$/.test(p.id)?`<a href="https://competicionesfrb.owbasket.com/equipo/?id=${p.t}&player=${p.id}&season=2026" target="_blank" rel="noopener" style="color:var(--navy-ink);font-size:13px;opacity:.85">Ver ficha oficial en la federación ↗</a>`:''}</div><button class="close" data-act="close">Cerrar</button></div>
   <div class="mbody">
     <div class="stats">
       <div class="stat"><small>Precio</small><b>${money(p.p)}</b></div>
@@ -598,7 +602,7 @@ function openPlayer(id){
 }
 function openBot(i){
   const s = autoTeam(1000+i*7919), dlg = $('#dlg');
-  const list = (ids, lbl) => ids.filter(Boolean).map(id=>`<tr><td class="l"><button class="pname" data-act="open" data-id="${id}">${esc(pname(P[id]))}</button>${s.captain===id?' <span class="chip">C</span>':''}</td><td class="l">${chip(P[id].t)}</td><td class="l note">${lbl}</td><td class="num">${money(P[id].p)}</td><td class="num">${fmt(P[id].avg)}</td></tr>`).join('');
+  const list = (ids, lbl) => ids.filter(Boolean).map(id=>`<tr><td class="l">${face(P[id],26)} <button class="pname" data-act="open" data-id="${id}">${esc(pname(P[id]))}</button>${s.captain===id?' <span class="chip">C</span>':''}</td><td class="l">${chip(P[id].t)}</td><td class="l note">${lbl}</td><td class="num">${money(P[id].p)}</td><td class="num">${fmt(P[id].avg)}</td></tr>`).join('');
   dlg.innerHTML = `<div class="mhead"><div style="min-width:0"><div class="eyebrow" style="color:var(--navy-ink);opacity:.7">Mánager rival</div><h2>${esc(BOT_NAMES[i])}</h2></div><button class="close" data-act="close">Cerrar</button></div>
   <div class="mbody"><div class="tablewrap"><table><thead><tr><th class="l">Jugador</th><th class="l">Equipo</th><th class="l">Rol</th><th>Precio</th><th>Media</th></tr></thead><tbody>
   ${list(s.starters,'Quinteto')}${list(s.bench,'Banquillo')}<tr><td class="l"><b>${esc(title(T[s.coach].coach))}</b></td><td class="l">${chip(s.coach)}</td><td class="l note">Entrenador</td><td class="num">${money(T[s.coach].cp)}</td><td></td></tr>

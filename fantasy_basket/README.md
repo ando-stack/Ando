@@ -20,4 +20,5 @@ cd fantasy_basket/scraper
 node crawl.js 629   # visita la competición, los 10 equipos y las actas nuevas
 python3 build.py    # une actas y plantillas -> dataset.json
 python3 price.py    # puntos fantasy y precios -> ../data.json
+python3 fotos.py    # fotos de jugadores y entrenadores (las que haya en la federación)
 ```
